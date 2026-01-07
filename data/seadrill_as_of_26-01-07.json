@@ -1,0 +1,140 @@
+[
+  {
+    "id": "west-capella",
+    "name": "West Capella",
+    "company": "Seadrill",
+    "generation": "6G",
+    "status": "Cold-Stacked",
+    "yearBuilt": 2008,
+    "contracts": []
+  },
+  {
+    "id": "west-carina",
+    "name": "West Carina",
+    "company": "Seadrill",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2015,
+    "contracts": [
+      { "id": "sdrl-car-1", "vesselId": "west-carina", "startDate": "2022-11-01", "endDate": "2026-01-31", "dayRate": 0, "client": "Petrobras", "region": "Brazil", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "sonangol-quenguela",
+    "name": "Sonangol Quenguela",
+    "company": "Seadrill",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2019,
+    "contracts": [
+      { "id": "sdrl-que-1", "vesselId": "sonangol-quenguela", "startDate": "2024-05-01", "endDate": "2026-04-30", "dayRate": 0, "client": "TotalEnergies", "region": "Angola", "status": "Firm" },
+      { "id": "sdrl-que-2", "vesselId": "sonangol-quenguela", "startDate": "2026-05-01", "endDate": "2027-02-28", "dayRate": 0, "client": "TotalEnergies", "region": "Angola", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "west-neptune",
+    "name": "West Neptune",
+    "company": "Seadrill",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      { "id": "sdrl-nep-1", "vesselId": "west-neptune", "startDate": "2025-05-01", "endDate": "2025-11-30", "dayRate": 477778, "client": "LLOG", "region": "US Gulf", "status": "Firm" },
+      { "id": "sdrl-nep-2", "vesselId": "west-neptune", "startDate": "2025-11-01", "endDate": "2026-05-31", "dayRate": 400000, "client": "LLOG", "region": "US Gulf", "status": "Firm" },
+      { "id": "sdrl-nep-3", "vesselId": "west-neptune", "startDate": "2026-06-01", "endDate": "2026-09-30", "dayRate": 400000, "client": "LLOG", "region": "US Gulf", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "west-vela",
+    "name": "West Vela",
+    "company": "Seadrill",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2013,
+    "contracts": [
+      { "id": "sdrl-vel-1", "vesselId": "west-vela", "startDate": "2025-11-01", "endDate": "2026-03-31", "dayRate": 233333, "client": "Talos", "region": "US Gulf", "status": "Firm" },
+      { "id": "sdrl-vel-2", "vesselId": "west-vela", "startDate": "2026-03-01", "endDate": "2026-05-31", "dayRate": 0, "client": "Walter Oil & Gas", "region": "US Gulf", "status": "Firm" },
+      { "id": "sdrl-vel-3", "vesselId": "west-vela", "startDate": "2026-06-01", "endDate": "2026-07-31", "dayRate": 866666, "client": "Talos", "region": "US Gulf", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "west-gemini",
+    "name": "West Gemini",
+    "company": "Seadrill",
+    "generation": "6G",
+    "status": "Active",
+    "yearBuilt": 2010,
+    "contracts": [
+      { "id": "sdrl-gem-1", "vesselId": "west-gemini", "startDate": "2026-01-01", "endDate": "2026-10-31", "dayRate": 0, "client": "Sonangol", "region": "Angola", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "west-saturn",
+    "name": "West Saturn",
+    "company": "Seadrill",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      { "id": "sdrl-sat-1", "vesselId": "west-saturn", "startDate": "2022-10-01", "endDate": "2026-10-31", "dayRate": 0, "client": "Equinor", "region": "Brazil", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "sonangol-libongos",
+    "name": "Sonangol Libongos",
+    "company": "Seadrill",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2019,
+    "contracts": [
+      { "id": "sdrl-lib-1", "vesselId": "sonangol-libongos", "startDate": "2020-12-01", "endDate": "2027-01-31", "dayRate": 0, "client": "Undisclosed", "region": "Angola", "status": "Firm" },
+      { "id": "sdrl-lib-2", "vesselId": "sonangol-libongos", "startDate": "2027-02-01", "endDate": "2030-01-31", "dayRate": 0, "client": "Undisclosed", "region": "Angola", "status": "Option" }
+    ]
+  },
+  {
+    "id": "west-auriga",
+    "name": "West Auriga",
+    "company": "Seadrill",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2013,
+    "contracts": [
+      { "id": "sdrl-auriga-1", "vesselId": "west-auriga", "startDate": "2024-12-01", "endDate": "2027-12-31", "dayRate": 526940, "client": "Petrobras", "region": "Brazil", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "west-polaris",
+    "name": "West Polaris",
+    "company": "Seadrill",
+    "generation": "6G",
+    "status": "Active",
+    "yearBuilt": 2008,
+    "contracts": [
+      { "id": "sdrl-pol-1", "vesselId": "west-polaris", "startDate": "2025-02-01", "endDate": "2028-01-31", "dayRate": 473059, "client": "Petrobras", "region": "Brazil", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "west-jupiter",
+    "name": "West Jupiter",
+    "company": "Seadrill",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      { "id": "sdrl-jup-1", "vesselId": "west-jupiter", "startDate": "2022-12-01", "endDate": "2025-12-31", "dayRate": 261600, "client": "Petrobras", "region": "Brazil", "status": "Firm" },
+      { "id": "sdrl-jup-2", "vesselId": "west-jupiter", "startDate": "2026-04-01", "endDate": "2029-04-30", "dayRate": 479452, "client": "Petrobras", "region": "Brazil", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "west-tellus",
+    "name": "West Tellus",
+    "company": "Seadrill",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2013,
+    "contracts": [
+      { "id": "sdrl-tel-1", "vesselId": "west-tellus", "startDate": "2023-01-01", "endDate": "2026-02-28", "dayRate": 246100, "client": "Petrobras", "region": "Brazil", "status": "Firm" },
+      { "id": "sdrl-tel-2", "vesselId": "west-tellus", "startDate": "2026-06-01", "endDate": "2029-06-30", "dayRate": 492237, "client": "Petrobras", "region": "Brazil", "status": "Firm" }
+    ]
+  }
+]

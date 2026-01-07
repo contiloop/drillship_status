@@ -1,0 +1,148 @@
+[
+  {
+    "id": "valaris-ds-18",
+    "name": "VALARIS DS-18",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2015,
+    "contracts": [
+      { "id": "valaris-ds-18-1", "vesselId": "valaris-ds-18", "startDate": "2022-08-01", "endDate": "2025-08-31", "dayRate": 0, "client": "Chevron / Occidental", "region": "USGOM", "status": "Firm" },
+      { "id": "valaris-ds-18-2", "vesselId": "valaris-ds-18", "startDate": "2026-11-01", "endDate": "2029-05-31", "dayRate": 0, "client": "Occidental", "region": "USGOM", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "valaris-ds-17",
+    "name": "VALARIS DS-17",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      { "id": "valaris-ds-17-1", "vesselId": "valaris-ds-17", "startDate": "2025-05-01", "endDate": "2025-12-31", "dayRate": 497000, "client": "Equinor", "region": "Brazil", "status": "Firm" },
+      { "id": "valaris-ds-17-2", "vesselId": "valaris-ds-17", "startDate": "2026-01-01", "endDate": "2028-01-31", "dayRate": 0, "client": "Equinor", "region": "Brazil", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "valaris-ds-16",
+    "name": "VALARIS DS-16",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      { "id": "valaris-ds-16-1", "vesselId": "valaris-ds-16", "startDate": "2024-06-01", "endDate": "2026-06-30", "dayRate": 0, "client": "Occidental", "region": "USGOM", "status": "Firm" },
+      { "id": "valaris-ds-16-2", "vesselId": "valaris-ds-16", "startDate": "2026-06-01", "endDate": "2028-12-31", "dayRate": 0, "client": "Occidental", "region": "USGOM", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "valaris-ds-15",
+    "name": "VALARIS DS-15",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Idle",
+    "yearBuilt": 2014,
+    "contracts": [
+      { "id": "valaris-ds-15-1", "vesselId": "valaris-ds-15", "startDate": "2024-12-01", "endDate": "2025-08-31", "dayRate": 400000, "client": "TotalEnergies", "region": "Brazil", "status": "Firm" },
+      { "id": "valaris-ds-15-2", "vesselId": "valaris-ds-15", "startDate": "2026-09-01", "endDate": "2027-05-31", "dayRate": 0, "client": "Undisclosed", "region": "West Africa", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "valaris-ds-12",
+    "name": "VALARIS DS-12",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Idle",
+    "yearBuilt": 2013,
+    "contracts": [
+      { "id": "valaris-ds-12-1", "vesselId": "valaris-ds-12", "startDate": "2026-05-01", "endDate": "2027-04-30", "dayRate": 0, "client": "bp", "region": "Egypt", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "valaris-ds-10",
+    "name": "VALARIS DS-10",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Idle",
+    "yearBuilt": 2017,
+    "contracts": [
+      { "id": "valaris-ds-10-1", "vesselId": "valaris-ds-10", "startDate": "2026-06-01", "endDate": "2028-06-30", "dayRate": 0, "client": "Undisclosed", "region": "West Africa", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "valaris-ds-9",
+    "name": "VALARIS DS-9",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2015,
+    "contracts": [
+      { "id": "valaris-ds-9-1", "vesselId": "valaris-ds-9", "startDate": "2022-07-01", "endDate": "2026-07-31", "dayRate": 0, "client": "ExxonMobil", "region": "Angola", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "valaris-ds-8",
+    "name": "VALARIS DS-8",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2015,
+    "contracts": [
+      {
+        "id": "valaris-ds-8-1",
+        "vesselId": "valaris-ds-8",
+        "startDate": "2023-12-01",
+        "endDate": "2026-12-31",
+        "dayRate": 428000,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm"
+      },
+      {
+        "id": "valaris-ds-8-2",
+        "vesselId": "valaris-ds-8",
+        "startDate": "2027-01-01",
+        "endDate": "2029-03-11",
+        "dayRate": 375000,
+        "client": "Shell",
+        "region": "Brazil",
+        "status": "Firm"
+      },
+      {
+        "id": "valaris-ds-8-3",
+        "vesselId": "valaris-ds-8",
+        "startDate": "2029-03-12",
+        "endDate": "2030-03-12",
+        "dayRate": 0,
+        "client": "Shell",
+        "region": "Brazil",
+        "status": "Option"
+      }
+    ]
+  },
+  {
+    "id": "valaris-ds-7",
+    "name": "VALARIS DS-7",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2013,
+    "contracts": [
+      { "id": "valaris-ds-7-1", "vesselId": "valaris-ds-7", "startDate": "2024-06-01", "endDate": "2026-10-31", "dayRate": 0, "client": "Azule Energy", "region": "Angola", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "valaris-ds-4",
+    "name": "VALARIS DS-4",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2010,
+    "contracts": [
+      { "id": "valaris-ds-4-1", "vesselId": "valaris-ds-4", "startDate": "2024-12-01", "endDate": "2027-11-30", "dayRate": 450000, "client": "Petrobras", "region": "Brazil", "status": "Firm" }
+    ]
+  },
+  { "id": "valaris-ds-14", "name": "VALARIS DS-14", "company": "Valaris", "generation": "7G", "status": "Cold-Stacked", "yearBuilt": 2023, "contracts": [] },
+  { "id": "valaris-ds-13", "name": "VALARIS DS-13", "company": "Valaris", "generation": "7G", "status": "Cold-Stacked", "yearBuilt": 2023, "contracts": [] },
+  { "id": "valaris-ds-11", "name": "VALARIS DS-11", "company": "Valaris", "generation": "7G", "status": "Cold-Stacked", "yearBuilt": 2013, "contracts": [] }
+]

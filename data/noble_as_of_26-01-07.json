@@ -1,0 +1,198 @@
+[
+  {
+    "id": "noble-faye-kozack",
+    "name": "Noble Faye Kozack",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2013,
+    "contracts": [
+      { "id": "noble-faye-kozack-1", "vesselId": "noble-faye-kozack", "startDate": "2024-07-01", "endDate": "2026-12-31", "dayRate": 0, "client": "Petrobras", "region": "Brazil", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "noble-stanley-lafosse",
+    "name": "Noble Stanley Lafosse",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      { "id": "noble-stanley-lafosse-1", "vesselId": "noble-stanley-lafosse", "startDate": "2025-02-01", "endDate": "2027-07-31", "dayRate": 0, "client": "Murphy", "region": "US Gulf", "status": "Firm" },
+      { "id": "noble-stanley-lafosse-2", "vesselId": "noble-stanley-lafosse", "startDate": "2027-08-01", "endDate": "2028-07-31", "dayRate": 0, "client": "Murphy", "region": "US Gulf", "status": "Option" }
+    ]
+  },
+  {
+    "id": "noble-valiant",
+    "name": "Noble Valiant",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      { "id": "noble-valiant-1", "vesselId": "noble-valiant", "startDate": "2026-10-01", "endDate": "2029-06-30", "dayRate": 0, "client": "TotalEnergies", "region": "Suriname", "status": "Firm" },
+      { "id": "noble-valiant-2", "vesselId": "noble-valiant", "startDate": "2029-07-01", "endDate": "2030-06-30", "dayRate": 0, "client": "TotalEnergies", "region": "Suriname", "status": "Option" }
+    ]
+  },
+  {
+    "id": "noble-venturer",
+    "name": "Noble Venturer",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      { "id": "noble-venturer-1", "vesselId": "noble-venturer", "startDate": "2025-11-01", "endDate": "2026-07-31", "dayRate": 475000, "client": "Tullow", "region": "Ghana", "status": "Firm" },
+      { "id": "noble-venturer-2", "vesselId": "noble-venturer", "startDate": "2026-08-01", "endDate": "2026-09-30", "dayRate": 450000, "client": "Amni", "region": "Ghana", "status": "Firm" },
+      { "id": "noble-venturer-3", "vesselId": "noble-venturer", "startDate": "2026-10-01", "endDate": "2027-09-30", "dayRate": 450000, "client": "Amni", "region": "Ghana", "status": "Option" },
+      { "id": "noble-venturer-4", "vesselId": "noble-venturer", "startDate": "2027-10-01", "endDate": "2031-06-30", "dayRate": 415000, "client": "Shell", "region": "US Gulf", "status": "Firm" },
+      { "id": "noble-venturer-5", "vesselId": "noble-venturer", "startDate": "2031-07-01", "endDate": "2035-06-30", "dayRate": 0, "client": "Shell", "region": "US Gulf", "status": "Option" }
+    ]
+  },
+  {
+    "id": "noble-viking",
+    "name": "Noble Viking",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      { "id": "noble-viking-1", "vesselId": "noble-viking", "startDate": "2025-06-01", "endDate": "2025-10-31", "dayRate": 499000, "client": "Prime", "region": "Philippines", "status": "Firm" },
+      { "id": "noble-viking-2", "vesselId": "noble-viking", "startDate": "2025-11-01", "endDate": "2025-11-30", "dayRate": 470000, "client": "Shell", "region": "Brunei", "status": "Firm" },
+      { "id": "noble-viking-3", "vesselId": "noble-viking", "startDate": "2025-12-01", "endDate": "2026-01-31", "dayRate": 727659, "client": "TotalEnergies", "region": "Papua New Guinea", "status": "Firm" },
+      { "id": "noble-viking-4", "vesselId": "noble-viking", "startDate": "2026-02-01", "endDate": "2026-05-31", "dayRate": 0, "client": "TotalEnergies", "region": "Papua New Guinea", "status": "Option" }
+    ]
+  },
+  {
+    "id": "noble-voyager",
+    "name": "Noble Voyager",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2015,
+    "contracts": [
+      { "id": "noble-voyager-1", "vesselId": "noble-voyager", "startDate": "2026-06-01", "endDate": "2030-03-31", "dayRate": 415000, "client": "Shell", "region": "US Gulf", "status": "Firm" },
+      { "id": "noble-voyager-2", "vesselId": "noble-voyager", "startDate": "2030-04-01", "endDate": "2034-03-31", "dayRate": 0, "client": "Shell", "region": "US Gulf", "status": "Option" }
+    ]
+  },
+  {
+    "id": "noble-tom-madden",
+    "name": "Noble Tom Madden",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      { "id": "noble-tom-madden-1", "vesselId": "noble-tom-madden", "startDate": "2019-12-01", "endDate": "2028-07-31", "dayRate": 450000, "client": "ExxonMobil", "region": "Guyana", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "noble-sam-croft",
+    "name": "Noble Sam Croft",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      { "id": "noble-sam-croft-1", "vesselId": "noble-sam-croft", "startDate": "2019-04-01", "endDate": "2028-07-31", "dayRate": 450000, "client": "ExxonMobil", "region": "Guyana", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "noble-don-taylor",
+    "name": "Noble Don Taylor",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2013,
+    "contracts": [
+      { "id": "noble-don-taylor-1", "vesselId": "noble-don-taylor", "startDate": "2019-11-01", "endDate": "2028-07-31", "dayRate": 450000, "client": "ExxonMobil", "region": "Guyana", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "noble-bob-douglas",
+    "name": "Noble Bob Douglas",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2013,
+    "contracts": [
+      { "id": "noble-bob-douglas-1", "vesselId": "noble-bob-douglas", "startDate": "2018-04-01", "endDate": "2028-07-31", "dayRate": 450000, "client": "ExxonMobil", "region": "Guyana", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "noble-blackhawk",
+    "name": "Noble BlackHawk",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      { "id": "noble-blackhawk-1", "vesselId": "noble-blackhawk", "startDate": "2024-11-01", "endDate": "2026-10-31", "dayRate": 479452, "client": "Occidental", "region": "US Gulf", "status": "Firm" },
+      { "id": "noble-blackhawk-2", "vesselId": "noble-blackhawk", "startDate": "2026-11-01", "endDate": "2029-10-31", "dayRate": 0, "client": "Occidental", "region": "US Gulf", "status": "Option" }
+    ]
+  },
+  {
+    "id": "noble-blackhornet",
+    "name": "Noble BlackHornet",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      { "id": "noble-blackhornet-1", "vesselId": "noble-blackhornet", "startDate": "2025-02-01", "endDate": "2027-01-31", "dayRate": 479452, "client": "bp", "region": "US Gulf", "status": "Firm" },
+      { "id": "noble-blackhornet-2", "vesselId": "noble-blackhornet", "startDate": "2027-02-01", "endDate": "2029-01-31", "dayRate": 424657, "client": "bp", "region": "US Gulf", "status": "Firm" },
+      { "id": "noble-blackhornet-3", "vesselId": "noble-blackhornet", "startDate": "2029-02-01", "endDate": "2030-01-31", "dayRate": 0, "client": "bp", "region": "US Gulf", "status": "Option" }
+    ]
+  },
+  {
+    "id": "noble-blacklion",
+    "name": "Noble BlackLion",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2015,
+    "contracts": [
+      { "id": "noble-blacklion-1", "vesselId": "noble-blacklion", "startDate": "2024-09-01", "endDate": "2026-08-31", "dayRate": 479452, "client": "bp", "region": "US Gulf", "status": "Firm" },
+      { "id": "noble-blacklion-2", "vesselId": "noble-blacklion", "startDate": "2026-09-01", "endDate": "2028-08-31", "dayRate": 424657, "client": "bp", "region": "US Gulf", "status": "Firm" },
+      { "id": "noble-blacklion-3", "vesselId": "noble-blacklion", "startDate": "2028-09-01", "endDate": "2029-08-31", "dayRate": 0, "client": "bp", "region": "US Gulf", "status": "Option" }
+    ]
+  },
+  {
+    "id": "noble-blackrhino",
+    "name": "Noble BlackRhino",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Idle",
+    "yearBuilt": 2014,
+    "contracts": []
+  },
+  {
+    "id": "noble-globetrotter-i",
+    "name": "Noble Globetrotter I",
+    "company": "Noble",
+    "generation": "6G",
+    "status": "Active",
+    "yearBuilt": 2011,
+    "contracts": [
+      { "id": "noble-globetrotter-i-1", "vesselId": "noble-globetrotter-i", "startDate": "2025-12-01", "endDate": "2026-03-31", "dayRate": 450000, "client": "OMV Petrom", "region": "Bulgaria", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "noble-globetrotter-ii",
+    "name": "Noble Globetrotter II",
+    "company": "Noble",
+    "generation": "6G",
+    "status": "Idle",
+    "yearBuilt": 2013,
+    "contracts": []
+  },
+  {
+    "id": "noble-gerry-de-souza",
+    "name": "Noble Gerry de Souza",
+    "company": "Noble",
+    "generation": "6G",
+    "status": "Idle",
+    "yearBuilt": 2011,
+    "contracts": []
+  }
+]
