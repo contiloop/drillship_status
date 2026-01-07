@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Drillship, Contract } from '../types';
+import { getComputedStatus } from '../utils/shipStatus';
 
 interface FleetGanttProps {
   ships: Drillship[];
@@ -63,7 +64,8 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships }) => {
         <div className="flex flex-wrap gap-4 text-[10px] uppercase font-black tracking-widest text-slate-400">
           <span className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-600 rounded-sm"></div> Firm</span>
           <span className="flex items-center gap-2"><div className="w-3 h-3 bg-sky-400/20 border border-sky-400 rounded-sm"></div> Option</span>
-          <span className="flex items-center gap-2"><div className="w-3 h-3 bg-slate-800 border border-slate-700 rounded-sm"></div> Idle</span>
+          <span className="flex items-center gap-2"><div className="w-3 h-3 bg-slate-950 border border-slate-800 rounded-sm"></div> Idle/Gap</span>
+          <span className="flex items-center gap-2"><div className="w-3 h-3 bg-slate-800 border border-slate-700 rounded-sm cold-stacked-legend"></div> Cold-Stacked</span>
         </div>
       </div>
       
@@ -100,7 +102,8 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships }) => {
                 return a.company.localeCompare(b.company);
               })
               .map((ship) => {
-                const isStacked = ship.status === 'Warm-Stacked' || ship.status === 'Cold-Stacked';
+                const computedStatus = getComputedStatus(ship, now);
+                const isColdStacked = computedStatus === 'Cold-Stacked';
                 return (
                 <div key={ship.id} className="flex items-center group transition-all relative">
                   {/* Sticky Vessel Information - Opaque Background */}
@@ -113,19 +116,27 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships }) => {
                       <span className="text-[9px] text-slate-500 font-bold uppercase tracking-tight">{ship.company}</span>
                     </div>
                   </div>
-                  
+
                   {/* Timeline Row Section */}
-                  <div className="flex-1 relative h-10 bg-slate-950/60 rounded-xl overflow-hidden border border-slate-800 z-10 mx-2">
-                    {isStacked ? (
-                      <div className="absolute inset-0 bg-slate-800/50 flex items-center justify-center">
-                        <span className="text-[9px] font-black text-slate-500 tracking-[0.3em] italic uppercase">{ship.status}</span>
-                      </div>
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        {ship.contracts.length === 0 && <span className="text-[9px] font-black text-slate-800 tracking-[0.4em]">AVAILABLE / IDLE</span>}
+                  <div className={`flex-1 relative h-10 rounded-xl overflow-hidden border z-10 mx-2 ${
+                    isColdStacked
+                      ? 'bg-slate-800 border-slate-700'
+                      : 'bg-slate-950/60 border-slate-800'
+                  }`}>
+                    {/* Cold-Stacked: 전체 회색 배경 + 빗금 패턴 */}
+                    {isColdStacked && (
+                      <div className="absolute inset-0 cold-stacked-pattern flex items-center justify-center">
+                        <span className="text-[9px] font-black text-slate-400 tracking-[0.3em] italic uppercase bg-slate-800/80 px-2 rounded">COLD-STACKED</span>
                       </div>
                     )}
-                    
+
+                    {/* Idle/Available (계약 없음) */}
+                    {!isColdStacked && ship.contracts.length === 0 && (
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <span className="text-[9px] font-black text-slate-700 tracking-[0.4em]">AVAILABLE / IDLE</span>
+                      </div>
+                    )}
+
                     {ship.contracts.map((c) => {
                       const start = getPos(c.startDate);
                       const end = getPos(c.endDate);
@@ -157,6 +168,24 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships }) => {
         .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; border: 2px solid #0f172a; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .cold-stacked-pattern {
+          background: repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 4px,
+            rgba(71, 85, 105, 0.3) 4px,
+            rgba(71, 85, 105, 0.3) 8px
+          );
+        }
+        .cold-stacked-legend {
+          background: repeating-linear-gradient(
+            -45deg,
+            #1e293b,
+            #1e293b 1px,
+            #475569 1px,
+            #475569 2px
+          );
+        }
       `}</style>
     </div>
   );

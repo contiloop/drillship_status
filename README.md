@@ -14,15 +14,42 @@ npm run dev
 ## 기능
 
 ### Dashboard
-- **KPI 카드**: Total Fleet, Utilization, Avg Dayrate, Warm/Cold Stacked 현황
+- **KPI 카드**: Total Fleet, Utilization (3가지 모드), Avg Dayrate, Cold Stacked 현황
 - **Average Dayrate 차트**: Generation별 또는 Company별 평균 Dayrate 비교
 - **Asset Composition 차트**: Generation별 또는 Company별 선박 수 비교
 - **Fleet Gantt**: 선박별 계약 타임라인 시각화
 
 ### README 탭
+- Utilization Metrics 정의 및 설명
 - JSON 스키마 가이드
 - 필드 레퍼런스 테이블
 - Notes & Tips
+
+## Utilization Metrics (가동률 지표)
+
+본 시스템은 3가지 가동률 지표를 제공합니다:
+
+### ① Fleet Utilization (함대 가동률)
+```
+계산식: 가동 중인 시추선 수 ÷ 전체 보유 시추선 수
+```
+- 가장 단순한 방식으로 전체 보유 자산 대비 가동 중인 비율
+- ⚠️ Cold-Stacked 시추선도 분모에 포함되어 실제 영업 가능 자산과 괴리 가능
+
+### ② Market Utilization (시장 가동률) ⭐ 가장 많이 사용
+```
+계산식: 가동 중 시추선 ÷ (가동 중 + 유휴 but 시장 출시)
+```
+- 실제로 시장에 나와 있는 시추선만 기준
+- **제외 대상**: Cold-Stacked, 폐선 예정, 장기 조선소 입고
+- 👉 **드릴링 시장 수급 판단 시 핵심 지표**
+
+### ③ Economic Utilization (경제적 가동률)
+```
+계산식: 유상 계약 일수 ÷ 전체 가능 일수
+```
+- 실제로 수익을 창출하는 날짜 기준
+- 가장 실무적이고 재무적 관점의 지표
 
 ## 사용 팁
 
@@ -35,7 +62,9 @@ npm run dev
   - Company별 Utilization (가동률)
   - 최고/최저 Dayrate 선박
 
-## Utilization 기준 (시장 사이클)
+## Market Utilization 기준 (시장 사이클)
+
+**아래 기준은 Market Utilization(시장 가동률)을 기준으로 합니다.**
 
 | 가동률 | 상태 | 설명 |
 |--------|------|------|

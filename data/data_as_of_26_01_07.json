@@ -642,7 +642,7 @@
     "name": "VALARIS DS-15",
     "company": "Valaris",
     "generation": "7G",
-    "status": "Idle",
+    "status": "Warm-Stacked",
     "yearBuilt": 2014,
     "contracts": [
       { "id": "valaris-ds-15-1", "vesselId": "valaris-ds-15", "startDate": "2024-12-01", "endDate": "2025-08-31", "dayRate": 400000, "client": "TotalEnergies", "region": "Brazil", "status": "Firm" },
@@ -654,7 +654,7 @@
     "name": "VALARIS DS-12",
     "company": "Valaris",
     "generation": "7G",
-    "status": "Idle",
+    "status": "Warm-Stacked",
     "yearBuilt": 2013,
     "contracts": [
       { "id": "valaris-ds-12-1", "vesselId": "valaris-ds-12", "startDate": "2026-05-01", "endDate": "2027-04-30", "dayRate": 0, "client": "bp", "region": "Egypt", "status": "Firm" }
@@ -665,7 +665,7 @@
     "name": "VALARIS DS-10",
     "company": "Valaris",
     "generation": "7G",
-    "status": "Idle",
+    "status": "Warm-Stacked",
     "yearBuilt": 2017,
     "contracts": [
       { "id": "valaris-ds-10-1", "vesselId": "valaris-ds-10", "startDate": "2026-06-01", "endDate": "2028-06-30", "dayRate": 0, "client": "Undisclosed", "region": "West Africa", "status": "Firm" }

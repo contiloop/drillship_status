@@ -7,12 +7,16 @@ import {
 import { Drillship, Company, Generation } from './types';
 import MarketChart from './components/MarketChart';
 import FleetGantt from './components/FleetGantt';
+import defaultData from './data/data_as_of_26_01_07.json';
 
 const STORAGE_KEY = 'drillship_fleet_data_v2';
 
+type TabType = 'overview' | 'transocean' | 'valaris' | 'noble' | 'seadrill' | 'readme';
+
 export default function App() {
   const [ships, setShips] = useState<Drillship[]>([]);
-  const [activeTab, setActiveTab] = useState<'overview' | 'input'>('overview');
+  const [activeTab, setActiveTab] = useState<TabType>('overview');
+  const [utilizationMode, setUtilizationMode] = useState<'fleet' | 'market' | 'economic'>('market');
   const isInitialMount = useRef(true);
   const isLoaded = useRef(false);
 
@@ -25,6 +29,9 @@ export default function App() {
       } catch (e) {
         console.error("Failed to load local data", e);
       }
+    } else {
+      // 저장된 데이터가 없으면 기본 데이터 로드
+      setShips(defaultData as Drillship[]);
     }
     isLoaded.current = true;
   }, []);
@@ -65,12 +72,50 @@ export default function App() {
     reader.readAsText(file);
   };
 
-  const totalShips = ships.length;
-  const activeShips = ships.filter(s => s.status === 'Active').length;
-  const allContracts = ships.flatMap(s => s.contracts);
+  // 회사별 필터링
+  const getFilteredShips = () => {
+    if (activeTab === 'transocean') return ships.filter(s => s.company === 'Transocean');
+    if (activeTab === 'valaris') return ships.filter(s => s.company === 'Valaris');
+    if (activeTab === 'noble') return ships.filter(s => s.company === 'Noble');
+    if (activeTab === 'seadrill') return ships.filter(s => s.company === 'Seadrill');
+    return ships;
+  };
+
+  const filteredShips = getFilteredShips();
+
+  const totalShips = filteredShips.length;
+  const activeShips = filteredShips.filter(s => s.status === 'Active').length;
+  const allContracts = filteredShips.flatMap(s => s.contracts);
   const avgDayrate = allContracts.filter(c => c.dayRate > 0).reduce((a, b, _, arr) => a + (b.dayRate / arr.length), 0);
-  const warmStacked = ships.filter(s => s.status === 'Warm-Stacked').length;
-  const coldStacked = ships.filter(s => s.status === 'Cold-Stacked').length;
+  const coldStacked = filteredShips.filter(s => s.status === 'Cold-Stacked').length;
+
+  // Utilization 계산
+  const marketedFleet = totalShips - coldStacked;
+  const fleetUtilization = totalShips > 0 ? Math.round((activeShips / totalShips) * 100) : 0;
+  const marketUtilization = marketedFleet > 0 ? Math.round((activeShips / marketedFleet) * 100) : 0;
+
+  // Economic Utilization: 유상 계약 일수 기준 (간단 계산)
+  const today = new Date();
+  const yearStart = new Date(today.getFullYear(), 0, 1);
+  const daysSinceYearStart = Math.floor((today.getTime() - yearStart.getTime()) / (1000 * 60 * 60 * 24));
+  const totalPossibleDays = marketedFleet * daysSinceYearStart;
+
+  let totalContractDays = 0;
+  filteredShips.forEach(ship => {
+    if (ship.status === 'Cold-Stacked') return;
+    ship.contracts.forEach(contract => {
+      const start = new Date(contract.startDate);
+      const end = new Date(contract.endDate);
+      const contractStart = start < yearStart ? yearStart : start;
+      const contractEnd = end > today ? today : end;
+      if (contractEnd >= contractStart) {
+        const days = Math.floor((contractEnd.getTime() - contractStart.getTime()) / (1000 * 60 * 60 * 24));
+        totalContractDays += days;
+      }
+    });
+  });
+
+  const economicUtilization = totalPossibleDays > 0 ? Math.round((totalContractDays / totalPossibleDays) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-blue-500/30">
@@ -82,12 +127,38 @@ export default function App() {
           <span className="hidden md:block font-black text-lg tracking-tighter">Drillship Status</span>
         </div>
         
-        <nav className="flex-1 space-y-2">
+        <nav className="flex-1 space-y-2 overflow-y-auto">
           <button onClick={() => setActiveTab('overview')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeTab === 'overview' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
             <LayoutGrid size={20} />
             <span className="hidden md:block font-bold">Dashboard</span>
           </button>
-          <button onClick={() => setActiveTab('input')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeTab === 'input' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
+
+          <div className="hidden md:block pt-2 pb-1 px-4">
+            <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Companies</p>
+          </div>
+
+          <button onClick={() => setActiveTab('transocean')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeTab === 'transocean' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
+            <Ship size={18} />
+            <span className="hidden md:block font-bold text-sm">Transocean</span>
+          </button>
+          <button onClick={() => setActiveTab('valaris')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeTab === 'valaris' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
+            <Ship size={18} />
+            <span className="hidden md:block font-bold text-sm">Valaris</span>
+          </button>
+          <button onClick={() => setActiveTab('noble')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeTab === 'noble' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
+            <Ship size={18} />
+            <span className="hidden md:block font-bold text-sm">Noble</span>
+          </button>
+          <button onClick={() => setActiveTab('seadrill')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeTab === 'seadrill' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
+            <Ship size={18} />
+            <span className="hidden md:block font-bold text-sm">Seadrill</span>
+          </button>
+
+          <div className="hidden md:block pt-4 pb-1 px-4">
+            <div className="border-t border-slate-800"></div>
+          </div>
+
+          <button onClick={() => setActiveTab('readme')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeTab === 'readme' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
             <Database size={20} />
             <span className="hidden md:block font-bold">README</span>
           </button>
@@ -104,10 +175,21 @@ export default function App() {
       <main className="flex-1 ml-20 md:ml-64 p-6 md:p-10">
         <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h2 className="text-3xl font-black text-white tracking-tight">{activeTab === 'overview' ? 'Market Overview' : 'Database Management'}</h2>
-            <p className="text-slate-500 mt-1 font-medium">Offshore Drillship Fleet Status & Pricing Intelligence</p>
+            <h2 className="text-3xl font-black text-white tracking-tight">
+              {activeTab === 'overview' && 'Market Overview'}
+              {activeTab === 'transocean' && 'Transocean Fleet'}
+              {activeTab === 'valaris' && 'Valaris Fleet'}
+              {activeTab === 'noble' && 'Noble Fleet'}
+              {activeTab === 'seadrill' && 'Seadrill Fleet'}
+              {activeTab === 'readme' && 'Database Management'}
+            </h2>
+            <p className="text-slate-500 mt-1 font-medium">
+              {activeTab === 'readme' ? 'Offshore Drillship Fleet Status & Pricing Intelligence' :
+               activeTab === 'overview' ? 'Offshore Drillship Fleet Status & Pricing Intelligence' :
+               `${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Drillship Fleet Analysis`}
+            </p>
           </div>
-          {activeTab === 'overview' && (
+          {(activeTab === 'overview' || activeTab === 'transocean' || activeTab === 'valaris' || activeTab === 'noble' || activeTab === 'seadrill') && (
             <div className="flex gap-3">
                <button onClick={exportData} className="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-lg text-slate-400 hover:text-white transition-all flex items-center gap-2 px-3">
                  <Download size={18} /> <span className="text-xs font-bold">Export JSON</span>
@@ -120,14 +202,13 @@ export default function App() {
           )}
         </header>
 
-        {activeTab === 'overview' ? (
+        {(activeTab === 'overview' || activeTab === 'transocean' || activeTab === 'valaris' || activeTab === 'noble' || activeTab === 'seadrill') ? (
           <div className="space-y-10 max-w-7xl">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
                 { label: 'Total Fleet', value: totalShips, icon: Ship },
-                { label: 'Utilization', value: `${totalShips > 0 ? Math.round((activeShips/totalShips)*100) : 0}%`, icon: BarChart3 },
                 { label: 'Avg Dayrate', value: `$${Math.round(avgDayrate/1000)}k`, icon: TrendingUp },
-                { label: 'Warm / Cold Stacked', value: `${warmStacked} / ${coldStacked}`, icon: AlertTriangle },
+                { label: 'Cold Stacked', value: coldStacked, icon: AlertTriangle },
               ].map((kpi, idx) => (
                 <div key={idx} className="bg-slate-900/50 p-6 rounded-3xl border border-slate-800 shadow-xl group hover:border-slate-700 transition-all">
                   <div className={`p-3 rounded-2xl bg-blue-500/10 text-blue-500 w-fit mb-4`}>
@@ -137,25 +218,139 @@ export default function App() {
                   <p className="text-3xl font-black text-white mt-1">{kpi.value}</p>
                 </div>
               ))}
+
+              {/* Utilization Card with Tabs */}
+              <div className="bg-slate-900/50 p-6 rounded-3xl border border-slate-800 shadow-xl group hover:border-slate-700 transition-all">
+                <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-500 w-fit mb-4">
+                  <BarChart3 size={24} />
+                </div>
+
+                {/* Tab Buttons */}
+                <div className="flex gap-1 mb-3">
+                  {(['fleet', 'market', 'economic'] as const).map(mode => (
+                    <button
+                      key={mode}
+                      onClick={() => setUtilizationMode(mode)}
+                      className={`px-2 py-1 text-[9px] font-bold uppercase tracking-wider rounded transition-all ${
+                        utilizationMode === mode
+                          ? 'bg-blue-600 text-white'
+                          : 'text-slate-500 hover:text-slate-300'
+                      }`}
+                    >
+                      {mode}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Display Current Utilization */}
+                <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">
+                  {utilizationMode === 'fleet' && 'Fleet Utilization'}
+                  {utilizationMode === 'market' && 'Market Utilization'}
+                  {utilizationMode === 'economic' && 'Economic Utilization'}
+                </p>
+                <p className="text-3xl font-black text-white mt-1">
+                  {utilizationMode === 'fleet' && `${fleetUtilization}%`}
+                  {utilizationMode === 'market' && `${marketUtilization}%`}
+                  {utilizationMode === 'economic' && `${economicUtilization}%`}
+                </p>
+                <p className="text-[10px] text-slate-600 mt-2 font-bold">
+                  {utilizationMode === 'fleet' && `${activeShips} active / ${totalShips} total`}
+                  {utilizationMode === 'market' && `${activeShips} active / ${marketedFleet} marketed`}
+                  {utilizationMode === 'economic' && `${totalContractDays} days / ${totalPossibleDays} possible`}
+                </p>
+              </div>
             </div>
 
-            {ships.length > 0 ? (
+            {filteredShips.length > 0 ? (
               <>
-                <MarketChart ships={ships} />
-                <FleetGantt ships={ships} />
+                <MarketChart ships={filteredShips} />
+                <FleetGantt ships={filteredShips} />
               </>
             ) : (
               <div className="text-center py-24 bg-slate-900/30 rounded-3xl border border-dashed border-slate-800">
                 <Database className="mx-auto text-slate-700 mb-4" size={48} />
-                <h3 className="text-xl font-bold text-slate-400">Empty Database</h3>
-                <p className="text-slate-600 mt-2 max-w-xs mx-auto">Upload a valid JSON file to visualize the offshore drilling fleet market.</p>
-                <button onClick={() => setActiveTab('input')} className="mt-6 bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-2xl font-bold transition-all">Go to Upload Guide</button>
+                <h3 className="text-xl font-bold text-slate-400">
+                  {ships.length === 0 ? 'Empty Database' : `No ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Ships`}
+                </h3>
+                <p className="text-slate-600 mt-2 max-w-xs mx-auto">
+                  {ships.length === 0 ? 'Upload a valid JSON file to visualize the offshore drilling fleet market.' :
+                   `No ships found for ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} in the current database.`}
+                </p>
+                {ships.length === 0 && (
+                  <button onClick={() => setActiveTab('readme')} className="mt-6 bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-2xl font-bold transition-all">Go to Upload Guide</button>
+                )}
               </div>
             )}
           </div>
         ) : (
           <div className="max-w-5xl grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-8">
+              {/* Utilization Definitions */}
+              <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-blue-500/10 text-blue-500 rounded-xl flex items-center justify-center">
+                    <BarChart3 size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold">Utilization Metrics Guide</h3>
+                </div>
+
+                <div className="space-y-6">
+                  <p className="text-slate-400 text-sm leading-relaxed">
+                    본 시스템은 3가지 가동률 지표를 제공합니다. 각 지표는 서로 다른 관점에서 시추선 함대의 활용도를 측정합니다.
+                  </p>
+
+                  <div className="space-y-4">
+                    {/* Fleet Utilization */}
+                    <div className="bg-slate-800/30 rounded-xl p-5 border border-slate-800">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <h4 className="text-sm font-bold text-white">① Fleet Utilization (함대 가동률)</h4>
+                      </div>
+                      <p className="text-xs text-slate-400 mb-2">
+                        <span className="font-mono bg-slate-950 px-2 py-1 rounded text-blue-300">가동 중인 시추선 수 ÷ 전체 보유 시추선 수</span>
+                      </p>
+                      <p className="text-xs text-slate-500 leading-relaxed mb-2">
+                        가장 단순한 방식으로, 전체 보유 자산 대비 실제 가동 중인 시추선의 비율을 나타냅니다.
+                      </p>
+                      <p className="text-xs text-orange-400/80 leading-relaxed">
+                        ⚠️ 주의: Cold-Stacked 시추선도 분모에 포함되어 실제 영업 가능한 자산과 괴리가 있을 수 있습니다.
+                      </p>
+                    </div>
+
+                    {/* Market Utilization */}
+                    <div className="bg-slate-800/30 rounded-xl p-5 border border-slate-800 border-l-4 border-l-blue-500">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <h4 className="text-sm font-bold text-white">② Market Utilization (시장 가동률) ⭐</h4>
+                      </div>
+                      <p className="text-xs text-slate-400 mb-2">
+                        <span className="font-mono bg-slate-950 px-2 py-1 rounded text-blue-300">가동 중 ÷ (가동 중 + 유휴 but 시장 출시)</span>
+                      </p>
+                      <p className="text-xs text-slate-500 leading-relaxed mb-2">
+                        실제로 시장에 나와 있는 시추선만을 기준으로 계산합니다. Cold-Stacked, 폐선 예정, 장기 조선소 입고 자산은 제외됩니다.
+                      </p>
+                      <p className="text-xs text-green-400/80 leading-relaxed">
+                        👉 드릴링 시장 수급 판단 시 가장 많이 사용되는 핵심 지표입니다.
+                      </p>
+                    </div>
+
+                    {/* Economic Utilization */}
+                    <div className="bg-slate-800/30 rounded-xl p-5 border border-slate-800">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <h4 className="text-sm font-bold text-white">③ Economic Utilization (경제적 가동률)</h4>
+                      </div>
+                      <p className="text-xs text-slate-400 mb-2">
+                        <span className="font-mono bg-slate-950 px-2 py-1 rounded text-blue-300">유상 계약 일수 ÷ 전체 가능 일수</span>
+                      </p>
+                      <p className="text-xs text-slate-500 leading-relaxed">
+                        실제로 수익을 창출하는 날짜를 기준으로 계산합니다. 가장 실무적이고 재무적 관점의 지표입니다.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 bg-blue-500/10 text-blue-500 rounded-xl flex items-center justify-center">
@@ -163,7 +358,7 @@ export default function App() {
                   </div>
                   <h3 className="text-xl font-bold">JSON Data Schema Guide</h3>
                 </div>
-                
+
                 <div className="space-y-6">
                   <p className="text-slate-400 text-sm leading-relaxed">
                     본 시스템은 특정 구조의 JSON 파일을 필요로 합니다. 외부 AI 도구를 사용하여 데이터를 구조화할 때 아래 스키마를 참고하십시오.
