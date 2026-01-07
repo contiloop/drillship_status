@@ -226,12 +226,12 @@
     ]
   },
   {
-    "id": "ocean-rig-apollo", "name": "Ocean Rig Apollo", "company": "Transocean", "generation": "7G", "status": "Stacked", "yearBuilt": 2015, "contracts": []
+    "id": "ocean-rig-apollo", "name": "Ocean Rig Apollo", "company": "Transocean", "generation": "7G", "status": "Cold-Stacked", "yearBuilt": 2015, "contracts": []
   },
   {
-    "id": "ocean-rig-athena", "name": "Ocean Rig Athena", "company": "Transocean", "generation": "7G", "status": "Stacked", "yearBuilt": 2014, "contracts": []
+    "id": "ocean-rig-athena", "name": "Ocean Rig Athena", "company": "Transocean", "generation": "7G", "status": "Cold-Stacked", "yearBuilt": 2014, "contracts": []
   },
   {
-    "id": "ocean-rig-mylos", "name": "Ocean Rig Mylos", "company": "Transocean", "generation": "7G", "status": "Stacked", "yearBuilt": 2013, "contracts": []
+    "id": "ocean-rig-mylos", "name": "Ocean Rig Mylos", "company": "Transocean", "generation": "7G", "status": "Cold-Stacked", "yearBuilt": 2013, "contracts": []
   }
 ]
