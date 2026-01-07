@@ -72,6 +72,15 @@ export default function App() {
     reader.readAsText(file);
   };
 
+  const resetToDefaultData = () => {
+    if (confirm("기본 데이터로 초기화하시겠습니까? 현재 데이터는 삭제됩니다.")) {
+      setShips(defaultData as Drillship[]);
+      localStorage.removeItem(STORAGE_KEY);
+      alert("기본 데이터로 초기화되었습니다.");
+      setActiveTab('overview');
+    }
+  };
+
   // 회사별 필터링
   const getFilteredShips = () => {
     if (activeTab === 'transocean') return ships.filter(s => s.company === 'Transocean');
@@ -198,6 +207,9 @@ export default function App() {
                  <FileJson size={18} /> <span className="text-xs font-bold">Upload JSON</span>
                  <input type="file" onChange={importData} className="hidden" />
                </label>
+               <button onClick={resetToDefaultData} className="p-2 bg-orange-900/50 hover:bg-orange-800 border border-orange-800 rounded-lg text-orange-400 hover:text-orange-300 transition-all flex items-center gap-2 px-3">
+                 <Trash2 size={18} /> <span className="text-xs font-bold">Reset Data</span>
+               </button>
             </div>
           )}
         </header>
