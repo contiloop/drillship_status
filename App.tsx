@@ -4,6 +4,7 @@ import {
   LayoutGrid, Ship, Download, FileJson, Database, BarChart3,
   AlertTriangle, TrendingUp, Code, Trash2
 } from 'lucide-react';
+import { Analytics } from '@vercel/analytics/react';
 import { Drillship, Company, Generation } from './types';
 import MarketChart from './components/MarketChart';
 import FleetGantt from './components/FleetGantt';
@@ -127,8 +128,10 @@ export default function App() {
   const economicUtilization = totalPossibleDays > 0 ? Math.round((totalContractDays / totalPossibleDays) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-blue-500/30">
-      <div className="fixed left-0 top-0 bottom-0 w-20 md:w-64 bg-slate-900 border-r border-slate-800 z-50 flex flex-col items-center md:items-stretch py-8 px-4">
+    <>
+      <Analytics />
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-blue-500/30">
+        <div className="fixed left-0 top-0 bottom-0 w-20 md:w-64 bg-slate-900 border-r border-slate-800 z-50 flex flex-col items-center md:items-stretch py-8 px-4">
         <div className="flex items-center gap-3 px-2 mb-12">
           <div className="bg-blue-600 p-2 rounded-xl shadow-lg shadow-blue-900/40">
             <Ship className="text-white w-6 h-6" />
@@ -529,6 +532,7 @@ export default function App() {
           </div>
         )}
       </main>
-    </div>
+      </div>
+    </>
   );
 }
