@@ -11,7 +11,7 @@
         "id": "deepwater-titan-1",
         "vesselId": "deepwater-titan",
         "startDate": "2023-04-01",
-        "endDate": "2028-03-31",
+        "endDate": "2028-04-30",
         "dayRate": 462000,
         "client": "Chevron",
         "region": "USGOM",
@@ -27,66 +27,12 @@
     "status": "Active",
     "yearBuilt": 2022,
     "contracts": [
-      { "id": "deepwater-atlas-1", "vesselId": "deepwater-atlas", "startDate": "2025-08-01", "endDate": "2026-02-28", "dayRate": 505000, "client": "Beacon", "region": "USGOM", "status": "Firm" },
-      { "id": "deepwater-atlas-2", "vesselId": "deepwater-atlas", "startDate": "2026-04-01", "endDate": "2026-06-30", "dayRate": 505000, "client": "Beacon", "region": "USGOM", "status": "Option" },
-      { "id": "deepwater-atlas-3", "vesselId": "deepwater-atlas", "startDate": "2026-07-01", "endDate": "2026-11-30", "dayRate": 580000, "client": "Beacon", "region": "USGOM", "status": "Firm" },
-      { "id": "deepwater-atlas-4", "vesselId": "deepwater-atlas", "startDate": "2026-12-01", "endDate": "2027-02-28", "dayRate": 650000, "client": "Beacon", "region": "USGOM", "status": "Option" },
-      { "id": "deepwater-atlas-5", "vesselId": "deepwater-atlas", "startDate": "2028-06-01", "endDate": "2029-04-30", "dayRate": 635000, "client": "bp", "region": "USGOM", "status": "Firm" },
-      { "id": "deepwater-atlas-6", "vesselId": "deepwater-atlas", "startDate": "2029-06-01", "endDate": "2030-04-30", "dayRate": 635000, "client": "bp", "region": "USGOM", "status": "Firm" }
-    ]
-  },
-  {
-    "id": "deepwater-mykonos",
-    "name": "Deepwater Mykonos",
-    "company": "Transocean",
-    "generation": "6G",
-    "status": "Active",
-    "yearBuilt": 2011,
-    "contracts": [
-      {
-        "id": "deepwater-mykonos-1",
-        "vesselId": "deepwater-mykonos",
-        "startDate": "2023-10-01",
-        "endDate": "2025-09-30",
-        "dayRate": 368000,
-        "client": "Petrobras",
-        "region": "Brazil",
-        "status": "Firm"
-      },
-      {
-        "id": "deepwater-mykonos-2",
-        "vesselId": "deepwater-mykonos",
-        "startDate": "2025-10-01",
-        "endDate": "2025-12-31",
-        "dayRate": 366667,
-        "client": "Petrobras",
-        "region": "Brazil",
-        "status": "Firm"
-      },
-      {
-        "id": "deepwater-mykonos-3",
-        "vesselId": "deepwater-mykonos",
-        "startDate": "2026-07-01",
-        "endDate": "2027-04-29",
-        "dayRate": 397351,
-        "client": "bp",
-        "region": "Brazil",
-        "status": "Firm"
-      }
-    ]
-  },
-  {
-    "id": "deepwater-skyros",
-    "name": "Deepwater Skyros",
-    "company": "Transocean",
-    "generation": "7G",
-    "status": "Active",
-    "yearBuilt": 2013,
-    "contracts": [
-      { "id": "deepwater-skyros-1", "vesselId": "deepwater-skyros", "startDate": "2025-01-01", "endDate": "2025-09-30", "dayRate": 400000, "client": "TotalEnergies", "region": "Angola", "status": "Firm" },
-      { "id": "deepwater-skyros-2", "vesselId": "deepwater-skyros", "startDate": "2025-12-01", "endDate": "2026-02-28", "dayRate": 381000, "client": "Murphy", "region": "Ivory Coast", "status": "Firm" },
-      { "id": "deepwater-skyros-3", "vesselId": "deepwater-skyros", "startDate": "2027-01-01", "endDate": "2027-11-17", "dayRate": 406250, "client": "Undisclosed", "region": "Australia", "status": "Firm" },
-      { "id": "deepwater-skyros-4", "vesselId": "deepwater-skyros", "startDate": "2027-11-18", "endDate": "2029-12-31", "dayRate": 0, "client": "Undisclosed", "region": "Australia", "status": "Option" }
+      { "id": "deepwater-atlas-1", "vesselId": "deepwater-atlas", "startDate": "2025-08-01", "endDate": "2026-03-31", "dayRate": 505000, "client": "Beacon", "region": "USGOM", "status": "Firm" },
+      { "id": "deepwater-atlas-2", "vesselId": "deepwater-atlas", "startDate": "2026-04-01", "endDate": "2026-07-31", "dayRate": 505000, "client": "Beacon", "region": "USGOM", "status": "Contingent" },
+      { "id": "deepwater-atlas-3", "vesselId": "deepwater-atlas", "startDate": "2026-07-01", "endDate": "2026-12-31", "dayRate": 580000, "client": "Beacon", "region": "USGOM", "status": "Firm" },
+      { "id": "deepwater-atlas-4", "vesselId": "deepwater-atlas", "startDate": "2026-12-01", "endDate": "2027-03-31", "dayRate": 650000, "client": "Beacon", "region": "USGOM", "status": "Contingent" },
+      { "id": "deepwater-atlas-5", "vesselId": "deepwater-atlas", "startDate": "2028-06-01", "endDate": "2029-05-31", "dayRate": 635000, "client": "bp", "region": "USGOM", "status": "Firm" },
+      { "id": "deepwater-atlas-6", "vesselId": "deepwater-atlas", "startDate": "2029-06-01", "endDate": "2030-05-31", "dayRate": 635000, "client": "bp", "region": "USGOM", "status": "Firm" }
     ]
   },
   {
@@ -97,7 +43,7 @@
     "status": "Active",
     "yearBuilt": 2024,
     "contracts": [
-      { "id": "deepwater-aquila-1", "vesselId": "deepwater-aquila", "startDate": "2024-06-01", "endDate": "2027-05-31", "dayRate": 456000, "client": "Petrobras", "region": "Brazil", "status": "Firm" }
+      { "id": "deepwater-aquila-1", "vesselId": "deepwater-aquila", "startDate": "2024-06-01", "endDate": "2027-06-30", "dayRate": 456000, "client": "Petrobras", "region": "Brazil", "status": "Firm" }
     ]
   },
   {
@@ -108,7 +54,7 @@
     "status": "Active",
     "yearBuilt": 2018,
     "contracts": [
-      { "id": "deepwater-poseidon-1", "vesselId": "deepwater-poseidon", "startDate": "2018-09-01", "endDate": "2028-01-31", "dayRate": 499000, "client": "Shell", "region": "USGOM", "status": "Firm" }
+      { "id": "deepwater-poseidon-1", "vesselId": "deepwater-poseidon", "startDate": "2018-09-01", "endDate": "2028-02-29", "dayRate": 499000, "client": "Shell", "region": "USGOM", "status": "Firm" }
     ]
   },
   {
@@ -119,7 +65,7 @@
     "status": "Active",
     "yearBuilt": 2017,
     "contracts": [
-      { "id": "deepwater-pontus-1", "vesselId": "deepwater-pontus", "startDate": "2017-10-01", "endDate": "2027-09-30", "dayRate": 496000, "client": "Shell", "region": "USGOM", "status": "Firm" }
+      { "id": "deepwater-pontus-1", "vesselId": "deepwater-pontus", "startDate": "2017-10-01", "endDate": "2027-10-31", "dayRate": 496000, "client": "Shell", "region": "USGOM", "status": "Firm" }
     ]
   },
   {
@@ -130,7 +76,7 @@
     "status": "Active",
     "yearBuilt": 2016,
     "contracts": [
-      { "id": "deepwater-conqueror-1", "vesselId": "deepwater-conqueror", "startDate": "2025-10-01", "endDate": "2026-08-31", "dayRate": 530000, "client": "Not Disclosed", "region": "USGOM", "status": "Firm" }
+      { "id": "deepwater-conqueror-1", "vesselId": "deepwater-conqueror", "startDate": "2025-10-01", "endDate": "2026-09-30", "dayRate": 530000, "client": "Not Disclosed", "region": "USGOM", "status": "Firm" }
     ]
   },
   {
@@ -141,7 +87,7 @@
     "status": "Active",
     "yearBuilt": 2016,
     "contracts": [
-      { "id": "deepwater-proteus-1", "vesselId": "deepwater-proteus", "startDate": "2016-08-01", "endDate": "2028-04-30", "dayRate": 498000, "client": "Shell", "region": "USGOM", "status": "Firm" }
+      { "id": "deepwater-proteus-1", "vesselId": "deepwater-proteus", "startDate": "2016-08-01", "endDate": "2026-05-31", "dayRate": 498000, "client": "Shell", "region": "USGOM", "status": "Firm" }
     ]
   },
   {
@@ -152,8 +98,8 @@
     "status": "Active",
     "yearBuilt": 2016,
     "contracts": [
-      { "id": "deepwater-thalassa-1", "vesselId": "deepwater-thalassa", "startDate": "2016-07-01", "endDate": "2026-02-28", "dayRate": 497000, "client": "Shell", "region": "USGOM", "status": "Firm" },
-      { "id": "deepwater-thalassa-2", "vesselId": "deepwater-thalassa", "startDate": "2026-04-01", "endDate": "2029-02-28", "dayRate": 480000, "client": "Woodside", "region": "Mexico", "status": "Firm" }
+      { "id": "deepwater-thalassa-1", "vesselId": "deepwater-thalassa", "startDate": "2016-07-01", "endDate": "2026-03-31", "dayRate": 497000, "client": "Shell", "region": "USGOM", "status": "Firm" },
+      { "id": "deepwater-thalassa-2", "vesselId": "deepwater-thalassa", "startDate": "2026-04-01", "endDate": "2029-03-31", "dayRate": 480000, "client": "Woodside", "region": "Mexico", "status": "Firm" }
     ]
   },
   {
@@ -164,7 +110,7 @@
     "status": "Active",
     "yearBuilt": 2014,
     "contracts": [
-      { "id": "deepwater-asgard-1", "vesselId": "deepwater-asgard", "startDate": "2025-06-01", "endDate": "2026-05-31", "dayRate": 515000, "client": "Hess Corporation", "region": "USGOM", "status": "Firm" }
+      { "id": "deepwater-asgard-1", "vesselId": "deepwater-asgard", "startDate": "2025-06-01", "endDate": "2026-06-30", "dayRate": 515000, "client": "Hess Corporation", "region": "USGOM", "status": "Firm" }
     ]
   },
   {
@@ -175,7 +121,46 @@
     "status": "Active",
     "yearBuilt": 2014,
     "contracts": [
-      { "id": "deepwater-invictus-1", "vesselId": "deepwater-invictus", "startDate": "2025-04-01", "endDate": "2028-03-31", "dayRate": 485000, "client": "bp", "region": "USGOM", "status": "Firm" }
+      { "id": "deepwater-invictus-1", "vesselId": "deepwater-invictus", "startDate": "2025-04-01", "endDate": "2028-04-30", "dayRate": 485000, "client": "bp", "region": "USGOM", "status": "Firm" }
+    ]
+  },
+  {
+    "id": "deepwater-skyros",
+    "name": "Deepwater Skyros",
+    "company": "Transocean",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2013,
+    "contracts": [
+      { "id": "deepwater-skyros-1", "vesselId": "deepwater-skyros", "startDate": "2025-01-01", "endDate": "2025-10-31", "dayRate": 400000, "client": "TotalEnergies", "region": "Angola", "status": "Firm" },
+      { "id": "deepwater-skyros-2", "vesselId": "deepwater-skyros", "startDate": "2025-12-01", "endDate": "2026-03-31", "dayRate": 361000, "client": "Murphy", "region": "Ivory Coast", "status": "Firm" },
+      { "id": "deepwater-skyros-3", "vesselId": "deepwater-skyros", "startDate": "2026-03-01", "endDate": "2026-04-30", "dayRate": 361000, "client": "Murphy", "region": "Ivory Coast", "status": "Option" },
+      { "id": "deepwater-skyros-4", "vesselId": "deepwater-skyros", "startDate": "2027-01-01", "endDate": "2027-11-30", "dayRate": 406250, "client": "Undisclosed", "region": "Australia", "status": "Firm" },
+      { "id": "deepwater-skyros-5", "vesselId": "deepwater-skyros", "startDate": "2027-12-01", "endDate": "2030-03-31", "dayRate": 0, "client": "Undisclosed", "region": "Australia", "status": "Option" }
+    ]
+  },
+  {
+    "id": "deepwater-mykonos",
+    "name": "Deepwater Mykonos",
+    "company": "Transocean",
+    "generation": "6G",
+    "status": "Active",
+    "yearBuilt": 2011,
+    "contracts": [
+      { "id": "deepwater-mykonos-1", "vesselId": "deepwater-mykonos", "startDate": "2023-10-01", "endDate": "2025-10-31", "dayRate": 368000, "client": "Petrobras", "region": "Brazil", "status": "Firm" },
+      { "id": "deepwater-mykonos-2", "vesselId": "deepwater-mykonos", "startDate": "2025-10-01", "endDate": "2025-12-31", "dayRate": 366667, "client": "Petrobras", "region": "Brazil", "status": "Firm" },
+      { "id": "deepwater-mykonos-3", "vesselId": "deepwater-mykonos", "startDate": "2025-12-01", "endDate": "2026-01-30", "dayRate": 366667, "client": "Petrobras", "region": "Brazil", "status": "Firm" },
+      { "id": "deepwater-mykonos-4", "vesselId": "deepwater-mykonos", "startDate": "2026-01-01", "endDate": "2026-04-30", "dayRate": 366667, "client": "bp", "region": "Brazil", "status": "Firm" },
+      {
+        "id": "deepwater-mykonos-5",
+        "vesselId": "deepwater-mykonos",
+        "startDate": "2026-07-01",
+        "endDate": "2027-04-30",
+        "dayRate": 397351,
+        "client": "bp",
+        "region": "Brazil",
+        "status": "Firm"
+      }
     ]
   },
   {
@@ -186,7 +171,7 @@
     "status": "Active",
     "yearBuilt": 2011,
     "contracts": [
-      { "id": "deepwater-corcovado-1", "vesselId": "deepwater-corcovado", "startDate": "2023-09-01", "endDate": "2027-08-31", "dayRate": 415000, "client": "Petrobras", "region": "Brazil", "status": "Firm" }
+      { "id": "deepwater-corcovado-1", "vesselId": "deepwater-corcovado", "startDate": "2023-09-01", "endDate": "2027-09-30", "dayRate": 415000, "client": "Petrobras", "region": "Brazil", "status": "Firm" }
     ]
   },
   {
@@ -197,7 +182,7 @@
     "status": "Active",
     "yearBuilt": 2011,
     "contracts": [
-      { "id": "deepwater-orion-1", "vesselId": "deepwater-orion", "startDate": "2024-03-01", "endDate": "2027-02-28", "dayRate": 427000, "client": "Petrobras", "region": "Brazil", "status": "Firm" }
+      { "id": "deepwater-orion-1", "vesselId": "deepwater-orion", "startDate": "2024-03-01", "endDate": "2027-03-31", "dayRate": 427000, "client": "Petrobras", "region": "Brazil", "status": "Firm" }
     ]
   },
   {
@@ -208,7 +193,7 @@
     "status": "Active",
     "yearBuilt": 2010,
     "contracts": [
-      { "id": "dhirubhai-deepwater-kg2-1", "vesselId": "dhirubhai-deepwater-kg2", "startDate": "2024-06-01", "endDate": "2026-04-30", "dayRate": 446000, "client": "Petrobras", "region": "Brazil", "status": "Firm" }
+      { "id": "dhirubhai-deepwater-kg2-1", "vesselId": "dhirubhai-deepwater-kg2", "startDate": "2024-06-01", "endDate": "2026-05-31", "dayRate": 446000, "client": "Petrobras", "region": "Brazil", "status": "Firm" }
     ]
   },
   {
@@ -219,11 +204,11 @@
     "status": "Active",
     "yearBuilt": 2009,
     "contracts": [
-      { "id": "petrobras-10000-1", "vesselId": "petrobras-10000", "startDate": "2024-10-01", "endDate": "2025-09-30", "dayRate": 397000, "client": "Petrobras", "region": "Brazil", "status": "Firm" },
-      { "id": "petrobras-10000-2", "vesselId": "petrobras-10000", "startDate": "2025-10-01", "endDate": "2026-09-30", "dayRate": 409000, "client": "Petrobras", "region": "Brazil", "status": "Firm" },
-      { "id": "petrobras-10000-3", "vesselId": "petrobras-10000", "startDate": "2026-10-01", "endDate": "2027-09-30", "dayRate": 422000, "client": "Petrobras", "region": "Brazil", "status": "Firm" },
-      { "id": "petrobras-10000-4", "vesselId": "petrobras-10000", "startDate": "2027-10-01", "endDate": "2028-07-31", "dayRate": 434000, "client": "Petrobras", "region": "Brazil", "status": "Firm" },
-      { "id": "petrobras-10000-5", "vesselId": "petrobras-10000", "startDate": "2028-08-01", "endDate": "2029-07-31", "dayRate": 447000, "client": "Petrobras", "region": "Brazil", "status": "Firm" }
+      { "id": "petrobras-10000-1", "vesselId": "petrobras-10000", "startDate": "2024-10-01", "endDate": "2025-10-31", "dayRate": 397000, "client": "Petrobras", "region": "Brazil", "status": "Firm" },
+      { "id": "petrobras-10000-2", "vesselId": "petrobras-10000", "startDate": "2025-10-01", "endDate": "2026-10-31", "dayRate": 409000, "client": "Petrobras", "region": "Brazil", "status": "Firm" },
+      { "id": "petrobras-10000-3", "vesselId": "petrobras-10000", "startDate": "2026-10-01", "endDate": "2027-10-31", "dayRate": 422000, "client": "Petrobras", "region": "Brazil", "status": "Firm" },
+      { "id": "petrobras-10000-4", "vesselId": "petrobras-10000", "startDate": "2027-10-01", "endDate": "2028-10-31", "dayRate": 434000, "client": "Petrobras", "region": "Brazil", "status": "Firm" },
+      { "id": "petrobras-10000-5", "vesselId": "petrobras-10000", "startDate": "2028-10-01", "endDate": "2029-08-31", "dayRate": 447000, "client": "Petrobras", "region": "Brazil", "status": "Firm" }
     ]
   },
   {
@@ -234,37 +219,19 @@
     "status": "Active",
     "yearBuilt": 2009,
     "contracts": [
-      { "id": "dhirubhai-deepwater-kg1-1", "vesselId": "dhirubhai-deepwater-kg1", "startDate": "2024-05-01", "endDate": "2026-01-31", "dayRate": 347500, "client": "ONGC", "region": "India", "status": "Firm" },
-      { "id": "dhirubhai-deepwater-kg1-2", "vesselId": "dhirubhai-deepwater-kg1", "startDate": "2026-04-01", "endDate": "2027-01-31", "dayRate": 410000, "client": "Reliance Industries", "region": "India", "status": "Firm" },
-      { "id": "dhirubhai-deepwater-kg1-3", "vesselId": "dhirubhai-deepwater-kg1", "startDate": "2027-02-01", "endDate": "2027-10-31", "dayRate": 410000, "client": "Reliance Industries", "region": "India", "status": "Firm" },
-      { "id": "dhirubhai-deepwater-kg1-4", "vesselId": "dhirubhai-deepwater-kg1", "startDate": "2027-11-01", "endDate": "2029-03-31", "dayRate": 0, "client": "Reliance Industries", "region": "India", "status": "Option" }
+      { "id": "dhirubhai-deepwater-kg1-1", "vesselId": "dhirubhai-deepwater-kg1", "startDate": "2024-05-01", "endDate": "2026-02-28", "dayRate": 347500, "client": "ONGC", "region": "India", "status": "Firm" },
+      { "id": "dhirubhai-deepwater-kg1-2", "vesselId": "dhirubhai-deepwater-kg1", "startDate": "2026-04-01", "endDate": "2027-02-28", "dayRate": 410000, "client": "Reliance Industries", "region": "India", "status": "Firm" },
+      { "id": "dhirubhai-deepwater-kg1-3", "vesselId": "dhirubhai-deepwater-kg1", "startDate": "2027-02-01", "endDate": "2027-11-30", "dayRate": 410000, "client": "Reliance Industries", "region": "India", "status": "Firm" },
+      { "id": "dhirubhai-deepwater-kg1-4", "vesselId": "dhirubhai-deepwater-kg1", "startDate": "2027-11-01", "endDate": "2029-04-30", "dayRate": 0, "client": "Reliance Industries", "region": "India", "status": "Option" }
     ]
   },
   {
-    "id": "ocean-rig-apollo",
-    "name": "Ocean Rig Apollo",
-    "company": "Transocean",
-    "generation": "7G",
-    "status": "Cold-Stacked",
-    "yearBuilt": 2015,
-    "contracts": []
+    "id": "ocean-rig-apollo", "name": "Ocean Rig Apollo", "company": "Transocean", "generation": "7G", "status": "Stacked", "yearBuilt": 2015, "contracts": []
   },
   {
-    "id": "ocean-rig-athena",
-    "name": "Ocean Rig Athena",
-    "company": "Transocean",
-    "generation": "7G",
-    "status": "Cold-Stacked",
-    "yearBuilt": 2014,
-    "contracts": []
+    "id": "ocean-rig-athena", "name": "Ocean Rig Athena", "company": "Transocean", "generation": "7G", "status": "Stacked", "yearBuilt": 2014, "contracts": []
   },
   {
-    "id": "ocean-rig-mylos",
-    "name": "Ocean Rig Mylos",
-    "company": "Transocean",
-    "generation": "7G",
-    "status": "Cold-Stacked",
-    "yearBuilt": 2013,
-    "contracts": []
+    "id": "ocean-rig-mylos", "name": "Ocean Rig Mylos", "company": "Transocean", "generation": "7G", "status": "Stacked", "yearBuilt": 2013, "contracts": []
   }
 ]
