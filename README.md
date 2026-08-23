@@ -11,6 +11,15 @@ npm run dev
 
 브라우저에서 `http://localhost:3000` 접속
 
+## 자동 업데이트 / 배포
+
+- 앱은 실행 시 `fleet-data.json`과 `fleet-data.meta.json`을 우선 읽고, 실패하면 번들 기본 JSON으로 되돌아갑니다.
+- GitHub Actions 워크플로는 매일 03:00 UTC에 `npm run data:sync`를 실행한 뒤 GitHub Pages로 배포합니다.
+- 원격 데이터 원천을 쓰려면 GitHub Repository Variables에 다음을 설정합니다.
+  - `FLEET_DATA_URL`
+  - `FLEET_DATA_META_URL`
+- 둘 다 없으면 현재 리포지토리의 기본 데이터가 그대로 사용됩니다.
+
 ## 기능
 
 ### Dashboard

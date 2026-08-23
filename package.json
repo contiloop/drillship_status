@@ -6,11 +6,13 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "data:sync": "node scripts/sync-fleet-data.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
     "@vercel/analytics": "^1.6.1",
     "lucide-react": "^0.562.0",
+    "pdf-parse": "^2.4.5",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "recharts": "^3.6.0"

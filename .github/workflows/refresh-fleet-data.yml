@@ -1,0 +1,38 @@
+name: Refresh Fleet Data
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 11 * * 1-5'
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Refresh fleet snapshot
+        run: node scripts/refresh-fleet-data.mjs
+
+      - name: Commit refreshed snapshot
+        run: |
+          if git diff --quiet -- data/latest_fleet_snapshot.json data/source_snapshot.json; then
+            echo "No changes"
+            exit 0
+          fi
+          git config user.name "drillship-bot"
+          git config user.email "drillship-bot@users.noreply.github.com"
+          git add data/latest_fleet_snapshot.json data/source_snapshot.json
+          git commit -m "Refresh fleet snapshot"
+          git push
+

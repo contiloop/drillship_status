@@ -10,42 +10,61 @@ import MarketChart from './components/MarketChart';
 import FleetGantt from './components/FleetGantt';
 import defaultData from './data/data_as_of_26_01_07.json';
 
-const STORAGE_KEY = 'drillship_fleet_data_v2';
+const BASE_URL = import.meta.env.BASE_URL || '/';
+const REMOTE_DATA_URL = import.meta.env.VITE_FLEET_DATA_URL || `${BASE_URL}fleet-data.json`;
+const REMOTE_META_URL = import.meta.env.VITE_FLEET_DATA_META_URL || `${BASE_URL}fleet-data.meta.json`;
+const REMOTE_SOURCE_STATUS_URL = `${BASE_URL}fleet-sources.json`;
 
 type TabType = 'overview' | 'transocean' | 'valaris' | 'noble' | 'seadrill' | 'readme';
 
 export default function App() {
   const [ships, setShips] = useState<Drillship[]>([]);
+  const [dataSource, setDataSource] = useState<'remote' | 'cached' | 'bundled'>('bundled');
+  const [syncMeta, setSyncMeta] = useState<{ updatedAt?: string; source?: string } | null>(null);
+  const [sourceStatus, setSourceStatus] = useState<{ generatedAt: string; results: Array<{ company: string; latestUrl: string | null; reportedAt: string | null; found: number; error?: string; status?: string; }>; }>({ generatedAt: '', results: [] });
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [utilizationMode, setUtilizationMode] = useState<'fleet' | 'market' | 'economic'>('market');
-  const isInitialMount = useRef(true);
   const isLoaded = useRef(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
+    const loadRemoteData = async () => {
       try {
-        let parsed: Drillship[] = JSON.parse(saved);
-        setShips(parsed);
-      } catch (e) {
-        console.error("Failed to load local data", e);
-      }
-    } else {
-      // 저장된 데이터가 없으면 기본 데이터 로드
-      setShips(defaultData as Drillship[]);
-    }
-    isLoaded.current = true;
-  }, []);
+        const metaResponse = await fetch(REMOTE_META_URL, { cache: 'no-store' });
+        if (metaResponse.ok) {
+          const meta = await metaResponse.json();
+          setSyncMeta(meta);
+        }
 
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-    if (isLoaded.current) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(ships));
-    }
-  }, [ships]);
+        const sourcesResponse = await fetch(REMOTE_SOURCE_STATUS_URL, { cache: 'no-store' });
+        if (sourcesResponse.ok) {
+          const sources = await sourcesResponse.json();
+          setSourceStatus({
+            generatedAt: sources.generatedAt || '',
+            results: Array.isArray(sources.results) ? sources.results : []
+          });
+        }
+
+        const response = await fetch(REMOTE_DATA_URL, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`remote data HTTP ${response.status}`);
+
+        const remoteShips = await response.json();
+        if (Array.isArray(remoteShips) && remoteShips.length > 0) {
+          setShips(remoteShips as Drillship[]);
+          setDataSource('remote');
+          isLoaded.current = true;
+          return;
+        }
+      } catch (error) {
+        console.warn('Remote fleet data unavailable, falling back to bundled data.', error);
+      }
+
+      setShips(defaultData as Drillship[]);
+      setDataSource('bundled');
+      isLoaded.current = true;
+    };
+
+    loadRemoteData();
+  }, []);
 
   const exportData = () => {
     const blob = new Blob([JSON.stringify(ships, null, 2)], { type: 'application/json' });
@@ -178,8 +197,8 @@ export default function App() {
 
         <div className="pt-8 border-t border-slate-800 opacity-50">
           <div className="hidden md:block p-4 bg-slate-800/30 rounded-2xl">
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Manual Mode</p>
-            <p className="text-[10px] text-slate-400">Database is strictly controlled by JSON imports.</p>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Auto Sync</p>
+            <p className="text-[10px] text-slate-400">Remote sync refreshes from official fleet pages; local JSON remains fallback.</p>
           </div>
         </div>
       </div>
@@ -199,6 +218,14 @@ export default function App() {
               {activeTab === 'readme' ? 'Offshore Drillship Fleet Status & Pricing Intelligence' :
                activeTab === 'overview' ? 'Offshore Drillship Fleet Status & Pricing Intelligence' :
                `${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Drillship Fleet Analysis`}
+            </p>
+            {syncMeta?.updatedAt && (
+              <p className="text-[11px] text-slate-600 mt-2">
+                Auto-sync {new Date(syncMeta.updatedAt).toLocaleString()} · {syncMeta.source || 'official sources'}
+              </p>
+            )}
+            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.24em] mt-2">
+              Data source: {dataSource}
             </p>
           </div>
           {(activeTab === 'overview' || activeTab === 'transocean' || activeTab === 'valaris' || activeTab === 'noble' || activeTab === 'seadrill') && (

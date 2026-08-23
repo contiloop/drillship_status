@@ -1,0 +1,31 @@
+[
+  {
+    "company": "Transocean",
+    "pageUrl": "https://www.deepwater.com/investors/fleet-status-report",
+    "latestUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/August%202026%20Fleet%20Status%20Report.pdf",
+    "reportedAt": "08/05/2026",
+    "found": 0
+  },
+  {
+    "company": "Valaris",
+    "pageUrl": "https://www.valaris.com/investors/default.aspx",
+    "latestUrl": "https://s23.q4cdn.com/956522167/files/doc_financials/2026/q2/08052026-Fleet-Status-Report_FINAL.pdf",
+    "reportedAt": null,
+    "found": 0,
+    "error": "Failed to load Valaris page: 403"
+  },
+  {
+    "company": "Noble",
+    "pageUrl": "https://noblecorp.com/our-fleet/",
+    "latestUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-3/?wpdmdl=3701",
+    "reportedAt": "July 27, 2026",
+    "found": 4
+  },
+  {
+    "company": "Seadrill",
+    "pageUrl": "https://www.seadrill.com/fleet/",
+    "latestUrl": "https://www.seadrill.com/wp-content/uploads/2026/08/Seadrill-Fleet-Status-Report-August-2026-vF.pdf",
+    "reportedAt": null,
+    "found": 0
+  }
+]
