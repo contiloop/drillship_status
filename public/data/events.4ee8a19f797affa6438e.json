@@ -1,0 +1,387 @@
+{
+  "generatedAt": "2026-08-23T17:11:49Z",
+  "events": [
+    {
+      "company": "Noble",
+      "title": "Noble Corporation plc to announce second quarter 2026 results",
+      "url": "https://noblecorp.com/press-release/noble-corporation-plc-to-announce-second-quarter-2026-results/",
+      "publishedAt": "July 14, 2026",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Noble",
+      "title": "Fleet Status Report",
+      "url": "https://noblecorp.com/our-investors/reports-filings/fleet-status-report/",
+      "publishedAt": "July 27, 2026",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Noble",
+      "title": "Quarterly Results",
+      "url": "https://noblecorp.com/our-investors/reports-filings/quarterly-results/",
+      "publishedAt": "July 27, 2026",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Noble",
+      "title": "NOBLE CORPORATION PLC ANNOUNCES SECOND QUARTER 2026 RESULTS",
+      "url": "https://noblecorp.com/press-release/noble-corporation-plc-announces-second-quarter-2026-results/",
+      "publishedAt": "July 27, 2026",
+      "vessels": [
+        "Noble Faye Kozack",
+        "Noble Viking"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Seadrill",
+      "title": "Seadrill Announces Multiple Contract Awards",
+      "url": "https://ir.seadrill.com/news/news-details/2026/Seadrill-Announces-Multiple-Contract-Awards/default.aspx",
+      "publishedAt": "2026-01-21",
+      "vessels": [
+        "West Capella",
+        "West Carina"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Seadrill",
+      "title": "Seadrill Announces West Saturn Contract Extension",
+      "url": "https://ir.seadrill.com/news/news-details/2026/Seadrill-Announces-West-Saturn-Contract-Extension/default.aspx",
+      "publishedAt": "2026-01-30",
+      "vessels": [
+        "West Saturn"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Seadrill",
+      "title": "Seadrill Announces Fourth Quarter and Full Year 2025 Results",
+      "url": "https://ir.seadrill.com/news/news-details/2026/Seadrill-Announces-Fourth-Quarter-and-Full-Year-2025-Results/default.aspx",
+      "publishedAt": "2026-02-25",
+      "vessels": [
+        "Sonangol Libongos",
+        "Sonangol Quenguela",
+        "West Capella",
+        "West Carina",
+        "West Gemini",
+        "West Jupiter",
+        "West Neptune",
+        "West Saturn",
+        "West Tellus"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Seadrill",
+      "title": "Seadrill Announces Contract Extension in Angola",
+      "url": "https://ir.seadrill.com/news/news-details/2026/Seadrill-Announces-Contract-Extension-in-Angola/default.aspx",
+      "publishedAt": "2026-03-16",
+      "vessels": [
+        "Sonangol Quenguela"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Seadrill",
+      "title": "Seadrill Announces West Polaris Contract Extension in Brazil",
+      "url": "https://ir.seadrill.com/news/news-details/2026/Seadrill-Announces-West-Polaris-Contract-Extension-in-Brazil/default.aspx",
+      "publishedAt": "2026-04-06",
+      "vessels": [
+        "West Polaris"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Seadrill",
+      "title": "Seadrill Announces U.S. Gulf Contract Awards for West Neptune and West Vela",
+      "url": "https://ir.seadrill.com/news/news-details/2026/Seadrill-Announces-U-S--Gulf-Contract-Awards-for-West-Neptune-and-West-Vela/default.aspx",
+      "publishedAt": "2026-04-22",
+      "vessels": [
+        "West Neptune",
+        "West Vela"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Seadrill",
+      "title": "Seadrill Announces First Quarter 2026 Results",
+      "url": "https://ir.seadrill.com/news/news-details/2026/Seadrill-Announces-First-Quarter-2026-Results/default.aspx",
+      "publishedAt": "2026-05-11",
+      "vessels": [
+        "Sonangol Libongos",
+        "Sonangol Quenguela",
+        "West Capella",
+        "West Carina",
+        "West Gemini",
+        "West Jupiter",
+        "West Neptune",
+        "West Polaris",
+        "West Vela"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Seadrill",
+      "title": "Seadrill Announces Second Quarter 2026 Results",
+      "url": "https://ir.seadrill.com/news/news-details/2026/Seadrill-Announces-Second-Quarter-2026-Results/default.aspx",
+      "publishedAt": "2026-08-10",
+      "vessels": [
+        "Sonangol Libongos",
+        "Sonangol Quenguela",
+        "West Capella",
+        "West Gemini",
+        "West Jupiter",
+        "West Tellus",
+        "West Vela"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Transocean",
+      "title": "Transocean Ltd. Announces $425 Million Additional Backlog for Ultra-Deepwater Drillship",
+      "url": "https://investor.deepwater.com/news-releases/news-release-details/transocean-ltd-announces-425-million-additional-backlog-ultra",
+      "publishedAt": "April 14, 2026",
+      "vessels": [
+        "Deepwater Corcovado"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Transocean",
+      "title": "Transocean Ltd. Announces $158 Million Award for Ultra-Deepwater Drillship",
+      "url": "https://investor.deepwater.com/news-releases/news-release-details/transocean-ltd-announces-158-million-award-ultra-deepwater",
+      "publishedAt": "April 16, 2026",
+      "vessels": [
+        "Deepwater Aquila",
+        "Deepwater Asgard",
+        "Deepwater Corcovado",
+        "Deepwater Orion"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Transocean",
+      "title": "Transocean Ltd. Announces $300 Million Contract For Ultra-Deepwater Drillship",
+      "url": "https://investor.deepwater.com/news-releases/news-release-details/transocean-ltd-announces-300-million-contract-ultra-deepwater",
+      "publishedAt": "August 20, 2026",
+      "vessels": [
+        "Dhirubhai Deepwater KG2"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": true,
+      "reviewStatus": "pending"
+    },
+    {
+      "company": "Transocean",
+      "title": "Transocean Ltd. Provides Quarterly Fleet Status Report",
+      "url": "https://investor.deepwater.com/news-releases/news-release-details/transocean-ltd-provides-quarterly-fleet-status-report-40",
+      "publishedAt": "August 5, 2026",
+      "vessels": [
+        "Deepwater Conqueror",
+        "Deepwater Proteus",
+        "Deepwater Skyros"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Transocean",
+      "title": "Transocean Ltd. Reports Second Quarter 2026 Results",
+      "url": "https://investor.deepwater.com/news-releases/news-release-details/transocean-ltd-reports-second-quarter-2026-results",
+      "publishedAt": "August 5, 2026",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Transocean",
+      "title": "Transocean Ltd. Announces Contract Awards Totaling $185 Million",
+      "url": "https://investor.deepwater.com/news-releases/news-release-details/transocean-ltd-announces-contract-awards-totaling-185-million",
+      "publishedAt": "June 16, 2026",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Transocean",
+      "title": "Transocean Ltd. Provides Quarterly Fleet Status Report",
+      "url": "https://investor.deepwater.com/news-releases/news-release-details/transocean-ltd-provides-quarterly-fleet-status-report-39",
+      "publishedAt": "May 4, 2026",
+      "vessels": [
+        "Deepwater Aquila",
+        "Deepwater Asgard",
+        "Deepwater Corcovado",
+        "Deepwater Orion"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Transocean",
+      "title": "Transocean Ltd. Reports First Quarter 2026 Results",
+      "url": "https://investor.deepwater.com/news-releases/news-release-details/transocean-ltd-reports-first-quarter-2026-results",
+      "publishedAt": "May 4, 2026",
+      "vessels": [
+        "Deepwater Titan"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Valaris",
+      "vessel": "VALARIS DS-18",
+      "classification": "letter-of-award",
+      "start": "Nov 26",
+      "end": "May 27",
+      "autoApplied": false,
+      "reason": "The report explicitly labels this period as an LOA, not firm backlog.",
+      "pendingReview": true,
+      "reviewStatus": "pending"
+    },
+    {
+      "company": "Valaris",
+      "title": "Valaris Issues Fleet Status Report",
+      "url": "https://www.valaris.com/news/news-details/2026/Valaris-Issues-Fleet-Status-Report/default.aspx",
+      "publishedAt": "2026-02-17",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Valaris",
+      "title": "Valaris Reports Fourth Quarter 2025 Results",
+      "url": "https://www.valaris.com/news/news-details/2026/Valaris-Reports-Fourth-Quarter-2025-Results/default.aspx",
+      "publishedAt": "2026-02-19",
+      "vessels": [
+        "VALARIS DS-15",
+        "VALARIS DS-7"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Valaris",
+      "title": "Valaris Announces Multi-Year Contract Award for Drillship VALARIS DS-4",
+      "url": "https://www.valaris.com/news/news-details/2026/Valaris-Announces-Multi-Year-Contract-Award-for-Drillship-VALARIS-DS-4/default.aspx",
+      "publishedAt": "2026-04-06",
+      "vessels": [
+        "VALARIS DS-4"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Valaris",
+      "title": "Valaris Issues Fleet Status Report",
+      "url": "https://www.valaris.com/news/news-details/2026/Valaris-Issues-Fleet-Status-Report-beb0bbe2d/default.aspx",
+      "publishedAt": "2026-05-04",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Valaris",
+      "title": "Valaris Reports First Quarter 2026 Results",
+      "url": "https://www.valaris.com/news/news-details/2026/Valaris-Reports-First-Quarter-2026-Results/default.aspx",
+      "publishedAt": "2026-05-04",
+      "vessels": [
+        "VALARIS DS-17",
+        "VALARIS DS-4"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Valaris",
+      "title": "Valaris Issues Fleet Status Report",
+      "url": "https://www.valaris.com/news/news-details/2026/Valaris-Issues-Fleet-Status-Report-9b4291bba/default.aspx",
+      "publishedAt": "2026-08-05",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Valaris",
+      "title": "Valaris Reports Second Quarter 2026 Results",
+      "url": "https://www.valaris.com/news/news-details/2026/Valaris-Reports-Second-Quarter-2026-Results/default.aspx",
+      "publishedAt": "2026-08-05",
+      "vessels": [
+        "VALARIS DS-12",
+        "VALARIS DS-17"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-23T17:04:41Z",
+  "generatedAt": "2026-08-23T17:11:49Z",
   "parserVersion": "2026.08.24.1",
   "observations": [
     {
@@ -171,7 +171,7 @@
       "sourceUrl": null,
       "sourceSha256": null,
       "reportDate": null,
-      "rateDisclosure": "unverified-serialized-as-zero",
+      "rate_disclosure": "unverified-serialized-as-zero",
       "start_date": "2025-06-01",
       "end_date": "2025-10-31",
       "client": "Prime",
@@ -188,7 +188,7 @@
       "sourceUrl": null,
       "sourceSha256": null,
       "reportDate": null,
-      "rateDisclosure": "unverified-serialized-as-zero",
+      "rate_disclosure": "unverified-serialized-as-zero",
       "start_date": "2025-11-01",
       "end_date": "2025-11-30",
       "client": "Shell",
@@ -205,7 +205,7 @@
       "sourceUrl": null,
       "sourceSha256": null,
       "reportDate": null,
-      "rateDisclosure": "unverified-serialized-as-zero",
+      "rate_disclosure": "unverified-serialized-as-zero",
       "start_date": "2025-12-01",
       "end_date": "2026-01-31",
       "client": "TotalEnergies",
@@ -560,6 +560,8 @@
       "sourceSha256": "ddfdfe43090fe4f2589352abb7bf14cb292ee7323569f29a9f89e20c079807a6",
       "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-3/?wpdmdl=3701",
       "reportDate": "2026-07-27",
+      "provenanceClass": "official-current-report-operational-note",
+      "rate_disclosure": "not-applicable",
       "operationalNote": "Available"
     },
     {
@@ -571,7 +573,7 @@
       "sourceUrl": null,
       "sourceSha256": null,
       "reportDate": null,
-      "rateDisclosure": "unverified-serialized-as-zero",
+      "rate_disclosure": "unverified-serialized-as-zero",
       "start_date": "2025-12-01",
       "end_date": "2026-03-31",
       "client": "OMV Petrom",
@@ -586,6 +588,8 @@
       "sourceSha256": "ddfdfe43090fe4f2589352abb7bf14cb292ee7323569f29a9f89e20c079807a6",
       "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-3/?wpdmdl=3701",
       "reportDate": "2026-07-27",
+      "provenanceClass": "official-current-report-operational-note",
+      "rate_disclosure": "not-applicable",
       "operationalNote": "Available"
     },
     {
@@ -595,6 +599,8 @@
       "sourceSha256": "ddfdfe43090fe4f2589352abb7bf14cb292ee7323569f29a9f89e20c079807a6",
       "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-3/?wpdmdl=3701",
       "reportDate": "2026-07-27",
+      "provenanceClass": "official-current-report-operational-note",
+      "rate_disclosure": "not-applicable",
       "operationalNote": "–"
     },
     {
@@ -666,7 +672,7 @@
       "sourceUrl": null,
       "sourceSha256": null,
       "reportDate": null,
-      "rateDisclosure": "unverified-serialized-as-zero",
+      "rate_disclosure": "unverified-serialized-as-zero",
       "start_date": "2022-11-01",
       "end_date": "2026-01-31",
       "client": "Petrobras",
@@ -681,6 +687,8 @@
       "sourceSha256": "b774357daafdb62dcc8c371fe5f5d118fb8d7d51c91badd05cd6cae3c9a39cb1",
       "sourceUrl": "https://www.seadrill.com/wp-content/uploads/2026/08/Seadrill-Fleet-Status-Report-August-2026-vF.pdf",
       "reportDate": "2026-08-10",
+      "provenanceClass": "official-current-report-operational-note",
+      "rate_disclosure": "not-applicable",
       "operationalNote": "Available in Namibia"
     },
     {
@@ -772,7 +780,7 @@
       "sourceUrl": null,
       "sourceSha256": null,
       "reportDate": null,
-      "rateDisclosure": "unverified-serialized-as-zero",
+      "rate_disclosure": "unverified-serialized-as-zero",
       "start_date": "2025-11-01",
       "end_date": "2026-03-31",
       "client": "Talos",
@@ -1049,7 +1057,7 @@
       "sourceUrl": null,
       "sourceSha256": null,
       "reportDate": null,
-      "rateDisclosure": "unverified-serialized-as-zero",
+      "rate_disclosure": "unverified-serialized-as-zero",
       "start_date": "2022-12-01",
       "end_date": "2025-12-31",
       "client": "Petrobras",
@@ -1086,7 +1094,7 @@
       "sourceUrl": null,
       "sourceSha256": null,
       "reportDate": null,
-      "rateDisclosure": "unverified-serialized-as-zero",
+      "rate_disclosure": "unverified-serialized-as-zero",
       "start_date": "2023-01-01",
       "end_date": "2026-02-28",
       "client": "Petrobras",
@@ -1143,7 +1151,7 @@
       "sourceUrl": null,
       "sourceSha256": null,
       "reportDate": null,
-      "rateDisclosure": "unverified-serialized-as-zero",
+      "rate_disclosure": "unverified-serialized-as-zero",
       "start_date": "2025-08-01",
       "end_date": "2026-03-31",
       "client": "Beacon",
@@ -1400,7 +1408,7 @@
       "sourceUrl": null,
       "sourceSha256": null,
       "reportDate": null,
-      "rateDisclosure": "unverified-serialized-as-zero",
+      "rate_disclosure": "unverified-serialized-as-zero",
       "start_date": "2016-08-01",
       "end_date": "2026-05-31",
       "client": "Shell",
@@ -1477,7 +1485,7 @@
       "sourceUrl": null,
       "sourceSha256": null,
       "reportDate": null,
-      "rateDisclosure": "unverified-serialized-as-zero",
+      "rate_disclosure": "unverified-serialized-as-zero",
       "start_date": "2025-06-01",
       "end_date": "2026-06-30",
       "client": "Hess Corporation",
@@ -1534,7 +1542,7 @@
       "sourceUrl": null,
       "sourceSha256": null,
       "reportDate": null,
-      "rateDisclosure": "unverified-serialized-as-zero",
+      "rate_disclosure": "unverified-serialized-as-zero",
       "start_date": "2025-01-01",
       "end_date": "2025-10-31",
       "client": "TotalEnergies",
@@ -1631,7 +1639,7 @@
       "sourceUrl": null,
       "sourceSha256": null,
       "reportDate": null,
-      "rateDisclosure": "unverified-serialized-as-zero",
+      "rate_disclosure": "unverified-serialized-as-zero",
       "start_date": "2023-10-01",
       "end_date": "2025-10-31",
       "client": "Petrobras",
@@ -1648,7 +1656,7 @@
       "sourceUrl": null,
       "sourceSha256": null,
       "reportDate": null,
-      "rateDisclosure": "unverified-serialized-as-zero",
+      "rate_disclosure": "unverified-serialized-as-zero",
       "start_date": "2025-10-01",
       "end_date": "2025-12-31",
       "client": "Petrobras",
@@ -1665,7 +1673,7 @@
       "sourceUrl": null,
       "sourceSha256": null,
       "reportDate": null,
-      "rateDisclosure": "unverified-serialized-as-zero",
+      "rate_disclosure": "unverified-serialized-as-zero",
       "start_date": "2025-12-01",
       "end_date": "2026-01-30",
       "client": "Petrobras",
@@ -1682,7 +1690,7 @@
       "sourceUrl": null,
       "sourceSha256": null,
       "reportDate": null,
-      "rateDisclosure": "unverified-serialized-as-zero",
+      "rate_disclosure": "unverified-serialized-as-zero",
       "start_date": "2026-01-01",
       "end_date": "2026-04-30",
       "client": "bp",
@@ -1717,6 +1725,8 @@
       "sourceSha256": "f2f98b03f750b5c4f6d299bff9b55d0ecc4dbeb0cb4f069054193968894db8b6",
       "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/August%202026%20Fleet%20Status%20Report.pdf",
       "reportDate": "2026-08-05",
+      "provenanceClass": "official-current-report-operational-note",
+      "rate_disclosure": "not-applicable",
       "operationalNote": "Out of Service 80 days - Contract Preparation"
     },
     {
@@ -1808,7 +1818,7 @@
       "sourceUrl": null,
       "sourceSha256": null,
       "reportDate": null,
-      "rateDisclosure": "unverified-serialized-as-zero",
+      "rate_disclosure": "unverified-serialized-as-zero",
       "start_date": "2024-06-01",
       "end_date": "2026-05-31",
       "client": "Petrobras",
@@ -1823,6 +1833,8 @@
       "sourceSha256": "f2f98b03f750b5c4f6d299bff9b55d0ecc4dbeb0cb4f069054193968894db8b6",
       "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/August%202026%20Fleet%20Status%20Report.pdf",
       "reportDate": "2026-08-05",
+      "provenanceClass": "official-current-report-operational-note",
+      "rate_disclosure": "not-applicable",
       "operationalNote": "Idle"
     },
     {
@@ -1914,7 +1926,7 @@
       "sourceUrl": null,
       "sourceSha256": null,
       "reportDate": null,
-      "rateDisclosure": "unverified-serialized-as-zero",
+      "rate_disclosure": "unverified-serialized-as-zero",
       "start_date": "2024-05-01",
       "end_date": "2026-02-28",
       "client": "ONGC",
@@ -1969,6 +1981,8 @@
       "sourceSha256": "f2f98b03f750b5c4f6d299bff9b55d0ecc4dbeb0cb4f069054193968894db8b6",
       "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/August%202026%20Fleet%20Status%20Report.pdf",
       "reportDate": "2026-08-05",
+      "provenanceClass": "official-current-report-operational-note",
+      "rate_disclosure": "not-applicable",
       "operationalNote": "Out of Service 70 days - Contract Preparation"
     },
     {
@@ -1978,6 +1992,8 @@
       "sourceSha256": "f2f98b03f750b5c4f6d299bff9b55d0ecc4dbeb0cb4f069054193968894db8b6",
       "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/August%202026%20Fleet%20Status%20Report.pdf",
       "reportDate": "2026-08-05",
+      "provenanceClass": "official-current-report-operational-note",
+      "rate_disclosure": "not-applicable",
       "operationalNote": "Stacked May-16"
     },
     {
@@ -1987,6 +2003,8 @@
       "sourceSha256": "f2f98b03f750b5c4f6d299bff9b55d0ecc4dbeb0cb4f069054193968894db8b6",
       "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/August%202026%20Fleet%20Status%20Report.pdf",
       "reportDate": "2026-08-05",
+      "provenanceClass": "official-current-report-operational-note",
+      "rate_disclosure": "not-applicable",
       "operationalNote": "Stacked Mar-17"
     },
     {
@@ -1996,6 +2014,8 @@
       "sourceSha256": "f2f98b03f750b5c4f6d299bff9b55d0ecc4dbeb0cb4f069054193968894db8b6",
       "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/August%202026%20Fleet%20Status%20Report.pdf",
       "reportDate": "2026-08-05",
+      "provenanceClass": "official-current-report-operational-note",
+      "rate_disclosure": "not-applicable",
       "operationalNote": "Stacked Sep-16"
     },
     {
@@ -2007,7 +2027,7 @@
       "sourceUrl": null,
       "sourceSha256": null,
       "reportDate": null,
-      "rateDisclosure": "unverified-serialized-as-zero",
+      "rate_disclosure": "unverified-serialized-as-zero",
       "start_date": "2022-08-01",
       "end_date": "2025-08-31",
       "client": "Chevron / Occidental",
@@ -2044,7 +2064,7 @@
       "sourceUrl": null,
       "sourceSha256": null,
       "reportDate": null,
-      "rateDisclosure": "unverified-serialized-as-zero",
+      "rate_disclosure": "unverified-serialized-as-zero",
       "start_date": "2025-05-01",
       "end_date": "2025-12-31",
       "client": "Equinor",
@@ -2121,7 +2141,7 @@
       "sourceUrl": null,
       "sourceSha256": null,
       "reportDate": null,
-      "rateDisclosure": "unverified-serialized-as-zero",
+      "rate_disclosure": "unverified-serialized-as-zero",
       "start_date": "2024-12-01",
       "end_date": "2025-08-31",
       "client": "TotalEnergies",
@@ -2356,6 +2376,8 @@
       "sourceSha256": "c94713719e350294eb91b0361212df7e5951c8d00b9e108ff7afa4a797e55e80",
       "sourceUrl": "https://s23.q4cdn.com/956522167/files/doc_financials/2026/q2/08052026-Fleet-Status-Report_FINAL.pdf",
       "reportDate": "2026-08-05",
+      "provenanceClass": "official-current-report-operational-note",
+      "rate_disclosure": "not-applicable",
       "operationalNote": "Listed in the official stacked-rig section"
     },
     {
@@ -2365,6 +2387,8 @@
       "sourceSha256": "c94713719e350294eb91b0361212df7e5951c8d00b9e108ff7afa4a797e55e80",
       "sourceUrl": "https://s23.q4cdn.com/956522167/files/doc_financials/2026/q2/08052026-Fleet-Status-Report_FINAL.pdf",
       "reportDate": "2026-08-05",
+      "provenanceClass": "official-current-report-operational-note",
+      "rate_disclosure": "not-applicable",
       "operationalNote": "Listed in the official stacked-rig section"
     },
     {
@@ -2374,6 +2398,8 @@
       "sourceSha256": "c94713719e350294eb91b0361212df7e5951c8d00b9e108ff7afa4a797e55e80",
       "sourceUrl": "https://s23.q4cdn.com/956522167/files/doc_financials/2026/q2/08052026-Fleet-Status-Report_FINAL.pdf",
       "reportDate": "2026-08-05",
+      "provenanceClass": "official-current-report-operational-note",
+      "rate_disclosure": "not-applicable",
       "operationalNote": "Listed in the official stacked-rig section"
     }
   ]

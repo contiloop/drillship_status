@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-23T17:04:41Z",
+  "generatedAt": "2026-08-23T17:11:49Z",
   "updatedAsOf": "2026-08-10",
   "dataHash": "5680482f4c85610e7bd4",
-  "stateFingerprint": "7112a586ac3ec61104a5",
+  "stateFingerprint": "c8a197c978b5103fd358",
   "fleetFile": "fleet.5680482f4c85610e7bd4.json",
-  "eventsFile": "events.34353369fb5a85727f01.json",
-  "eventsHash": "34353369fb5a85727f01",
+  "eventsFile": "events.4ee8a19f797affa6438e.json",
+  "eventsHash": "4ee8a19f797affa6438e",
   "shipCount": 62,
   "contractCount": 116,
   "sourceCount": 4,
@@ -20,7 +20,9 @@
       "byteSize": 195253,
       "parserVersion": "2026.08.24.1",
       "discovery": "official-index",
-      "contentType": "application/pdf"
+      "contentType": "application/pdf",
+      "health": "healthy",
+      "newsMonitor": "healthy"
     },
     {
       "company": "Seadrill",
@@ -31,7 +33,9 @@
       "byteSize": 408026,
       "parserVersion": "2026.08.24.1",
       "discovery": "official-wordpress-api",
-      "contentType": "application/pdf"
+      "contentType": "application/pdf",
+      "health": "healthy",
+      "newsMonitor": "healthy"
     },
     {
       "company": "Transocean",
@@ -42,7 +46,9 @@
       "byteSize": 633637,
       "parserVersion": "2026.08.24.1",
       "discovery": "official-index",
-      "contentType": "application/pdf"
+      "contentType": "application/pdf",
+      "health": "healthy",
+      "newsMonitor": "healthy"
     },
     {
       "company": "Valaris",
@@ -53,9 +59,42 @@
       "byteSize": 974321,
       "parserVersion": "2026.08.24.1",
       "discovery": "official-index-after-sec-HTTPError",
-      "contentType": "application/pdf"
+      "contentType": "application/pdf",
+      "health": "healthy-official-alternate",
+      "newsMonitor": "healthy"
     }
   ],
-  "warningsCount": 13,
-  "pendingEventCount": 28
+  "sourceHealth": [
+    {
+      "company": "Noble",
+      "fleetReport": "healthy",
+      "discovery": "official-index",
+      "newsMonitor": "healthy",
+      "preservedNewsEvents": 0
+    },
+    {
+      "company": "Seadrill",
+      "fleetReport": "healthy",
+      "discovery": "official-wordpress-api",
+      "newsMonitor": "healthy",
+      "preservedNewsEvents": 0
+    },
+    {
+      "company": "Transocean",
+      "fleetReport": "healthy",
+      "discovery": "official-index",
+      "newsMonitor": "healthy",
+      "preservedNewsEvents": 0
+    },
+    {
+      "company": "Valaris",
+      "fleetReport": "healthy-official-alternate",
+      "discovery": "official-index-after-sec-HTTPError",
+      "newsMonitor": "healthy",
+      "preservedNewsEvents": 0
+    }
+  ],
+  "warningsCount": 12,
+  "eventCount": 28,
+  "pendingEventCount": 2
 }
