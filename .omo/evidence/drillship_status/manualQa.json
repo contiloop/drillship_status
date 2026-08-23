@@ -37,7 +37,7 @@
         "scenarioId": "S5",
         "criterionReference": "Local HTTP serves manifest, fleet, and event payloads",
         "surface": "HTTP",
-        "exactInvocation": "curl -i http://127.0.0.1:4174/data/manifest.json; curl -i http://127.0.0.1:4174/data/fleet.5680482f4c85610e7bd4.json; curl -i http://127.0.0.1:4174/data/events.34353369fb5a85727f01.json",
+        "exactInvocation": "curl -i http://127.0.0.1:4174/data/manifest.json; curl -i http://127.0.0.1:4174/data/fleet.06d7348ab9cd5c01f447.json; curl -i http://127.0.0.1:4174/data/events.31919c11d036f9f2cac3.json",
         "verdict": "PASS",
         "artifactRefs": ["local-manifest-curl", "local-fleet-curl", "local-events-curl"]
       },

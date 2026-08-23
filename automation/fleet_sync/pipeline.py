@@ -45,13 +45,13 @@ ALLOWED_GENERATIONS = {"6G", "7G", "7G+", "8G"}
 ALLOWED_VESSEL_STATUSES = {"Active", "Idle", "Warm-Stacked", "Cold-Stacked"}
 ALLOWED_CONTRACT_STATUSES = {"Firm", "Option", "Contingent"}
 OFFLINE_FILES = {
-    "Transocean": ".cache/reports/transocean-2026-08.pdf",
-    "Valaris": ".cache/reports/valaris-2026-08.pdf",
-    "Noble": ".cache/reports/noble-2026-07.pdf",
-    "Seadrill": ".cache/reports/seadrill-2026-08.pdf",
+    "Transocean": "automation/tests/fixtures/reports/transocean-2026-08.pdf",
+    "Valaris": "automation/tests/fixtures/reports/valaris-2026-08.pdf",
+    "Noble": "automation/tests/fixtures/reports/noble-2026-07.pdf",
+    "Seadrill": "automation/tests/fixtures/reports/seadrill-2026-08.pdf",
 }
 # The four current golden reports contain 33/15/27/20 contract rows. A parser
-# must retain at least half of that known-good coverage; a larger legitimate
+# must retain at least 75% of that known-good coverage; a larger legitimate
 # fleet change still needs a reviewed baseline update instead of silent publish.
 KNOWN_GOOD_CONTRACT_COUNTS = {
     "Transocean": 33,
@@ -60,14 +60,16 @@ KNOWN_GOOD_CONTRACT_COUNTS = {
     "Seadrill": 20,
 }
 MIN_PARSED_CONTRACTS = {
-    company: (count + 1) // 2
+    company: (count * 3 + 3) // 4
     for company, count in KNOWN_GOOD_CONTRACT_COUNTS.items()
 }
 # Fleet-status reports are normally quarterly. Direct official discovery is
-# given extra headroom, while a hard-coded fallback expires after four months.
+# given extra headroom; a hard-coded fallback expires after four months or four
+# consecutive scheduled runs, whichever comes first.
 MAX_REPORT_AGE_DAYS = 180
 MAX_FALLBACK_REPORT_AGE_DAYS = 120
 MAX_FUTURE_REPORT_DAYS = 2
+MAX_CONSECUTIVE_FALLBACK_RUNS = 4
 
 
 class PipelineError(RuntimeError):
@@ -80,7 +82,10 @@ def _load_current_fleet(root: Path) -> list[dict[str, Any]]:
         manifest = load_json(manifest_path)
         if not isinstance(manifest, dict) or not isinstance(manifest.get("fleetFile"), str):
             raise PipelineError("existing manifest has an invalid fleetFile")
-        current_path = manifest_path.parent / manifest["fleetFile"]
+        filename = manifest["fleetFile"]
+        if Path(filename).name != filename:
+            raise PipelineError("existing manifest has an unsafe fleetFile")
+        current_path = manifest_path.parent / filename
         current = load_json(current_path)
     else:
         current = load_json(root / "data" / "data_as_of_26_01_07.json")
@@ -134,6 +139,23 @@ def _previous_report_dates(root: Path) -> dict[str, str]:
         if isinstance(item, dict)
         and isinstance(item.get("company"), str)
         and isinstance(item.get("reportDate"), str)
+    }
+
+
+def _previous_source_health(root: Path) -> dict[str, dict[str, Any]]:
+    manifest_path = root / "public" / "data" / "manifest.json"
+    if not manifest_path.exists():
+        return {}
+    manifest = load_json(manifest_path)
+    if not isinstance(manifest, dict):
+        return {}
+    health = manifest.get("sourceHealth", [])
+    if not isinstance(health, list):
+        return {}
+    return {
+        item["company"]: item
+        for item in health
+        if isinstance(item, dict) and isinstance(item.get("company"), str)
     }
 
 
@@ -193,6 +215,7 @@ def _fleet_source_health(
     *,
     as_of: date | None = None,
     enforce_age: bool = True,
+    fallback_streak: int = 0,
 ) -> tuple[str, str | None]:
     """Validate report chronology and classify stable discovery health."""
 
@@ -222,14 +245,64 @@ def _fleet_source_health(
                 f"{company}: {mode} report {report_date} is {age_days} days old; "
                 f"maximum allowed age is {max_age} days"
             )
+        if fallback and fallback_streak > MAX_CONSECUTIVE_FALLBACK_RUNS:
+            raise PipelineError(
+                f"{company}: identical fallback report persisted for {fallback_streak} consecutive runs; "
+                f"maximum allowed is {MAX_CONSECUTIVE_FALLBACK_RUNS}"
+            )
 
     warning = None
     if fallback:
         warning = (
             f"{company} fleet discovery degraded: {discovery}; validated fallback report "
-            f"{report_date} is accepted for at most {MAX_FALLBACK_REPORT_AGE_DAYS} days."
+            f"{report_date} is accepted for at most {MAX_FALLBACK_REPORT_AGE_DAYS} days "
+            f"and {MAX_CONSECUTIVE_FALLBACK_RUNS} consecutive runs "
+            f"(current streak {fallback_streak})."
+        )
+    elif discovery.startswith("sec-submissions-after-official-"):
+        health = "degraded-regulatory-alternate"
+        warning = (
+            f"{company} official investor index discovery degraded: {discovery}; "
+            "a validated SEC fleet-status exhibit was used."
         )
     return health, warning
+
+
+def _next_fallback_streak(
+    discovery: str,
+    previous: dict[str, Any] | None,
+    *,
+    report_date: str,
+    sha256: str,
+) -> int:
+    if not discovery.startswith("fallback-after-"):
+        return 0
+    if not previous or previous.get("fleetReport") != "degraded-fallback":
+        return 1
+    same_document = (
+        previous.get("reportDate") == report_date
+        and previous.get("sha256") == sha256
+    )
+    if not same_document:
+        return 1
+    prior_streak = previous.get("fallbackStreak", 0)
+    if not isinstance(prior_streak, int) or prior_streak < 0:
+        prior_streak = 0
+    return prior_streak + 1
+
+
+def _restore_verified_history_rate(
+    contract: dict[str, Any],
+    prior: dict[str, Any] | None,
+) -> bool:
+    if not prior or not prior.get("sourceUrl") or not prior.get("sourceSha256"):
+        return False
+    disclosure = prior.get("rate_disclosure", prior.get("rateDisclosure"))
+    prior_rate = prior.get("day_rate")
+    if disclosure != "reported" or not isinstance(prior_rate, int) or prior_rate <= 0:
+        return False
+    contract["dayRate"] = prior_rate
+    return True
 
 
 def _event_identity(event: dict[str, Any]) -> tuple[str, ...]:
@@ -256,7 +329,22 @@ def _merge_news_events(
     for event in [*previous, *current]:
         if event.get("classification") != "official-news-signal":
             continue
-        merged[_event_identity(event)] = dict(event)
+        identity = _event_identity(event)
+        prior = merged.get(identity, {})
+        combined = {**prior, **event}
+        prior_vessels = prior.get("vessels")
+        current_vessels = event.get("vessels")
+        combined["vessels"] = sorted(
+            {
+                str(vessel)
+                for vessel in [
+                    *(prior_vessels if isinstance(prior_vessels, list) else []),
+                    *(current_vessels if isinstance(current_vessels, list) else []),
+                ]
+                if str(vessel)
+            }
+        )
+        merged[identity] = combined
     return list(merged.values())
 
 
@@ -297,6 +385,10 @@ def _annotate_event_review(
             event["reviewStatus"] = "pending" if is_pending else "applied"
         annotated.append(event)
     return annotated
+
+
+def _dedupe_warnings(warnings: list[str]) -> list[str]:
+    return sorted(set(warnings))
 
 
 def _semantic_changes(before: list[dict[str, Any]], after: list[dict[str, Any]]) -> dict[str, Any]:
@@ -355,6 +447,9 @@ def validate_fleet(fleet: list[dict[str, Any]], expected_names: dict[str, set[st
             raise PipelineError(f"{ship.get('name')}: invalid generation")
         if ship.get("status") not in ALLOWED_VESSEL_STATUSES:
             raise PipelineError(f"{ship.get('name')}: invalid vessel status")
+        if not isinstance(ship.get("statusAsOf"), str):
+            raise PipelineError(f"{ship.get('name')}: missing statusAsOf")
+        validate_iso_date(ship["statusAsOf"])
         if not isinstance(ship.get("yearBuilt"), int):
             raise PipelineError(f"{ship.get('name')}: invalid build year")
         for contract in ship.get("contracts", []):
@@ -398,6 +493,7 @@ def _build_outputs(
         for company, ships in by_company.items()
     }
     previous_dates = _previous_report_dates(root)
+    previous_health = _previous_source_health(root)
     previous_events = _load_previous_events(root)
     previous_observations = _load_previous_observations(root)
     client = HttpClient()
@@ -431,12 +527,20 @@ def _build_outputs(
             content_type,
         )
         _validate_contract_coverage(spec.company, result)
+        document_sha = file_sha256(content)
+        fallback_streak = _next_fallback_streak(
+            discovery,
+            previous_health.get(spec.company),
+            report_date=report_date,
+            sha256=document_sha,
+        )
         fleet_health, fleet_warning = _fleet_source_health(
             spec.company,
             report_date,
             discovery,
             previous_dates.get(spec.company),
             enforce_age=not offline,
+            fallback_streak=fallback_streak,
         )
         if fleet_warning:
             monitor_warnings.append(fleet_warning)
@@ -446,6 +550,10 @@ def _build_outputs(
             "discovery": discovery,
             "newsMonitor": "not-run-offline" if offline else "healthy",
             "preservedNewsEvents": 0,
+            "reportDate": report_date,
+            "documentUrl": document_url,
+            "sha256": document_sha,
+            "fallbackStreak": fallback_streak,
         }
         parsed[spec.company] = (result, report_date)
         sources.append(
@@ -454,7 +562,7 @@ def _build_outputs(
                 index_url=spec.index_url,
                 document_url=document_url,
                 report_date=report_date,
-                sha256=file_sha256(content),
+                sha256=document_sha,
                 byte_size=len(content),
                 retrieved_at=retrieved_at(),
                 parser_version=PARSER_VERSION,
@@ -513,6 +621,7 @@ def _build_outputs(
                 "company": company,
                 "generation": old_ship["generation"],
                 "status": snapshot.status,
+                "statusAsOf": report_date,
                 "yearBuilt": old_ship["yearBuilt"],
                 "contracts": assigned,
             }
@@ -534,6 +643,7 @@ def _build_outputs(
             observation = observed_by_key.get(key)
             if observation is None:
                 prior = previous_observations.get((company, old_ship["id"], contract["id"]))
+                _restore_verified_history_rate(contract, prior)
                 if prior and prior.get("sourceUrl") and prior.get("sourceSha256"):
                     carried = dict(prior)
                     carried.update(
@@ -591,7 +701,16 @@ def _build_outputs(
                     **asdict(observation),
                 }
             )
-        for note in snapshot.notes:
+        operational_rows = getattr(snapshot, "operational_observations", [])
+        if operational_rows:
+            serialized_operational_rows = [
+                (item.note, item.page, item.row) for item in operational_rows
+            ]
+        else:
+            serialized_operational_rows = [
+                (note, None, "legacy-note-without-source-row") for note in snapshot.notes
+            ]
+        for note, page, row in serialized_operational_rows:
             observations.append(
                 {
                     "company": company,
@@ -603,6 +722,8 @@ def _build_outputs(
                     "provenanceClass": "official-current-report-operational-note",
                     "rate_disclosure": "not-applicable",
                     "operationalNote": note,
+                    "page": page,
+                    "row": row,
                 }
             )
 
@@ -643,7 +764,7 @@ def run(root: Path, *, write: bool, offline: bool = False) -> dict[str, Any]:
     fleet, sources, observations, events, warnings, source_health = _build_outputs(
         root, offline=offline
     )
-    warnings = sorted(set(warnings))
+    warnings = _dedupe_warnings(warnings)
     fleet_hash = content_hash(fleet, length=20)
     events_hash = content_hash(events, length=20)
     health_by_company = {item["company"]: item for item in source_health}

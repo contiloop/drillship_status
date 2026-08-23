@@ -67,6 +67,8 @@ SOURCE_SPECS = (
 
 
 class HttpClient:
+    MAX_REDIRECTS = 5
+
     def __init__(self) -> None:
         user_agent = os.environ.get(
             "SEC_USER_AGENT",
@@ -93,23 +95,102 @@ class HttpClient:
         if parsed.scheme != "https" or parsed.hostname not in ALLOWED_HOSTS:
             raise ValueError(f"source URL is not allowlisted: {url}")
 
+    def _request(
+        self,
+        method: str,
+        url: str,
+        *,
+        timeout: int,
+        byte_limit: int,
+        json_payload: dict | None = None,
+    ) -> requests.Response:
+        current_method = method
+        current_url = url
+        current_payload = json_payload
+        for redirect_count in range(self.MAX_REDIRECTS + 1):
+            self._validate_url(current_url)
+            response = self.session.request(
+                current_method,
+                current_url,
+                json=current_payload,
+                timeout=timeout,
+                allow_redirects=False,
+                stream=True,
+            )
+            self._validate_url(response.url)
+            if response.is_redirect or response.is_permanent_redirect:
+                if redirect_count >= self.MAX_REDIRECTS:
+                    response.close()
+                    raise ValueError(f"source exceeded {self.MAX_REDIRECTS} redirects: {url}")
+                location = response.headers.get("location")
+                if not location:
+                    response.close()
+                    raise ValueError(f"source redirect has no Location header: {response.url}")
+                next_url = urljoin(response.url, location)
+                # Validate before the next request so an allowlisted host cannot
+                # bounce credentials or traffic to an arbitrary destination.
+                self._validate_url(next_url)
+                if response.status_code == 303 or (
+                    current_method == "POST" and response.status_code in {301, 302}
+                ):
+                    current_method = "GET"
+                    current_payload = None
+                response.close()
+                current_url = next_url
+                continue
+
+            try:
+                response.raise_for_status()
+            except Exception:
+                response.close()
+                raise
+            declared_length = response.headers.get("content-length")
+            if declared_length:
+                try:
+                    declared_bytes = int(declared_length)
+                except ValueError:
+                    declared_bytes = None
+                if declared_bytes is not None and declared_bytes > byte_limit:
+                    response.close()
+                    raise ValueError(
+                        f"source response exceeds {byte_limit} bytes: {response.url}"
+                    )
+
+            chunks: list[bytes] = []
+            received = 0
+            try:
+                for chunk in response.iter_content(chunk_size=64 * 1024):
+                    if not chunk:
+                        continue
+                    received += len(chunk)
+                    if received > byte_limit:
+                        raise ValueError(
+                            f"source response exceeds {byte_limit} bytes: {response.url}"
+                        )
+                    chunks.append(chunk)
+            finally:
+                response.close()
+            response._content = b"".join(chunks)
+            response._content_consumed = True
+            return response
+        raise AssertionError("redirect loop escaped its bound")
+
     def get(self, url: str, *, timeout: int = 45) -> requests.Response:
-        self._validate_url(url)
-        response = self.session.get(url, timeout=timeout, allow_redirects=True)
-        response.raise_for_status()
-        self._validate_url(response.url)
-        if len(response.content) > 25 * 1024 * 1024:
-            raise ValueError(f"source document is unexpectedly large: {response.url}")
-        return response
+        return self._request(
+            "GET",
+            url,
+            timeout=timeout,
+            byte_limit=25 * 1024 * 1024,
+        )
 
     def post_json(self, url: str, payload: dict, *, timeout: int = 45) -> requests.Response:
-        self._validate_url(url)
-        response = self.session.post(url, json=payload, timeout=timeout, allow_redirects=True)
-        response.raise_for_status()
-        self._validate_url(response.url)
-        if len(response.content) > 5 * 1024 * 1024:
-            raise ValueError(f"source API response is unexpectedly large: {response.url}")
-        return response
+        return self._request(
+            "POST",
+            url,
+            timeout=timeout,
+            byte_limit=5 * 1024 * 1024,
+            json_payload=payload,
+        )
 
 
 def discover_document(client: HttpClient, spec: SourceSpec) -> tuple[str, str]:
@@ -118,11 +199,11 @@ def discover_document(client: HttpClient, spec: SourceSpec) -> tuple[str, str]:
             return _discover_transocean(client, spec), "official-index"
         if spec.company == "Valaris":
             try:
-                return _discover_valaris_sec(client), "sec-submissions"
-            except Exception as sec_error:
+                return _discover_valaris_official(client, spec), "official-index"
+            except Exception as official_error:
                 return (
-                    _discover_valaris_official(client, spec),
-                    f"official-index-after-sec-{type(sec_error).__name__}",
+                    _discover_valaris_sec(client),
+                    f"sec-submissions-after-official-{type(official_error).__name__}",
                 )
         if spec.company == "Noble":
             return _discover_noble(client, spec), "official-index"
@@ -369,9 +450,12 @@ def _extract_review_facts(company: str, title: str, detail_text: str) -> dict | 
         and "300 Million Contract" in title
         and re.search(r"\b(?:ONGC|Oil and Natural Gas Corporation)\b", detail_text, re.I)
         and re.search(r"\bIndia\b", detail_text, re.I)
-        and re.search(r"\b(?:first quarter|Q1)\s+2027\b", detail_text, re.I)
+        and re.search(r"\b(?:first quarter(?: of)?|Q1)\s+2027\b", detail_text, re.I)
         and re.search(r"\b(?:two|2)[- ]year\b", detail_text, re.I)
+        and re.search(r"binding\s+Letter of Award", detail_text, re.I)
+        and re.search(r"two years of priced options", detail_text, re.I)
         and re.search(r"\$?300\s+million", detail_text, re.I)
+        and re.search(r"inclusive of additional services and mobilization fees", detail_text, re.I)
     ):
         return None
     return {
@@ -379,7 +463,8 @@ def _extract_review_facts(company: str, title: str, detail_text: str) -> dict | 
         "location": "India",
         "expectedStart": "Q1 2027",
         "startPrecision": "quarter",
-        "firmTermYears": 2,
+        "awardType": "binding-letter-of-award",
+        "awardTermYears": 2,
         "optionTermYears": 2,
         "announcedValueUsdApprox": 300_000_000,
         "valueIncludes": ["additional services", "mobilization fee"],

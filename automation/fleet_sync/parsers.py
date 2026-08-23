@@ -18,12 +18,86 @@ from .dates import (
     parse_period_end_inclusive,
     parse_period_start,
 )
-from .model import ContractObservation, ParseResult, VesselSnapshot
+from .model import ContractObservation, OperationalObservation, ParseResult, VesselSnapshot
 
 
 FULL_DATE = re.compile(
     r"\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},\s+\d{4}\b"
 )
+
+TRANSOCEAN_ROW_STATUSES = {
+    "firm",
+    "contingent",
+    "priced option",
+    "priced options",
+    "idle",
+    "out of service",
+    "stacked",
+}
+
+
+def _raise_unknown_vessels(company: str, names: Iterable[str]) -> None:
+    unexpected = sorted(set(names), key=str.casefold)
+    if unexpected:
+        raise ValueError(f"{company} drillship registry changed; unexpected={unexpected}")
+
+
+def _match_transocean_name(extracted: str, expected_names: set[str]) -> str | None:
+    for name in sorted(expected_names, key=len, reverse=True):
+        if extracted == name:
+            return name
+        if extracted.startswith(f"{name} "):
+            # The PDF places numeric footnote markers in the rig-name cell.
+            # Only accept that narrow suffix; a real name extension such as
+            # "Deepwater Atlas II" must be treated as a new vessel.
+            suffix = extracted[len(name) :].strip()
+            if re.fullmatch(r"[\d,\s]+", suffix):
+                return name
+    return None
+
+
+def _is_transocean_vessel_row(name: str, year: str, status: str) -> bool:
+    return bool(re.search(r"[A-Za-z]", name)) and (
+        bool(re.fullmatch(r"(?:19|20)\d{2}", clean_text(year)))
+        or clean_text(status).casefold() in TRANSOCEAN_ROW_STATUSES
+    )
+
+
+def _append_operational_note(
+    vessel: VesselSnapshot,
+    note: str,
+    *,
+    page: int | None,
+    row: str,
+) -> None:
+    normalized = clean_text(note)
+    if not normalized:
+        return
+    vessel.notes.append(normalized)
+    vessel.operational_observations.append(
+        OperationalObservation(note=normalized, page=page, row=row)
+    )
+
+
+def _noble_operational_note(operator: object, comments: object) -> str | None:
+    operator_text = clean_text(operator)
+    comments_text = clean_text(comments)
+    if "available" in operator_text.casefold():
+        return operator_text
+    if "held for sale" in comments_text.casefold():
+        return comments_text
+    return None
+
+
+def _match_seadrill_name(extracted: str, expected_names: set[str]) -> str:
+    if extracted in expected_names:
+        return extracted
+    # Two Sonangol names carry a superscript footnote marker that pdfplumber
+    # emits as a trailing "1".  Strip it only when the remainder is already in
+    # the reviewed registry; never normalize an unknown name into silence.
+    if extracted.endswith("1") and extracted[:-1] in expected_names:
+        return extracted[:-1]
+    return extracted
 
 
 def _report_date_from_pdf(pdf: pdfplumber.PDF) -> str:
@@ -91,35 +165,43 @@ def parse_transocean_pdf(content: bytes, expected_names: set[str]) -> tuple[Pars
         current_name: str | None = None
         seen_names: set[str] = set()
         explicitly_unavailable: set[str] = set()
+        unknown_names: set[str] = set()
 
         for top, words in _group_word_lines(page):
             cells = _cells_for_line(words, boundaries)
-            name_cell, _, _, _, region, client, raw_status, start, end, rate, comments = cells
+            name_cell, _, _, year, region, client, raw_status, start, end, rate, comments = cells
             normalized_name_cell = clean_text(name_cell)
-            matched = next(
-                (
-                    name
-                    for name in sorted(expected_names, key=len, reverse=True)
-                    if normalized_name_cell == name
-                    or normalized_name_cell.startswith(f"{name} ")
-                ),
-                None,
-            )
+            matched = _match_transocean_name(normalized_name_cell, expected_names)
             if matched:
                 current_name = matched
                 seen_names.add(matched)
+            elif _is_transocean_vessel_row(normalized_name_cell, year, raw_status):
+                # Do not let an unknown vessel's continuation rows attach to
+                # the preceding known vessel while we wait to fail coverage.
+                unknown_names.add(normalized_name_cell)
+                current_name = None
             if current_name is None:
                 continue
 
             status_text = clean_text(raw_status).casefold()
             if status_text == "stacked":
                 vessels[current_name].status = "Cold-Stacked"
-                vessels[current_name].notes.append(clean_text(comments) or "Stacked")
+                _append_operational_note(
+                    vessels[current_name],
+                    clean_text(comments) or "Stacked",
+                    page=page.page_number,
+                    row=f"y={top:.1f}",
+                )
                 continue
             if status_text in {"idle", "out of service"}:
                 vessels[current_name].status = "Idle"
                 explicitly_unavailable.add(current_name)
-                vessels[current_name].notes.append(clean_text(raw_status + " " + comments))
+                _append_operational_note(
+                    vessels[current_name],
+                    raw_status + " " + comments,
+                    page=page.page_number,
+                    row=f"y={top:.1f}",
+                )
                 continue
 
             status_map = {
@@ -151,6 +233,7 @@ def parse_transocean_pdf(content: bytes, expected_names: set[str]) -> tuple[Pars
                 )
             )
 
+        _raise_unknown_vessels("Transocean", unknown_names)
         if seen_names != expected_names:
             missing = sorted(expected_names - seen_names)
             unexpected = sorted(seen_names - expected_names)
@@ -166,17 +249,48 @@ def parse_transocean_pdf(content: bytes, expected_names: set[str]) -> tuple[Pars
         return result, report_date
 
 
-def _valaris_rows_to_result(rows: list[list[object]], stacked_rows: list[list[object]], expected_names: set[str], report_date: str) -> ParseResult:
+def _valaris_rows_to_result(
+    rows: list[list[object]],
+    stacked_rows: list[list[object]],
+    expected_names: set[str],
+    report_date: str,
+    *,
+    source_page: int | None,
+    row_locators: list[str] | None = None,
+    stacked_row_locators: list[str] | None = None,
+) -> ParseResult:
     vessels = {name: VesselSnapshot(name=name, status="Idle") for name in expected_names}
     seen: set[str] = set()
     warnings: list[str] = []
     pending: list[dict] = []
+
+    def table_name(row: list[object]) -> str | None:
+        name = clean_text((list(row) + [""])[0])
+        if not name or name.casefold() in {
+            "asset category / rig",
+            "drillships",
+            "stacked",
+        }:
+            return None
+        return name
+
+    unknown_names = {
+        name
+        for row in [*rows, *stacked_rows]
+        if (name := table_name(row)) is not None and name not in expected_names
+    }
+    _raise_unknown_vessels("Valaris", unknown_names)
 
     for row_index, row in enumerate(rows):
         padded = list(row) + [""] * (9 - len(row))
         name = clean_text(padded[0])
         if name not in expected_names:
             continue
+        row_locator = (
+            row_locators[row_index]
+            if row_locators is not None and row_index < len(row_locators)
+            else f"row={row_index + 1}"
+        )
         seen.add(name)
         clients = split_lines(padded[3])
         locations = split_lines(padded[4])
@@ -215,22 +329,38 @@ def _valaris_rows_to_result(rows: list[list[object]], stacked_rows: list[list[ob
                     end_date=iso(parse_period_end_inclusive(ends[index])),
                     day_rate=day_rate,
                     status="Firm",
-                    page=4,
-                    row=f"row={row_index + 1},slot={index + 1}",
+                    page=source_page,
+                    row=f"{row_locator},slot={index + 1}",
                     rate_disclosure=disclosure,
                 )
             )
         if "warm stacked" in comments.casefold():
             vessels[name].status = "Warm-Stacked"
+            _append_operational_note(
+                vessels[name],
+                comments,
+                page=source_page,
+                row=row_locator,
+            )
         if re.search(r"\boptions?\b", comments, re.I):
             warnings.append(f"{name}: undated option language is retained as a warning, not an invented interval")
 
-    for row in stacked_rows:
+    for row_index, row in enumerate(stacked_rows):
         name = clean_text((list(row) + [""])[0])
         if name in expected_names:
             seen.add(name)
             vessels[name].status = "Cold-Stacked"
-            vessels[name].notes.append("Listed in the official stacked-rig section")
+            row_locator = (
+                stacked_row_locators[row_index]
+                if stacked_row_locators is not None and row_index < len(stacked_row_locators)
+                else f"row={row_index + 1}"
+            )
+            _append_operational_note(
+                vessels[name],
+                "Listed in the official stacked-rig section",
+                page=source_page,
+                row=row_locator,
+            )
 
     if seen != expected_names:
         raise ValueError(f"Valaris vessel coverage changed; missing={sorted(expected_names - seen)}")
@@ -267,7 +397,16 @@ def parse_valaris_pdf(content: bytes, expected_names: set[str]) -> tuple[ParseRe
         stacked = next((table for table in tables if any(clean_text(row[0]) == "VALARIS DS-14" for row in table if row)), None)
         if rows is None or stacked is None:
             raise ValueError("Valaris active or stacked drillship table was not found")
-        return _valaris_rows_to_result(rows, stacked, expected_names, report_date), report_date
+        return (
+            _valaris_rows_to_result(
+                rows,
+                stacked,
+                expected_names,
+                report_date,
+                source_page=page.page_number,
+            ),
+            report_date,
+        )
 
 
 def _html_slots(cell) -> list[str]:
@@ -286,6 +425,7 @@ def parse_valaris_html(content: bytes, expected_names: set[str]) -> tuple[ParseR
         raise ValueError("Valaris exhibit does not contain a report date")
     report_date = iso(parse_long_date(date_match.group(0)))
     target = None
+    target_index: int | None = None
     header_indexes: dict[str, int] = {}
     required = {
         "rig": "asset category / rig",
@@ -296,12 +436,13 @@ def parse_valaris_html(content: bytes, expected_names: set[str]) -> tuple[ParseR
         "rate": "day rate",
         "comments": "comments",
     }
-    for table in soup.find_all("table"):
+    for table_index, table in enumerate(soup.find_all("table")):
         for row in table.find_all("tr"):
             cells = row.find_all("td", recursive=False)
             values = [clean_text(cell.get_text(" ")).casefold() for cell in cells]
             if all(any(label in value for value in values) for label in required.values()):
                 target = table
+                target_index = table_index
                 for key, label in required.items():
                     header_indexes[key] = next(index for index, value in enumerate(values) if label in value)
                 break
@@ -312,16 +453,35 @@ def parse_valaris_html(content: bytes, expected_names: set[str]) -> tuple[ParseR
 
     active_rows: list[list[object]] = []
     stacked_rows: list[list[object]] = []
+    active_locators: list[str] = []
+    stacked_locators: list[str] = []
     context = ""
-    for row in target.find_all("tr"):
+    for row_index, row in enumerate(target.find_all("tr")):
         cells = row.find_all("td", recursive=False)
-        if not cells or max(header_indexes.values()) >= len(cells):
+        if not cells or header_indexes["rig"] >= len(cells):
             continue
         rig_text = clean_text(cells[header_indexes["rig"]].get_text(" "))
-        if rig_text.casefold() in {"drillships", "stacked"}:
-            context = rig_text.casefold()
+        section = rig_text.casefold()
+        if "stacked" in section and not section.startswith("valaris"):
+            context = "stacked"
             continue
-        if rig_text not in expected_names:
+        if "drillship" in section and not section.startswith("valaris"):
+            context = "drillships"
+            continue
+        if any(
+            label in section
+            for label in ("semisub", "semi-sub", "jackup", "jack-up")
+        ) and not section.startswith("valaris"):
+            context = "other"
+            continue
+        if max(header_indexes.values()) >= len(cells):
+            continue
+        is_stacked_drillship = context == "stacked" and bool(
+            re.fullmatch(r"VALARIS\s+DS-[A-Za-z0-9-]+", rig_text, re.I)
+        )
+        if context != "drillships" and not is_stacked_drillship:
+            # Stacked semisubs and jackups share the stacked section in SEC
+            # exhibits, but their MS/JU names are outside this drillship parser.
             continue
         serialized = [""] * 9
         serialized[0] = rig_text
@@ -331,8 +491,25 @@ def parse_valaris_html(content: bytes, expected_names: set[str]) -> tuple[ParseR
         serialized[6] = "\n".join(_html_slots(cells[header_indexes["end"]]))
         serialized[7] = "\n".join(_html_slots(cells[header_indexes["rate"]]))
         serialized[8] = clean_text(cells[header_indexes["comments"]].get_text(" "))
-        (stacked_rows if context == "stacked" else active_rows).append(serialized)
-    return _valaris_rows_to_result(active_rows, stacked_rows, expected_names, report_date), report_date
+        locator = f"html-table={target_index + 1},tr={row_index + 1}"
+        if context == "stacked":
+            stacked_rows.append(serialized)
+            stacked_locators.append(locator)
+        else:
+            active_rows.append(serialized)
+            active_locators.append(locator)
+    return (
+        _valaris_rows_to_result(
+            active_rows,
+            stacked_rows,
+            expected_names,
+            report_date,
+            source_page=None,
+            row_locators=active_locators,
+            stacked_row_locators=stacked_locators,
+        ),
+        report_date,
+    )
 
 
 def _add_years_minus_day(start_iso: str, years: int) -> str:
@@ -349,6 +526,7 @@ def parse_noble_pdf(content: bytes, expected_names: set[str]) -> tuple[ParseResu
         report_date = _report_date_from_pdf(pdf)
         vessels = {name: VesselSnapshot(name=name, status="Idle") for name in expected_names}
         seen: set[str] = set()
+        unknown_names: set[str] = set()
         page_notes: dict[str, str] = {}
         page_numbers: dict[str, int] = {}
         base_x = [38.8, 127, 216, 258, 326, 409, 482, 548, 608, 675, 921.1]
@@ -380,6 +558,14 @@ def parse_noble_pdf(content: bytes, expected_names: set[str]) -> tuple[ParseResu
             for row_index, row in enumerate(table):
                 padded = list(row) + [""] * (10 - len(row))
                 name = clean_text(padded[0])
+                built = clean_text(padded[2])
+                if (
+                    name not in expected_names
+                    and re.fullmatch(r"(?:19|20)\d{2}", built)
+                    and re.search(r"[A-Za-z]", name)
+                ):
+                    unknown_names.add(name)
+                    continue
                 if name not in expected_names:
                     continue
                 seen.add(name)
@@ -412,10 +598,17 @@ def parse_noble_pdf(content: bytes, expected_names: set[str]) -> tuple[ParseResu
                             rate_disclosure=disclosure,
                         )
                     )
-                if "Available" in clean_text(padded[5]) or "Held for sale" in comments:
+                operational_note = _noble_operational_note(padded[5], comments)
+                if operational_note:
                     vessels[name].status = "Idle"
-                    vessels[name].notes.append(clean_text(padded[5]) or comments)
+                    _append_operational_note(
+                        vessels[name],
+                        operational_note,
+                        page=page.page_number,
+                        row=f"row={row_index + 1}",
+                    )
 
+        _raise_unknown_vessels("Noble", unknown_names)
         if seen != expected_names:
             raise ValueError(f"Noble vessel coverage changed; missing={sorted(expected_names - seen)}")
 
@@ -528,6 +721,7 @@ def parse_seadrill_pdf(content: bytes, expected_names: set[str]) -> tuple[ParseR
         report_date = _report_date_from_pdf(pdf)
         vessels = {name: VesselSnapshot(name=name, status="Idle") for name in expected_names}
         seen: set[str] = set()
+        unknown_names: set[str] = set()
         base_x = [30, 130, 190, 260, 330, 415, 468, 520, 930]
         warnings: list[str] = []
 
@@ -547,9 +741,16 @@ def parse_seadrill_pdf(content: bytes, expected_names: set[str]) -> tuple[ParseR
             for table in page.extract_tables(settings):
                 for row_index, row in enumerate(table):
                     padded = list(row) + [""] * (8 - len(row))
-                    name = re.sub(r"(?<=\D)1$", "", clean_text(padded[0]))
+                    extracted_name = clean_text(padded[0])
+                    name = _match_seadrill_name(extracted_name, expected_names)
                     rig_type = clean_text(padded[2])
-                    if name not in expected_names or rig_type != "Drillship":
+                    if rig_type != "Drillship":
+                        continue
+                    if name not in expected_names:
+                        unknown_names.add(
+                            extracted_name
+                            or f"<blank name at page={page.page_number},row={row_index + 1}>"
+                        )
                         continue
                     seen.add(name)
                     location = clean_text(padded[3]) or "Undisclosed"
@@ -559,7 +760,12 @@ def parse_seadrill_pdf(content: bytes, expected_names: set[str]) -> tuple[ParseR
                     notes = clean_text(padded[7])
                     if name == "West Carina" and "Available" in notes:
                         vessels[name].status = "Idle"
-                        vessels[name].notes.append("Available in Namibia")
+                        _append_operational_note(
+                            vessels[name],
+                            "Available in Namibia",
+                            page=page.page_number,
+                            row=f"row={row_index + 1}",
+                        )
                         continue
                     if name == "West Polaris":
                         bands = _parse_seadrill_rate_bands(starts[0], notes, page.page_number)
@@ -603,6 +809,7 @@ def parse_seadrill_pdf(content: bytes, expected_names: set[str]) -> tuple[ParseR
                             )
                         )
 
+        _raise_unknown_vessels("Seadrill", unknown_names)
         if seen != expected_names:
             raise ValueError(f"Seadrill vessel coverage changed; missing={sorted(expected_names - seen)}")
         for vessel in vessels.values():

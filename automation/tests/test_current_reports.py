@@ -13,10 +13,9 @@ from automation.fleet_sync.parsers import (
 
 
 ROOT = Path(__file__).resolve().parents[2]
-REPORTS = ROOT / ".cache" / "reports"
+REPORTS = ROOT / "automation" / "tests" / "fixtures" / "reports"
 
 
-@pytest.mark.skipif(not REPORTS.exists(), reason="local official PDF fixtures are not present")
 @pytest.mark.parametrize(
     ("company", "filename", "sha256", "parser", "report_date", "statuses"),
     [
@@ -34,3 +33,16 @@ def test_current_official_report_golden_counts(company, filename, sha256, parser
     result, actual_report_date = parser(content, names)
     assert actual_report_date == report_date
     assert Counter(item.status for vessel in result.vessels.values() for item in vessel.contracts) == statuses
+
+
+def test_current_noble_held_for_sale_note_is_preserved() -> None:
+    content = (REPORTS / "noble-2026-07.pdf").read_bytes()
+    seed = load_json(ROOT / "data" / "data_as_of_26_01_07.json")
+    names = {ship["name"] for ship in seed if ship["company"] == "Noble"}
+
+    result, _ = parse_noble_pdf(content, names)
+
+    vessel = result.vessels["Noble Globetrotter II"]
+    assert vessel.notes == ["Held for sale."]
+    assert vessel.operational_observations[0].page == 4
+    assert vessel.operational_observations[0].row == "row=9"

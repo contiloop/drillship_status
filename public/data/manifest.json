@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-23T17:11:49Z",
+  "generatedAt": "2026-08-23T17:15:30Z",
   "updatedAsOf": "2026-08-10",
-  "dataHash": "5680482f4c85610e7bd4",
-  "stateFingerprint": "c8a197c978b5103fd358",
-  "fleetFile": "fleet.5680482f4c85610e7bd4.json",
-  "eventsFile": "events.4ee8a19f797affa6438e.json",
-  "eventsHash": "4ee8a19f797affa6438e",
+  "dataHash": "06d7348ab9cd5c01f447",
+  "stateFingerprint": "7466b911d16328e20c3b",
+  "fleetFile": "fleet.06d7348ab9cd5c01f447.json",
+  "eventsFile": "events.31919c11d036f9f2cac3.json",
+  "eventsHash": "31919c11d036f9f2cac3",
   "shipCount": 62,
   "contractCount": 116,
   "sourceCount": 4,
@@ -58,9 +58,9 @@
       "sha256": "c94713719e350294eb91b0361212df7e5951c8d00b9e108ff7afa4a797e55e80",
       "byteSize": 974321,
       "parserVersion": "2026.08.24.1",
-      "discovery": "official-index-after-sec-HTTPError",
+      "discovery": "official-index",
       "contentType": "application/pdf",
-      "health": "healthy-official-alternate",
+      "health": "healthy",
       "newsMonitor": "healthy"
     }
   ],
@@ -70,28 +70,44 @@
       "fleetReport": "healthy",
       "discovery": "official-index",
       "newsMonitor": "healthy",
-      "preservedNewsEvents": 0
+      "preservedNewsEvents": 0,
+      "reportDate": "2026-07-27",
+      "documentUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-3/?wpdmdl=3701",
+      "sha256": "ddfdfe43090fe4f2589352abb7bf14cb292ee7323569f29a9f89e20c079807a6",
+      "fallbackStreak": 0
     },
     {
       "company": "Seadrill",
       "fleetReport": "healthy",
       "discovery": "official-wordpress-api",
       "newsMonitor": "healthy",
-      "preservedNewsEvents": 0
+      "preservedNewsEvents": 0,
+      "reportDate": "2026-08-10",
+      "documentUrl": "https://www.seadrill.com/wp-content/uploads/2026/08/Seadrill-Fleet-Status-Report-August-2026-vF.pdf",
+      "sha256": "b774357daafdb62dcc8c371fe5f5d118fb8d7d51c91badd05cd6cae3c9a39cb1",
+      "fallbackStreak": 0
     },
     {
       "company": "Transocean",
       "fleetReport": "healthy",
       "discovery": "official-index",
       "newsMonitor": "healthy",
-      "preservedNewsEvents": 0
+      "preservedNewsEvents": 0,
+      "reportDate": "2026-08-05",
+      "documentUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/August%202026%20Fleet%20Status%20Report.pdf",
+      "sha256": "f2f98b03f750b5c4f6d299bff9b55d0ecc4dbeb0cb4f069054193968894db8b6",
+      "fallbackStreak": 0
     },
     {
       "company": "Valaris",
-      "fleetReport": "healthy-official-alternate",
-      "discovery": "official-index-after-sec-HTTPError",
+      "fleetReport": "healthy",
+      "discovery": "official-index",
       "newsMonitor": "healthy",
-      "preservedNewsEvents": 0
+      "preservedNewsEvents": 0,
+      "reportDate": "2026-08-05",
+      "documentUrl": "https://s23.q4cdn.com/956522167/files/doc_financials/2026/q2/08052026-Fleet-Status-Report_FINAL.pdf",
+      "sha256": "c94713719e350294eb91b0361212df7e5951c8d00b9e108ff7afa4a797e55e80",
+      "fallbackStreak": 0
     }
   ],
   "warningsCount": 12,

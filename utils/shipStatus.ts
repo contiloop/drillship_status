@@ -6,27 +6,31 @@ export type ComputedStatus = 'Active' | 'Idle' | 'Warm-Stacked' | 'Cold-Stacked'
  * 오늘 날짜 기준으로 선박의 상태를 자동 계산합니다.
  *
  * 로직:
- * 공식 보고서의 명시적 Idle/Stacked 상태를 우선합니다. Active로 보고된
- * 선박만 오늘 유효한 Firm 계약이 끝났는지 동적으로 확인합니다.
+ * - 공식 보고서의 상태는 statusAsOf 기준일까지 유효합니다.
+ * - 보고서 이후 시작한 Firm 계약이 오늘 유효하면 Idle/Stacked를 Active로
+ *   전환합니다. 보고서가 이미 반영한 이전 계약으로는 상태를 덮어쓰지 않습니다.
+ * - Active로 보고됐더라도 오늘 유효한 Firm 계약이 없으면 Idle로 전환합니다.
+ * - statusAsOf가 없는 레거시 데이터는 비가동 상태를 보수적으로 유지합니다.
  */
 export function getComputedStatus(ship: Drillship, today: Date = new Date()): ComputedStatus {
-  if (ship.status !== 'Active') {
-    return ship.status;
-  }
-
   const todayStr = today.toISOString().split('T')[0];
-
-  // 현재 진행 중인 계약이 있는지 확인
-  const hasActiveContract = ship.contracts.some(contract => {
+  const currentFirmContracts = ship.contracts.filter(contract => {
     return contract.status === 'Firm' && contract.startDate <= todayStr && contract.endDate >= todayStr;
   });
 
-  if (hasActiveContract) {
-    return 'Active';
+  if (ship.status === 'Active') {
+    return currentFirmContracts.length > 0 ? 'Active' : 'Idle';
   }
 
-  // 계약 사이 gap 또는 미래 계약 대기 중
-  return 'Idle';
+  if (!ship.statusAsOf || todayStr <= ship.statusAsOf) {
+    return ship.status;
+  }
+
+  const beganAfterStatusSnapshot = currentFirmContracts.some(contract => {
+    return contract.startDate > ship.statusAsOf!;
+  });
+
+  return beganAfterStatusSnapshot ? 'Active' : ship.status;
 }
 
 /**

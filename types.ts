@@ -21,6 +21,7 @@ export interface Drillship {
   company: Company;
   generation: Generation;
   status: VesselStatus;
+  statusAsOf?: string;
   yearBuilt: number;
   contracts: Contract[];
 }
@@ -64,5 +65,22 @@ export interface OfficialEvent {
   vessel?: string;
   classification: string;
   autoApplied: boolean;
+  pendingReview?: boolean;
+  reviewStatus?: 'pending' | 'acknowledged' | 'date-unverified' | 'applied';
+  start?: string;
+  end?: string;
   reason?: string;
+  facts?: {
+    counterparty?: string;
+    location?: string;
+    expectedStart?: string;
+    startPrecision?: string;
+    awardType?: string;
+    awardTermYears?: number;
+    optionTermYears?: number;
+    announcedValueUsdApprox?: number;
+    valueIncludes?: string[];
+    exactDatesInferred?: boolean;
+    dayRateInferred?: boolean;
+  };
 }

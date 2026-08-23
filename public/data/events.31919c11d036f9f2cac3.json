@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-23T17:04:41Z",
+  "generatedAt": "2026-08-23T17:15:30Z",
   "events": [
     {
       "company": "Noble",
@@ -8,7 +8,9 @@
       "publishedAt": "July 14, 2026",
       "vessels": [],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Noble",
@@ -17,7 +19,9 @@
       "publishedAt": "July 27, 2026",
       "vessels": [],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Noble",
@@ -26,7 +30,9 @@
       "publishedAt": "July 27, 2026",
       "vessels": [],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Noble",
@@ -38,7 +44,9 @@
         "Noble Viking"
       ],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Seadrill",
@@ -50,7 +58,9 @@
         "West Carina"
       ],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Seadrill",
@@ -61,7 +71,9 @@
         "West Saturn"
       ],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Seadrill",
@@ -80,7 +92,9 @@
         "West Tellus"
       ],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Seadrill",
@@ -91,7 +105,9 @@
         "Sonangol Quenguela"
       ],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Seadrill",
@@ -102,7 +118,9 @@
         "West Polaris"
       ],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Seadrill",
@@ -114,7 +132,9 @@
         "West Vela"
       ],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Seadrill",
@@ -133,7 +153,9 @@
         "West Vela"
       ],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Seadrill",
@@ -150,7 +172,9 @@
         "West Vela"
       ],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Transocean",
@@ -161,7 +185,9 @@
         "Deepwater Corcovado"
       ],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Transocean",
@@ -175,7 +201,9 @@
         "Deepwater Orion"
       ],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Transocean",
@@ -186,7 +214,25 @@
         "Dhirubhai Deepwater KG2"
       ],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": true,
+      "reviewStatus": "pending",
+      "facts": {
+        "counterparty": "ONGC",
+        "location": "India",
+        "expectedStart": "Q1 2027",
+        "startPrecision": "quarter",
+        "awardType": "binding-letter-of-award",
+        "awardTermYears": 2,
+        "optionTermYears": 2,
+        "announcedValueUsdApprox": 300000000,
+        "valueIncludes": [
+          "additional services",
+          "mobilization fee"
+        ],
+        "exactDatesInferred": false,
+        "dayRateInferred": false
+      }
     },
     {
       "company": "Transocean",
@@ -199,7 +245,9 @@
         "Deepwater Skyros"
       ],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Transocean",
@@ -208,7 +256,9 @@
       "publishedAt": "August 5, 2026",
       "vessels": [],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Transocean",
@@ -217,7 +267,9 @@
       "publishedAt": "June 16, 2026",
       "vessels": [],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Transocean",
@@ -231,7 +283,9 @@
         "Deepwater Orion"
       ],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Transocean",
@@ -242,7 +296,9 @@
         "Deepwater Titan"
       ],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Valaris",
@@ -251,7 +307,9 @@
       "start": "Nov 26",
       "end": "May 27",
       "autoApplied": false,
-      "reason": "The report explicitly labels this period as an LOA, not firm backlog."
+      "reason": "The report explicitly labels this period as an LOA, not firm backlog.",
+      "pendingReview": true,
+      "reviewStatus": "pending"
     },
     {
       "company": "Valaris",
@@ -260,7 +318,9 @@
       "publishedAt": "2026-02-17",
       "vessels": [],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Valaris",
@@ -272,7 +332,9 @@
         "VALARIS DS-7"
       ],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Valaris",
@@ -283,7 +345,9 @@
         "VALARIS DS-4"
       ],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Valaris",
@@ -292,7 +356,9 @@
       "publishedAt": "2026-05-04",
       "vessels": [],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Valaris",
@@ -304,7 +370,9 @@
         "VALARIS DS-4"
       ],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Valaris",
@@ -313,7 +381,9 @@
       "publishedAt": "2026-08-05",
       "vessels": [],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     },
     {
       "company": "Valaris",
@@ -325,7 +395,9 @@
         "VALARIS DS-17"
       ],
       "classification": "official-news-signal",
-      "autoApplied": false
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged"
     }
   ]
 }

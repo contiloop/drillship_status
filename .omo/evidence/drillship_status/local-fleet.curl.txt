@@ -1,11 +1,11 @@
 HTTP/1.1 200 OK
 Vary: Origin
-Content-Length: 43730
+Content-Length: 45714
 Content-Type: application/json
-Last-Modified: Sun, 23 Aug 2026 17:08:31 GMT
-ETag: W/"43730-1787504911266"
+Last-Modified: Sun, 23 Aug 2026 17:16:14 GMT
+ETag: W/"45714-1787505374454"
 Cache-Control: no-cache
-Date: Sun, 23 Aug 2026 17:08:43 GMT
+Date: Sun, 23 Aug 2026 17:16:19 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 
@@ -16,6 +16,7 @@ Keep-Alive: timeout=5
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2013,
     "contracts": [
       {
@@ -36,6 +37,7 @@ Keep-Alive: timeout=5
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -56,6 +58,7 @@ Keep-Alive: timeout=5
     "company": "Noble",
     "generation": "7G",
     "status": "Idle",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -76,6 +79,7 @@ Keep-Alive: timeout=5
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -136,6 +140,7 @@ Keep-Alive: timeout=5
     "company": "Noble",
     "generation": "7G",
     "status": "Idle",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -206,6 +211,7 @@ Keep-Alive: timeout=5
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2015,
     "contracts": [
       {
@@ -236,6 +242,7 @@ Keep-Alive: timeout=5
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -256,6 +263,7 @@ Keep-Alive: timeout=5
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -276,6 +284,7 @@ Keep-Alive: timeout=5
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2013,
     "contracts": [
       {
@@ -296,6 +305,7 @@ Keep-Alive: timeout=5
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2013,
     "contracts": [
       {
@@ -316,6 +326,7 @@ Keep-Alive: timeout=5
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -346,6 +357,7 @@ Keep-Alive: timeout=5
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -386,6 +398,7 @@ Keep-Alive: timeout=5
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2015,
     "contracts": [
       {
@@ -426,6 +439,7 @@ Keep-Alive: timeout=5
     "company": "Noble",
     "generation": "7G",
     "status": "Idle",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2014,
     "contracts": []
   },
@@ -435,6 +449,7 @@ Keep-Alive: timeout=5
     "company": "Noble",
     "generation": "6G",
     "status": "Idle",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2011,
     "contracts": [
       {
@@ -455,6 +470,7 @@ Keep-Alive: timeout=5
     "company": "Noble",
     "generation": "6G",
     "status": "Idle",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2013,
     "contracts": []
   },
@@ -464,6 +480,7 @@ Keep-Alive: timeout=5
     "company": "Noble",
     "generation": "6G",
     "status": "Idle",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2011,
     "contracts": [
       {
@@ -494,6 +511,7 @@ Keep-Alive: timeout=5
     "company": "Seadrill",
     "generation": "6G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2008,
     "contracts": [
       {
@@ -514,6 +532,7 @@ Keep-Alive: timeout=5
     "company": "Seadrill",
     "generation": "7G",
     "status": "Idle",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2015,
     "contracts": [
       {
@@ -534,6 +553,7 @@ Keep-Alive: timeout=5
     "company": "Seadrill",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2019,
     "contracts": [
       {
@@ -554,6 +574,7 @@ Keep-Alive: timeout=5
     "company": "Seadrill",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -594,6 +615,7 @@ Keep-Alive: timeout=5
     "company": "Seadrill",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2013,
     "contracts": [
       {
@@ -644,6 +666,7 @@ Keep-Alive: timeout=5
     "company": "Seadrill",
     "generation": "6G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2010,
     "contracts": [
       {
@@ -664,6 +687,7 @@ Keep-Alive: timeout=5
     "company": "Seadrill",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -694,6 +718,7 @@ Keep-Alive: timeout=5
     "company": "Seadrill",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2019,
     "contracts": [
       {
@@ -724,6 +749,7 @@ Keep-Alive: timeout=5
     "company": "Seadrill",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2013,
     "contracts": [
       {
@@ -744,6 +770,7 @@ Keep-Alive: timeout=5
     "company": "Seadrill",
     "generation": "6G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2008,
     "contracts": [
       {
@@ -794,6 +821,7 @@ Keep-Alive: timeout=5
     "company": "Seadrill",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -824,6 +852,7 @@ Keep-Alive: timeout=5
     "company": "Seadrill",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2013,
     "contracts": [
       {
@@ -854,6 +883,7 @@ Keep-Alive: timeout=5
     "company": "Transocean",
     "generation": "8G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2023,
     "contracts": [
       {
@@ -874,6 +904,7 @@ Keep-Alive: timeout=5
     "company": "Transocean",
     "generation": "8G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2022,
     "contracts": [
       {
@@ -964,6 +995,7 @@ Keep-Alive: timeout=5
     "company": "Transocean",
     "generation": "7G+",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2024,
     "contracts": [
       {
@@ -994,6 +1026,7 @@ Keep-Alive: timeout=5
     "company": "Transocean",
     "generation": "7G+",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2018,
     "contracts": [
       {
@@ -1014,6 +1047,7 @@ Keep-Alive: timeout=5
     "company": "Transocean",
     "generation": "7G+",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2017,
     "contracts": [
       {
@@ -1034,6 +1068,7 @@ Keep-Alive: timeout=5
     "company": "Transocean",
     "generation": "7G+",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2016,
     "contracts": [
       {
@@ -1054,6 +1089,7 @@ Keep-Alive: timeout=5
     "company": "Transocean",
     "generation": "7G+",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2016,
     "contracts": [
       {
@@ -1094,6 +1130,7 @@ Keep-Alive: timeout=5
     "company": "Transocean",
     "generation": "7G+",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2016,
     "contracts": [
       {
@@ -1114,6 +1151,7 @@ Keep-Alive: timeout=5
     "company": "Transocean",
     "generation": "7G+",
     "status": "Idle",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -1144,6 +1182,7 @@ Keep-Alive: timeout=5
     "company": "Transocean",
     "generation": "7G+",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -1164,6 +1203,7 @@ Keep-Alive: timeout=5
     "company": "Transocean",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2013,
     "contracts": [
       {
@@ -1224,6 +1264,7 @@ Keep-Alive: timeout=5
     "company": "Transocean",
     "generation": "6G",
     "status": "Idle",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2011,
     "contracts": [
       {
@@ -1284,6 +1325,7 @@ Keep-Alive: timeout=5
     "company": "Transocean",
     "generation": "6G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2011,
     "contracts": [
       {
@@ -1314,6 +1356,7 @@ Keep-Alive: timeout=5
     "company": "Transocean",
     "generation": "6G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2011,
     "contracts": [
       {
@@ -1344,6 +1387,7 @@ Keep-Alive: timeout=5
     "company": "Transocean",
     "generation": "6G",
     "status": "Idle",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2010,
     "contracts": [
       {
@@ -1364,6 +1408,7 @@ Keep-Alive: timeout=5
     "company": "Transocean",
     "generation": "6G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2009,
     "contracts": [
       {
@@ -1414,6 +1459,7 @@ Keep-Alive: timeout=5
     "company": "Transocean",
     "generation": "6G",
     "status": "Idle",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2009,
     "contracts": [
       {
@@ -1454,6 +1500,7 @@ Keep-Alive: timeout=5
     "company": "Transocean",
     "generation": "7G",
     "status": "Cold-Stacked",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2015,
     "contracts": []
   },
@@ -1463,6 +1510,7 @@ Keep-Alive: timeout=5
     "company": "Transocean",
     "generation": "7G",
     "status": "Cold-Stacked",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2014,
     "contracts": []
   },
@@ -1472,6 +1520,7 @@ Keep-Alive: timeout=5
     "company": "Transocean",
     "generation": "7G",
     "status": "Cold-Stacked",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2013,
     "contracts": []
   },
@@ -1481,6 +1530,7 @@ Keep-Alive: timeout=5
     "company": "Valaris",
     "generation": "7G",
     "status": "Idle",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2015,
     "contracts": [
       {
@@ -1511,6 +1561,7 @@ Keep-Alive: timeout=5
     "company": "Valaris",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -1541,6 +1592,7 @@ Keep-Alive: timeout=5
     "company": "Valaris",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -1571,6 +1623,7 @@ Keep-Alive: timeout=5
     "company": "Valaris",
     "generation": "7G",
     "status": "Warm-Stacked",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -1601,6 +1654,7 @@ Keep-Alive: timeout=5
     "company": "Valaris",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2013,
     "contracts": [
       {
@@ -1621,6 +1675,7 @@ Keep-Alive: timeout=5
     "company": "Valaris",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2017,
     "contracts": [
       {
@@ -1641,6 +1696,7 @@ Keep-Alive: timeout=5
     "company": "Valaris",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2015,
     "contracts": [
       {
@@ -1671,6 +1727,7 @@ Keep-Alive: timeout=5
     "company": "Valaris",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2015,
     "contracts": [
       {
@@ -1701,6 +1758,7 @@ Keep-Alive: timeout=5
     "company": "Valaris",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2013,
     "contracts": [
       {
@@ -1731,6 +1789,7 @@ Keep-Alive: timeout=5
     "company": "Valaris",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2010,
     "contracts": [
       {
@@ -1761,6 +1820,7 @@ Keep-Alive: timeout=5
     "company": "Valaris",
     "generation": "7G",
     "status": "Cold-Stacked",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2023,
     "contracts": []
   },
@@ -1770,6 +1830,7 @@ Keep-Alive: timeout=5
     "company": "Valaris",
     "generation": "7G",
     "status": "Cold-Stacked",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2023,
     "contracts": []
   },
@@ -1779,6 +1840,7 @@ Keep-Alive: timeout=5
     "company": "Valaris",
     "generation": "7G",
     "status": "Cold-Stacked",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2013,
     "contracts": []
   }

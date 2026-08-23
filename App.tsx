@@ -134,8 +134,17 @@ export default function App() {
 
   const economicUtilization = totalPossibleDays > 0 ? Math.round((totalContractDays / totalPossibleDays) * 100) : 0;
   const recentEvents = [...officialEvents]
+    .filter(event => event.pendingReview !== false)
     .sort((a, b) => (Date.parse(b.publishedAt || '') || 0) - (Date.parse(a.publishedAt || '') || 0))
     .slice(0, 5);
+  const reportSources = [...(manifest?.sources ?? [])]
+    .sort((a, b) => a.company.localeCompare(b.company));
+  const reportDates = reportSources.map(source => source.reportDate).sort();
+  const reportDateRange = reportDates.length === 0
+    ? 'bundled fallback'
+    : reportDates[0] === reportDates[reportDates.length - 1]
+      ? `report date ${reportDates[0]}`
+      : `report dates ${reportDates[0]}–${reportDates[reportDates.length - 1]}`;
 
   return (
     <>
@@ -215,12 +224,17 @@ export default function App() {
               <span className="text-slate-200">{manifest?.sourceCount ?? 0}/4 verified</span>
               <span className="text-slate-600">·</span>
               <span className="text-slate-500">
-                {manifest?.updatedAsOf ? `as of ${manifest.updatedAsOf}` : 'bundled fallback'}
+                {reportDateRange}
               </span>
             </p>
+            {reportSources.length > 0 && (
+              <p className="text-[11px] text-slate-500 mt-2">
+                Sources: {reportSources.map(source => `${source.company} ${source.reportDate}`).join(' · ')}
+              </p>
+            )}
             {manifest?.generatedAt && (
               <p className="text-[11px] text-slate-600 mt-2">
-                Checked {new Date(manifest.generatedAt).toLocaleString()} · {manifest.contractCount} contract records · {manifest.pendingEventCount} review signals
+                Generated {new Date(manifest.generatedAt).toLocaleString()} · {manifest.contractCount} contract records · {manifest.pendingEventCount} review signals
               </p>
             )}
             {syncError && <p className="text-[11px] text-amber-500/80 mt-2">Live sync fallback: {syncError}</p>}
@@ -258,11 +272,27 @@ export default function App() {
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-3">
                   {recentEvents.map((event, index) => {
                     const label = event.title || `${event.vessel || event.company} · ${event.classification}`;
+                    const facts = event.facts;
+                    const factSummary = facts
+                      ? [
+                          facts.counterparty,
+                          facts.location,
+                          facts.expectedStart,
+                          facts.awardTermYears ? `${facts.awardTermYears}y award` : null,
+                          facts.optionTermYears ? `${facts.optionTermYears}y options` : null,
+                          facts.announcedValueUsdApprox
+                            ? `~$${Math.round(facts.announcedValueUsdApprox / 1_000_000)}m`
+                            : null,
+                        ].filter(Boolean).join(' · ')
+                      : event.start && event.end
+                        ? `${event.start}–${event.end}`
+                        : null;
                     const content = (
                       <>
                         <span className="text-[9px] font-black uppercase tracking-widest text-blue-400">{event.company}</span>
                         <span className="block text-xs font-bold text-slate-200 mt-2 leading-snug">{label}</span>
                         <span className="block text-[10px] text-slate-600 mt-2">{event.publishedAt || 'Date pending'}{event.vessels?.length ? ` · ${event.vessels.join(', ')}` : ''}</span>
+                        {factSummary && <span className="block text-[10px] text-amber-300/80 mt-2 leading-relaxed">{factSummary}</span>}
                       </>
                     );
                     return event.url ? (
@@ -442,6 +472,7 @@ export default function App() {
     "company": "Transocean",
     "generation": "8G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2023,
     "contracts": [
       {
@@ -484,6 +515,11 @@ export default function App() {
                           <td className="p-3 font-medium">status (ship)</td>
                           <td className="p-3 text-slate-500">string</td>
                           <td className="p-3">Active, Idle, Warm-Stacked, Cold-Stacked</td>
+                        </tr>
+                        <tr className="border-b border-slate-800">
+                          <td className="p-3 font-medium">statusAsOf (optional)</td>
+                          <td className="p-3 text-slate-500">string</td>
+                          <td className="p-3">Official status snapshot date (YYYY-MM-DD)</td>
                         </tr>
                         <tr className="border-b border-slate-800">
                           <td className="p-3 font-medium">status (contract)</td>

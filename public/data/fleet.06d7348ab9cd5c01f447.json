@@ -5,6 +5,7 @@
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2013,
     "contracts": [
       {
@@ -25,6 +26,7 @@
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -45,6 +47,7 @@
     "company": "Noble",
     "generation": "7G",
     "status": "Idle",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -65,6 +68,7 @@
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -125,6 +129,7 @@
     "company": "Noble",
     "generation": "7G",
     "status": "Idle",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -195,6 +200,7 @@
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2015,
     "contracts": [
       {
@@ -225,6 +231,7 @@
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -245,6 +252,7 @@
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -265,6 +273,7 @@
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2013,
     "contracts": [
       {
@@ -285,6 +294,7 @@
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2013,
     "contracts": [
       {
@@ -305,6 +315,7 @@
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -335,6 +346,7 @@
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -375,6 +387,7 @@
     "company": "Noble",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2015,
     "contracts": [
       {
@@ -415,6 +428,7 @@
     "company": "Noble",
     "generation": "7G",
     "status": "Idle",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2014,
     "contracts": []
   },
@@ -424,6 +438,7 @@
     "company": "Noble",
     "generation": "6G",
     "status": "Idle",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2011,
     "contracts": [
       {
@@ -444,6 +459,7 @@
     "company": "Noble",
     "generation": "6G",
     "status": "Idle",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2013,
     "contracts": []
   },
@@ -453,6 +469,7 @@
     "company": "Noble",
     "generation": "6G",
     "status": "Idle",
+    "statusAsOf": "2026-07-27",
     "yearBuilt": 2011,
     "contracts": [
       {
@@ -483,6 +500,7 @@
     "company": "Seadrill",
     "generation": "6G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2008,
     "contracts": [
       {
@@ -503,6 +521,7 @@
     "company": "Seadrill",
     "generation": "7G",
     "status": "Idle",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2015,
     "contracts": [
       {
@@ -523,6 +542,7 @@
     "company": "Seadrill",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2019,
     "contracts": [
       {
@@ -543,6 +563,7 @@
     "company": "Seadrill",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -583,6 +604,7 @@
     "company": "Seadrill",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2013,
     "contracts": [
       {
@@ -633,6 +655,7 @@
     "company": "Seadrill",
     "generation": "6G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2010,
     "contracts": [
       {
@@ -653,6 +676,7 @@
     "company": "Seadrill",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -683,6 +707,7 @@
     "company": "Seadrill",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2019,
     "contracts": [
       {
@@ -713,6 +738,7 @@
     "company": "Seadrill",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2013,
     "contracts": [
       {
@@ -733,6 +759,7 @@
     "company": "Seadrill",
     "generation": "6G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2008,
     "contracts": [
       {
@@ -783,6 +810,7 @@
     "company": "Seadrill",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -813,6 +841,7 @@
     "company": "Seadrill",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-10",
     "yearBuilt": 2013,
     "contracts": [
       {
@@ -843,6 +872,7 @@
     "company": "Transocean",
     "generation": "8G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2023,
     "contracts": [
       {
@@ -863,6 +893,7 @@
     "company": "Transocean",
     "generation": "8G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2022,
     "contracts": [
       {
@@ -953,6 +984,7 @@
     "company": "Transocean",
     "generation": "7G+",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2024,
     "contracts": [
       {
@@ -983,6 +1015,7 @@
     "company": "Transocean",
     "generation": "7G+",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2018,
     "contracts": [
       {
@@ -1003,6 +1036,7 @@
     "company": "Transocean",
     "generation": "7G+",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2017,
     "contracts": [
       {
@@ -1023,6 +1057,7 @@
     "company": "Transocean",
     "generation": "7G+",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2016,
     "contracts": [
       {
@@ -1043,6 +1078,7 @@
     "company": "Transocean",
     "generation": "7G+",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2016,
     "contracts": [
       {
@@ -1083,6 +1119,7 @@
     "company": "Transocean",
     "generation": "7G+",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2016,
     "contracts": [
       {
@@ -1103,6 +1140,7 @@
     "company": "Transocean",
     "generation": "7G+",
     "status": "Idle",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -1133,6 +1171,7 @@
     "company": "Transocean",
     "generation": "7G+",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -1153,6 +1192,7 @@
     "company": "Transocean",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2013,
     "contracts": [
       {
@@ -1213,6 +1253,7 @@
     "company": "Transocean",
     "generation": "6G",
     "status": "Idle",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2011,
     "contracts": [
       {
@@ -1273,6 +1314,7 @@
     "company": "Transocean",
     "generation": "6G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2011,
     "contracts": [
       {
@@ -1303,6 +1345,7 @@
     "company": "Transocean",
     "generation": "6G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2011,
     "contracts": [
       {
@@ -1333,6 +1376,7 @@
     "company": "Transocean",
     "generation": "6G",
     "status": "Idle",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2010,
     "contracts": [
       {
@@ -1353,6 +1397,7 @@
     "company": "Transocean",
     "generation": "6G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2009,
     "contracts": [
       {
@@ -1403,6 +1448,7 @@
     "company": "Transocean",
     "generation": "6G",
     "status": "Idle",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2009,
     "contracts": [
       {
@@ -1443,6 +1489,7 @@
     "company": "Transocean",
     "generation": "7G",
     "status": "Cold-Stacked",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2015,
     "contracts": []
   },
@@ -1452,6 +1499,7 @@
     "company": "Transocean",
     "generation": "7G",
     "status": "Cold-Stacked",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2014,
     "contracts": []
   },
@@ -1461,6 +1509,7 @@
     "company": "Transocean",
     "generation": "7G",
     "status": "Cold-Stacked",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2013,
     "contracts": []
   },
@@ -1470,6 +1519,7 @@
     "company": "Valaris",
     "generation": "7G",
     "status": "Idle",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2015,
     "contracts": [
       {
@@ -1500,6 +1550,7 @@
     "company": "Valaris",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -1530,6 +1581,7 @@
     "company": "Valaris",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -1560,6 +1612,7 @@
     "company": "Valaris",
     "generation": "7G",
     "status": "Warm-Stacked",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2014,
     "contracts": [
       {
@@ -1590,6 +1643,7 @@
     "company": "Valaris",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2013,
     "contracts": [
       {
@@ -1610,6 +1664,7 @@
     "company": "Valaris",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2017,
     "contracts": [
       {
@@ -1630,6 +1685,7 @@
     "company": "Valaris",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2015,
     "contracts": [
       {
@@ -1660,6 +1716,7 @@
     "company": "Valaris",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2015,
     "contracts": [
       {
@@ -1690,6 +1747,7 @@
     "company": "Valaris",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2013,
     "contracts": [
       {
@@ -1720,6 +1778,7 @@
     "company": "Valaris",
     "generation": "7G",
     "status": "Active",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2010,
     "contracts": [
       {
@@ -1750,6 +1809,7 @@
     "company": "Valaris",
     "generation": "7G",
     "status": "Cold-Stacked",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2023,
     "contracts": []
   },
@@ -1759,6 +1819,7 @@
     "company": "Valaris",
     "generation": "7G",
     "status": "Cold-Stacked",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2023,
     "contracts": []
   },
@@ -1768,6 +1829,7 @@
     "company": "Valaris",
     "generation": "7G",
     "status": "Cold-Stacked",
+    "statusAsOf": "2026-08-05",
     "yearBuilt": 2013,
     "contracts": []
   }

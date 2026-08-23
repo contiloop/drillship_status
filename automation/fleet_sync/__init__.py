@@ -1,3 +1,3 @@
 """Official fleet-report synchronizer."""
 
-PARSER_VERSION = "2026.08.24.1"
+PARSER_VERSION = "2026.08.24.2"

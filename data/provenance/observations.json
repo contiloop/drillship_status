@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-23T17:11:49Z",
+  "generatedAt": "2026-08-23T17:15:30Z",
   "parserVersion": "2026.08.24.1",
   "observations": [
     {
@@ -562,7 +562,9 @@
       "reportDate": "2026-07-27",
       "provenanceClass": "official-current-report-operational-note",
       "rate_disclosure": "not-applicable",
-      "operationalNote": "Available"
+      "operationalNote": "Available",
+      "page": 4,
+      "row": "row=5"
     },
     {
       "company": "Noble",
@@ -590,7 +592,9 @@
       "reportDate": "2026-07-27",
       "provenanceClass": "official-current-report-operational-note",
       "rate_disclosure": "not-applicable",
-      "operationalNote": "Available"
+      "operationalNote": "Available",
+      "page": 4,
+      "row": "row=8"
     },
     {
       "company": "Noble",
@@ -601,7 +605,9 @@
       "reportDate": "2026-07-27",
       "provenanceClass": "official-current-report-operational-note",
       "rate_disclosure": "not-applicable",
-      "operationalNote": "–"
+      "operationalNote": "Held for sale.",
+      "page": 4,
+      "row": "row=9"
     },
     {
       "company": "Noble",
@@ -689,7 +695,9 @@
       "reportDate": "2026-08-10",
       "provenanceClass": "official-current-report-operational-note",
       "rate_disclosure": "not-applicable",
-      "operationalNote": "Available in Namibia"
+      "operationalNote": "Available in Namibia",
+      "page": 3,
+      "row": "row=7"
     },
     {
       "company": "Seadrill",
@@ -1727,7 +1735,9 @@
       "reportDate": "2026-08-05",
       "provenanceClass": "official-current-report-operational-note",
       "rate_disclosure": "not-applicable",
-      "operationalNote": "Out of Service 80 days - Contract Preparation"
+      "operationalNote": "Out of Service 80 days - Contract Preparation",
+      "page": 4,
+      "row": "y=390.5"
     },
     {
       "company": "Transocean",
@@ -1835,7 +1845,9 @@
       "reportDate": "2026-08-05",
       "provenanceClass": "official-current-report-operational-note",
       "rate_disclosure": "not-applicable",
-      "operationalNote": "Idle"
+      "operationalNote": "Idle",
+      "page": 4,
+      "row": "y=427.2"
     },
     {
       "company": "Transocean",
@@ -1983,7 +1995,9 @@
       "reportDate": "2026-08-05",
       "provenanceClass": "official-current-report-operational-note",
       "rate_disclosure": "not-applicable",
-      "operationalNote": "Out of Service 70 days - Contract Preparation"
+      "operationalNote": "Out of Service 70 days - Contract Preparation",
+      "page": 4,
+      "row": "y=473.3"
     },
     {
       "company": "Transocean",
@@ -1994,7 +2008,9 @@
       "reportDate": "2026-08-05",
       "provenanceClass": "official-current-report-operational-note",
       "rate_disclosure": "not-applicable",
-      "operationalNote": "Stacked May-16"
+      "operationalNote": "Stacked May-16",
+      "page": 4,
+      "row": "y=500.4"
     },
     {
       "company": "Transocean",
@@ -2005,7 +2021,9 @@
       "reportDate": "2026-08-05",
       "provenanceClass": "official-current-report-operational-note",
       "rate_disclosure": "not-applicable",
-      "operationalNote": "Stacked Mar-17"
+      "operationalNote": "Stacked Mar-17",
+      "page": 4,
+      "row": "y=509.6"
     },
     {
       "company": "Transocean",
@@ -2016,7 +2034,9 @@
       "reportDate": "2026-08-05",
       "provenanceClass": "official-current-report-operational-note",
       "rate_disclosure": "not-applicable",
-      "operationalNote": "Stacked Sep-16"
+      "operationalNote": "Stacked Sep-16",
+      "page": 4,
+      "row": "y=518.9"
     },
     {
       "company": "Valaris",
@@ -2168,6 +2188,19 @@
       "row": "row=4,slot=1",
       "date_precision": "month",
       "rate_disclosure": "undisclosed"
+    },
+    {
+      "company": "Valaris",
+      "vesselId": "valaris-ds-15",
+      "vessel": "VALARIS DS-15",
+      "sourceSha256": "c94713719e350294eb91b0361212df7e5951c8d00b9e108ff7afa4a797e55e80",
+      "sourceUrl": "https://s23.q4cdn.com/956522167/files/doc_financials/2026/q2/08052026-Fleet-Status-Report_FINAL.pdf",
+      "reportDate": "2026-08-05",
+      "provenanceClass": "official-current-report-operational-note",
+      "rate_disclosure": "not-applicable",
+      "operationalNote": "Rig is warm stacked in Las Palmas, Spain TCV, based on an estimated duration of 250 days, is approx. $135 million, including upfront payments for rig upgrades and mobilization. TCV does not include the provision of additional services. Priced options with a total estimated duration of 80 to 100 days",
+      "page": 4,
+      "row": "row=4"
     },
     {
       "company": "Valaris",
@@ -2378,7 +2411,9 @@
       "reportDate": "2026-08-05",
       "provenanceClass": "official-current-report-operational-note",
       "rate_disclosure": "not-applicable",
-      "operationalNote": "Listed in the official stacked-rig section"
+      "operationalNote": "Listed in the official stacked-rig section",
+      "page": 4,
+      "row": "row=1"
     },
     {
       "company": "Valaris",
@@ -2389,7 +2424,9 @@
       "reportDate": "2026-08-05",
       "provenanceClass": "official-current-report-operational-note",
       "rate_disclosure": "not-applicable",
-      "operationalNote": "Listed in the official stacked-rig section"
+      "operationalNote": "Listed in the official stacked-rig section",
+      "page": 4,
+      "row": "row=2"
     },
     {
       "company": "Valaris",
@@ -2400,7 +2437,9 @@
       "reportDate": "2026-08-05",
       "provenanceClass": "official-current-report-operational-note",
       "rate_disclosure": "not-applicable",
-      "operationalNote": "Listed in the official stacked-rig section"
+      "operationalNote": "Listed in the official stacked-rig section",
+      "page": 4,
+      "row": "row=3"
     }
   ]
 }

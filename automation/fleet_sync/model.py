@@ -17,7 +17,9 @@ class ContractObservation:
     end_date: str
     day_rate: int
     status: ContractStatus
-    page: int
+    # HTML exhibits do not have a meaningful PDF page number.  ``row`` stays
+    # required so every observation still has an exact source locator.
+    page: int | None
     row: str
     date_precision: str = "month"
     rate_disclosure: str = "reported"
@@ -33,12 +35,20 @@ class ContractObservation:
         )
 
 
+@dataclass(frozen=True)
+class OperationalObservation:
+    note: str
+    page: int | None
+    row: str
+
+
 @dataclass
 class VesselSnapshot:
     name: str
     status: ShipStatus
     contracts: list[ContractObservation] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
+    operational_observations: list[OperationalObservation] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -61,4 +71,3 @@ class ParseResult:
     vessels: dict[str, VesselSnapshot]
     warnings: list[str] = field(default_factory=list)
     pending_events: list[dict] = field(default_factory=list)
-
