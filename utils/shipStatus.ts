@@ -1,28 +1,24 @@
 import { Drillship } from '../types';
 
-export type ComputedStatus = 'Active' | 'Idle' | 'Cold-Stacked';
+export type ComputedStatus = 'Active' | 'Idle' | 'Warm-Stacked' | 'Cold-Stacked';
 
 /**
  * 오늘 날짜 기준으로 선박의 상태를 자동 계산합니다.
  *
  * 로직:
- * 1. 원본 status가 Cold-Stacked → Cold-Stacked (수동 지정 유지)
- * 2. 현재 계약 진행 중 → Active
- * 3. 그 외 (계약 사이 gap, 미래 계약 대기) → Idle
- *
- * Note: Warm-Stacked는 별도로 구분하지 않음. 계약 사이의 gap은 모두 Idle로 처리.
+ * 공식 보고서의 명시적 Idle/Stacked 상태를 우선합니다. Active로 보고된
+ * 선박만 오늘 유효한 Firm 계약이 끝났는지 동적으로 확인합니다.
  */
 export function getComputedStatus(ship: Drillship, today: Date = new Date()): ComputedStatus {
-  // Cold-Stacked는 원본 status에서 가져옴 (수동 지정)
-  if (ship.status === 'Cold-Stacked') {
-    return 'Cold-Stacked';
+  if (ship.status !== 'Active') {
+    return ship.status;
   }
 
   const todayStr = today.toISOString().split('T')[0];
 
   // 현재 진행 중인 계약이 있는지 확인
   const hasActiveContract = ship.contracts.some(contract => {
-    return contract.startDate <= todayStr && contract.endDate >= todayStr;
+    return contract.status === 'Firm' && contract.startDate <= todayStr && contract.endDate >= todayStr;
   });
 
   if (hasActiveContract) {
@@ -52,7 +48,7 @@ export function getIdlePeriods(
   const periods: IdlePeriod[] = [];
 
   // 계약을 시작일 기준으로 정렬
-  const sortedContracts = [...ship.contracts].sort((a, b) =>
+  const sortedContracts = ship.contracts.filter(contract => contract.status === 'Firm').sort((a, b) =>
     a.startDate.localeCompare(b.startDate)
   );
 
@@ -97,4 +93,32 @@ export function getIdlePeriods(
   }
 
   return periods;
+}
+
+/** Firm 계약 구간을 합집합으로 계산해 월 정밀도 경계의 중복을 제거합니다. */
+export function countFirmCoveredDays(ship: Drillship, rangeStart: Date, rangeEnd: Date): number {
+  const from = rangeStart.toISOString().slice(0, 10);
+  const to = rangeEnd.toISOString().slice(0, 10);
+  const intervals = ship.contracts
+    .filter(contract => contract.status === 'Firm' && contract.endDate >= from && contract.startDate <= to)
+    .map(contract => [contract.startDate < from ? from : contract.startDate, contract.endDate > to ? to : contract.endDate] as const)
+    .sort((a, b) => a[0].localeCompare(b[0]));
+
+  if (intervals.length === 0) return 0;
+  let total = 0;
+  let currentStart = intervals[0][0];
+  let currentEnd = intervals[0][1];
+  const dayMs = 86_400_000;
+  const utc = (value: string) => Date.parse(`${value}T00:00:00Z`);
+
+  for (const [start, end] of intervals.slice(1)) {
+    if (utc(start) <= utc(currentEnd) + dayMs) {
+      if (end > currentEnd) currentEnd = end;
+      continue;
+    }
+    total += Math.floor((utc(currentEnd) - utc(currentStart)) / dayMs) + 1;
+    currentStart = start;
+    currentEnd = end;
+  }
+  return total + Math.floor((utc(currentEnd) - utc(currentStart)) / dayMs) + 1;
 }

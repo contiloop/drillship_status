@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-23T17:04:41Z",
+  "updatedAsOf": "2026-08-10",
+  "dataHash": "5680482f4c85610e7bd4",
+  "stateFingerprint": "7112a586ac3ec61104a5",
+  "fleetFile": "fleet.5680482f4c85610e7bd4.json",
+  "eventsFile": "events.34353369fb5a85727f01.json",
+  "eventsHash": "34353369fb5a85727f01",
+  "shipCount": 62,
+  "contractCount": 116,
+  "sourceCount": 4,
+  "sources": [
+    {
+      "company": "Noble",
+      "indexUrl": "https://noblecorp.com/our-investors/reports-filings/fleet-status-report/",
+      "documentUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-3/?wpdmdl=3701",
+      "reportDate": "2026-07-27",
+      "sha256": "ddfdfe43090fe4f2589352abb7bf14cb292ee7323569f29a9f89e20c079807a6",
+      "byteSize": 195253,
+      "parserVersion": "2026.08.24.1",
+      "discovery": "official-index",
+      "contentType": "application/pdf"
+    },
+    {
+      "company": "Seadrill",
+      "indexUrl": "https://www.seadrill.com/wp-json/wp/v2/pages/987508015",
+      "documentUrl": "https://www.seadrill.com/wp-content/uploads/2026/08/Seadrill-Fleet-Status-Report-August-2026-vF.pdf",
+      "reportDate": "2026-08-10",
+      "sha256": "b774357daafdb62dcc8c371fe5f5d118fb8d7d51c91badd05cd6cae3c9a39cb1",
+      "byteSize": 408026,
+      "parserVersion": "2026.08.24.1",
+      "discovery": "official-wordpress-api",
+      "contentType": "application/pdf"
+    },
+    {
+      "company": "Transocean",
+      "indexUrl": "https://www.deepwater.com/investors/fleet-status-report",
+      "documentUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/August%202026%20Fleet%20Status%20Report.pdf",
+      "reportDate": "2026-08-05",
+      "sha256": "f2f98b03f750b5c4f6d299bff9b55d0ecc4dbeb0cb4f069054193968894db8b6",
+      "byteSize": 633637,
+      "parserVersion": "2026.08.24.1",
+      "discovery": "official-index",
+      "contentType": "application/pdf"
+    },
+    {
+      "company": "Valaris",
+      "indexUrl": "https://www.valaris.com/investors/",
+      "documentUrl": "https://s23.q4cdn.com/956522167/files/doc_financials/2026/q2/08052026-Fleet-Status-Report_FINAL.pdf",
+      "reportDate": "2026-08-05",
+      "sha256": "c94713719e350294eb91b0361212df7e5951c8d00b9e108ff7afa4a797e55e80",
+      "byteSize": 974321,
+      "parserVersion": "2026.08.24.1",
+      "discovery": "official-index-after-sec-HTTPError",
+      "contentType": "application/pdf"
+    }
+  ],
+  "warningsCount": 13,
+  "pendingEventCount": 28
+}

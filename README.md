@@ -1,127 +1,72 @@
 # Drillship Status
 
-Offshore Drillship Fleet Status & Pricing Intelligence 대시보드
+Transocean, Valaris, Noble, Seadrill의 공식 fleet status report와 공식 IR/SEC 공지를 추적하는 드릴십 대시보드입니다.
 
-## 실행 방법
+프로덕션: <https://offshore-drillship-fleet-analyst.vercel.app>
+
+## 자동 갱신 흐름
+
+1. GitHub Actions가 6시간마다 각 회사의 공식 보고서 인덱스, SEC 제출 목록, 공식 IR 뉴스 페이지를 확인합니다.
+2. 최신 PDF 또는 SEC HTML의 원문 형식, 파일 크기, 해시, 보고서 날짜를 검증합니다.
+3. 회사별 결정론적 파서가 선박·계약·dayrate·상태를 추출합니다.
+4. 62척 master registry, 날짜, enum, 계약 ID, 출처 추적성, 보고서 rollback을 검증합니다.
+5. 검증을 모두 통과한 경우에만 `public/data/manifest.json`과 content-addressed fleet JSON을 커밋합니다.
+6. 기존 Vercel Git 연동이 `main`의 새 커밋을 프로덕션으로 배포합니다.
+
+모호한 뉴스, LOA, 정확한 날짜가 없는 option은 계약으로 추정하지 않습니다. `public/data/events.json`의 review signal로만 남기며, 기존 검증 데이터를 덮어쓰지 않습니다. 공개되지 않은 dayrate는 기존 UI 호환을 위해 `0`으로 직렬화하되 provenance에는 `undisclosed`로 기록합니다.
+
+## 공식 원천
+
+- [Transocean Fleet Status Report](https://www.deepwater.com/investors/fleet-status-report)
+- [Valaris Investors / Fleet Status Report](https://www.valaris.com/investors/) (SEC submissions CIK 0000314808도 우선 확인)
+- [Noble Fleet Status Report](https://noblecorp.com/our-investors/reports-filings/fleet-status-report/)
+- [Seadrill Fleet](https://www.seadrill.com/fleet/)
+
+한국 DART 공시는 사용하지 않습니다.
+
+## 로컬 실행
 
 ```bash
-npm install
+python3 -m venv .venv
+.venv/bin/pip install -r automation/requirements.txt
+npm ci
+npm run data:check
 npm run dev
 ```
 
-브라우저에서 `http://localhost:3000` 접속
+검증된 데이터를 실제 생성하려면:
 
-## 자동 업데이트 / 배포
-
-- 앱은 실행 시 `fleet-data.json`과 `fleet-data.meta.json`을 우선 읽고, 실패하면 번들 기본 JSON으로 되돌아갑니다.
-- GitHub Actions 워크플로는 매일 03:00 UTC에 `npm run data:sync`를 실행한 뒤 GitHub Pages로 배포합니다.
-- 원격 데이터 원천을 쓰려면 GitHub Repository Variables에 다음을 설정합니다.
-  - `FLEET_DATA_URL`
-  - `FLEET_DATA_META_URL`
-- 둘 다 없으면 현재 리포지토리의 기본 데이터가 그대로 사용됩니다.
-
-## 기능
-
-### Dashboard
-- **KPI 카드**: Total Fleet, Utilization (3가지 모드), Avg Dayrate, Cold Stacked 현황
-- **Average Dayrate 차트**: Generation별 또는 Company별 평균 Dayrate 비교
-- **Asset Composition 차트**: Generation별 또는 Company별 선박 수 비교
-- **Fleet Gantt**: 선박별 계약 타임라인 시각화
-
-### README 탭
-- Utilization Metrics 정의 및 설명
-- JSON 스키마 가이드
-- 필드 레퍼런스 테이블
-- Notes & Tips
-
-## Utilization Metrics (가동률 지표)
-
-본 시스템은 3가지 가동률 지표를 제공합니다:
-
-### ① Fleet Utilization (함대 가동률)
-```
-계산식: 가동 중인 시추선 수 ÷ 전체 보유 시추선 수
-```
-- 가장 단순한 방식으로 전체 보유 자산 대비 가동 중인 비율
-- ⚠️ Cold-Stacked 시추선도 분모에 포함되어 실제 영업 가능 자산과 괴리 가능
-
-### ② Market Utilization (시장 가동률) ⭐ 가장 많이 사용
-```
-계산식: 가동 중 시추선 ÷ (가동 중 + 유휴 but 시장 출시)
-```
-- 실제로 시장에 나와 있는 시추선만 기준
-- **제외 대상**: Cold-Stacked, 폐선 예정, 장기 조선소 입고
-- 👉 **드릴링 시장 수급 판단 시 핵심 지표**
-
-### ③ Economic Utilization (경제적 가동률)
-```
-계산식: 유상 계약 일수 ÷ 전체 가능 일수
-```
-- 실제로 수익을 창출하는 날짜 기준
-- 가장 실무적이고 재무적 관점의 지표
-
-## 사용 팁
-
-- JSON 파일은 Dashboard 탭에서 업로드/다운로드 가능
-- 데이터는 로컬 브라우저에 저장되며, 다른 기기와 동기화되지 않음
-- 중요한 데이터는 Export JSON으로 백업
-- Dayrate 단위는 USD/일 기준
-- 차트에서 **BY GENERATION / BY COMPANY** 버튼으로 뷰 전환 가능
-- 차트 바에 커서를 올리면 상세 정보 확인 가능:
-  - Company별 Utilization (가동률)
-  - 최고/최저 Dayrate 선박
-
-## Market Utilization 기준 (시장 사이클)
-
-**아래 기준은 Market Utilization(시장 가동률)을 기준으로 합니다.**
-
-| 가동률 | 상태 | 설명 |
-|--------|------|------|
-| **95%+** | Super Cycle (분홍) | 초호황, 공급 부족. 모든 배가 계약 중이며 IOC들이 2-3년 뒤 물량 선점 경쟁. Dayrate $60만+ |
-| **85-95%** | Seller's Market (녹색) | 공급자 우위. 85% 매직넘버를 넘으면 Dayrate 급상승. 시추업체 고단가 장기계약 선호 |
-| **75-85%** | Balanced (주황) | 균형/전환기. 점유율 경쟁으로 Dayrate 상승 제한. 유가가 버텨주느냐가 관건 |
-| **75% 미만** | Buyer's Market (빨강) | 수요자 우위, 불황. 공급과잉. Dayrate가 OPEX 수준으로 하락. Cold Stack/Scrapping 증가 |
-
-## JSON 데이터 형식
-
-```json
-[
-  {
-    "id": "deepwater-titan",
-    "name": "Deepwater Titan",
-    "company": "Transocean",
-    "generation": "8G",
-    "status": "Active",
-    "yearBuilt": 2023,
-    "contracts": [
-      {
-        "id": "deepwater-titan-1",
-        "vesselId": "deepwater-titan",
-        "startDate": "2023-04-01",
-        "endDate": "2028-04-01",
-        "dayRate": 462000,
-        "client": "Chevron",
-        "region": "USGOM",
-        "status": "Firm"
-      }
-    ]
-  }
-]
+```bash
+npm run data:sync
+npm run verify
 ```
 
-## 필드 레퍼런스
+## 생성 산출물
 
-| Field | Type | Allowed Values |
-|-------|------|----------------|
-| company | string | Transocean, Valaris, Noble, Seadrill |
-| generation | string | 6G, 7G, 7G+, 8G |
-| status (ship) | string | Active, Idle, Warm-Stacked, Cold-Stacked |
-| status (contract) | string | Firm, Option |
-| dayRate | number | Integer (e.g. 462000) |
-| client | string | e.g. Chevron, Petrobras, Shell, bp |
-| region | string | e.g. USGOM, Brazil, India, Australia |
-| dates | string | YYYY-MM-DD format |
+- `public/data/manifest.json`: 현재 데이터 해시, 보고서 기준일, 공식 출처
+- `public/data/fleet.<hash>.json`: 62척 canonical fleet data
+- `public/data/events.<hash>.json`: 자동 반영하지 않은 공식 뉴스/공시 signal
+- `public/data/changes.json`: 직전 데이터와의 semantic diff 요약
+- `data/provenance/sources.json`: 문서 URL, SHA-256, parser version
+- `data/provenance/observations.json`: 계약별 페이지/행 evidence
 
-## Notes
+## 데이터 규칙
 
-- **Noble Guyana 4척** (Tom Madden, Sam Croft, Don Taylor, Bob Douglas): ExxonMobil 계약으로, 매년 3월과 9월에 시장 상황에 따라 dayRate가 조정됨
+- 계약 상태: `Firm`, `Option`, `Contingent`
+- 선박 상태: `Active`, `Idle`, `Warm-Stacked`, `Cold-Stacked`
+- 월 정밀도 원문의 시작일은 월 1일, 종료일은 월 말로 투영합니다.
+- Noble의 종료 token은 exclusive boundary이므로 바로 전날로 저장합니다.
+- 경제적 가동률은 `Firm` 구간의 합집합으로 계산하여 같은 달 전환 계약의 겹침을 이중 계산하지 않습니다.
+- total contract value를 기간으로 나누어 dayrate를 추정하지 않습니다.
+- 최신 snapshot에 없는 완료 계약은 이력 보존 규칙에 따라 유지하고, stale future 계약은 제거합니다.
+
+## 운영 명령
+
+```bash
+python3 -m automation.fleet_sync --check   # fetch + parse + validate, no write
+python3 -m automation.fleet_sync --write   # validated generated artifacts only
+python3 -m pytest automation/tests -q
+npm run build
+```
+
+파싱 또는 스키마가 달라지면 workflow는 실패하며 마지막 정상 데이터와 프로덕션 사이트는 그대로 유지됩니다.

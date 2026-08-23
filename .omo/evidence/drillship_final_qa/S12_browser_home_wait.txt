@@ -1,0 +1,2 @@
+Navigating to http://127.0.0.1:4174/
+Capturing screenshot into .omo/evidence/drillship_final_qa/S12_browser_home_wait.png

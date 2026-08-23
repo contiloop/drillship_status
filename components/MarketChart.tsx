@@ -4,6 +4,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, BarChart, Bar, Cell
 } from 'recharts';
 import { Drillship, Company, Generation } from '../types';
+import { getComputedStatus } from '../utils/shipStatus';
 
 interface MarketChartProps {
   ships: Drillship[];
@@ -11,18 +12,21 @@ interface MarketChartProps {
 
 const MarketChart: React.FC<MarketChartProps> = ({ ships }) => {
   const [view, setView] = useState<'generation' | 'company'>('generation');
+  const today = new Date().toISOString().slice(0, 10);
+  const isCurrentReportedRate = (contract: Drillship['contracts'][number]) =>
+    contract.status === 'Firm' && contract.dayRate > 0 && contract.startDate <= today && contract.endDate >= today;
 
   const generations: Generation[] = ['6G', '7G', '7G+', '8G'];
   const companies: Company[] = ['Transocean', 'Valaris', 'Noble', 'Seadrill'];
 
   // Market Benchmark
-  const allRates = ships.flatMap(s => s.contracts).filter(c => c.dayRate > 0).map(c => c.dayRate);
+  const allRates = ships.flatMap(s => s.contracts).filter(isCurrentReportedRate).map(c => c.dayRate);
   const marketAvg = allRates.length > 0 ? allRates.reduce((a, b) => a + b, 0) / allRates.length : 0;
 
   // Generation Stats
   const genStats = generations.map(gen => {
     const genShips = ships.filter(s => s.generation === gen);
-    const rates = genShips.flatMap(s => s.contracts).filter(c => c.dayRate > 0).map(c => c.dayRate);
+    const rates = genShips.flatMap(s => s.contracts).filter(isCurrentReportedRate).map(c => c.dayRate);
     const avgRate = rates.length > 0 ? Math.round(rates.reduce((a, b) => a + b, 0) / rates.length) : 0;
     return { name: gen, avgRate, count: genShips.length };
   });
@@ -35,21 +39,21 @@ const MarketChart: React.FC<MarketChartProps> = ({ ships }) => {
     generations.forEach(gen => {
       const filtered = compShips.filter(s => s.generation === gen);
       data[`${gen}_count`] = filtered.length;
-      const rates = filtered.flatMap(s => s.contracts).filter(c => c.dayRate > 0).map(c => c.dayRate);
+      const rates = filtered.flatMap(s => s.contracts).filter(isCurrentReportedRate).map(c => c.dayRate);
       data[`${gen}_avgRate`] = rates.length > 0 ? Math.round(rates.reduce((a, b) => a + b, 0) / rates.length) : 0;
     });
 
-    const compRates = compShips.flatMap(s => s.contracts).filter(c => c.dayRate > 0).map(c => c.dayRate);
+    const compRates = compShips.flatMap(s => s.contracts).filter(isCurrentReportedRate).map(c => c.dayRate);
     data.overallAvgRate = compRates.length > 0 ? Math.round(compRates.reduce((a, b) => a + b, 0) / compRates.length) : 0;
     data.totalCount = compShips.length;
     data.premium = marketAvg > 0 ? ((data.overallAvgRate - marketAvg) / marketAvg) * 100 : 0;
 
     // Utilization 계산: Active 선박 수 / 전체 선박 수
-    const activeCount = compShips.filter(s => s.status === 'Active').length;
+    const activeCount = compShips.filter(s => getComputedStatus(s) === 'Active').length;
     data.utilization = compShips.length > 0 ? Math.round((activeCount / compShips.length) * 100) : 0;
     
     const sortedVessels = compShips.map(s => {
-      const vRates = s.contracts.filter(c => c.dayRate > 0).map(c => c.dayRate);
+      const vRates = s.contracts.filter(isCurrentReportedRate).map(c => c.dayRate);
       const vAvg = vRates.length > 0 ? Math.round(vRates.reduce((a, b) => a + b, 0) / vRates.length) : 0;
       return { name: s.name, avg: vAvg };
     }).filter(v => v.avg > 0).sort((a, b) => b.avg - a.avg);
@@ -166,7 +170,7 @@ const MarketChart: React.FC<MarketChartProps> = ({ ships }) => {
             <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div> Average Dayrate
           </h4>
           <div className="flex-1 w-full min-h-0">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={{ width: 500, height: 320 }}>
               <BarChart data={view === 'generation' ? genStats : companyStats} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
                 <XAxis dataKey="name" stroke="#64748b" fontSize={11} tickLine={false} axisLine={false} dy={10} />
@@ -187,7 +191,7 @@ const MarketChart: React.FC<MarketChartProps> = ({ ships }) => {
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Asset Composition
           </h4>
           <div className="flex-1 w-full min-h-0">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={{ width: 500, height: 320 }}>
               <BarChart data={view === 'generation' ? genStats : companyStats} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
                 <XAxis dataKey="name" stroke="#64748b" fontSize={11} tickLine={false} axisLine={false} dy={10} />

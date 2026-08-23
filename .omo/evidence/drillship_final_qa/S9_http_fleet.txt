@@ -1,0 +1,1788 @@
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0HTTP/1.1 200 OK
+Vary: Origin
+Content-Length: 43730
+Content-Type: application/json
+Last-Modified: Sun, 23 Aug 2026 17:05:12 GMT
+ETag: W/"43730-1787504712175"
+Cache-Control: no-cache
+Date: Sun, 23 Aug 2026 17:06:02 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+[
+  {
+    "id": "noble-faye-kozack",
+    "name": "Noble Faye Kozack",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2013,
+    "contracts": [
+      {
+        "vesselId": "noble-faye-kozack",
+        "startDate": "2024-07-01",
+        "endDate": "2026-12-31",
+        "dayRate": 0,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "noble-faye-kozack-f35970f156"
+      }
+    ]
+  },
+  {
+    "id": "noble-stanley-lafosse",
+    "name": "Noble Stanley Lafosse",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      {
+        "vesselId": "noble-stanley-lafosse",
+        "startDate": "2025-02-01",
+        "endDate": "2026-12-31",
+        "dayRate": 0,
+        "client": "Murphy",
+        "region": "US Gulf",
+        "status": "Firm",
+        "id": "noble-stanley-lafosse-a635b013db"
+      }
+    ]
+  },
+  {
+    "id": "noble-valiant",
+    "name": "Noble Valiant",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Idle",
+    "yearBuilt": 2014,
+    "contracts": [
+      {
+        "vesselId": "noble-valiant",
+        "startDate": "2026-11-01",
+        "endDate": "2029-06-30",
+        "dayRate": 0,
+        "client": "TotalEnergies",
+        "region": "Suriname",
+        "status": "Firm",
+        "id": "noble-valiant-72ce40eb06"
+      }
+    ]
+  },
+  {
+    "id": "noble-venturer",
+    "name": "Noble Venturer",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      {
+        "vesselId": "noble-venturer",
+        "startDate": "2025-11-01",
+        "endDate": "2026-08-31",
+        "dayRate": 0,
+        "client": "Tullow",
+        "region": "Ghana",
+        "status": "Firm",
+        "id": "noble-venturer-57cee55354"
+      },
+      {
+        "vesselId": "noble-venturer",
+        "startDate": "2026-12-01",
+        "endDate": "2027-01-31",
+        "dayRate": 430000,
+        "client": "Planet One",
+        "region": "Ghana",
+        "status": "Firm",
+        "id": "noble-venturer-8c5d4f74d5"
+      },
+      {
+        "vesselId": "noble-venturer",
+        "startDate": "2027-02-01",
+        "endDate": "2027-02-28",
+        "dayRate": 450000,
+        "client": "Amni",
+        "region": "Ghana",
+        "status": "Firm",
+        "id": "noble-venturer-101286e260"
+      },
+      {
+        "vesselId": "noble-venturer",
+        "startDate": "2027-10-01",
+        "endDate": "2031-06-30",
+        "dayRate": 0,
+        "client": "Shell",
+        "region": "US Gulf",
+        "status": "Firm",
+        "id": "noble-venturer-26bd126dca"
+      },
+      {
+        "vesselId": "noble-venturer",
+        "startDate": "2031-07-01",
+        "endDate": "2035-06-30",
+        "dayRate": 0,
+        "client": "Shell",
+        "region": "US Gulf",
+        "status": "Option",
+        "id": "noble-venturer-300040a979"
+      }
+    ]
+  },
+  {
+    "id": "noble-viking",
+    "name": "Noble Viking",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Idle",
+    "yearBuilt": 2014,
+    "contracts": [
+      {
+        "vesselId": "noble-viking",
+        "startDate": "2025-06-01",
+        "endDate": "2025-10-31",
+        "dayRate": 0,
+        "client": "Prime",
+        "region": "Philippines",
+        "status": "Firm",
+        "id": "noble-viking-6515888156"
+      },
+      {
+        "vesselId": "noble-viking",
+        "startDate": "2025-11-01",
+        "endDate": "2025-11-30",
+        "dayRate": 0,
+        "client": "Shell",
+        "region": "Brunei",
+        "status": "Firm",
+        "id": "noble-viking-5a1c34c19a"
+      },
+      {
+        "vesselId": "noble-viking",
+        "startDate": "2025-12-01",
+        "endDate": "2026-01-31",
+        "dayRate": 0,
+        "client": "TotalEnergies",
+        "region": "Papua New Guinea",
+        "status": "Firm",
+        "id": "noble-viking-2d65c0bb41"
+      },
+      {
+        "vesselId": "noble-viking",
+        "startDate": "2026-08-01",
+        "endDate": "2026-09-30",
+        "dayRate": 0,
+        "client": "Undisclosed",
+        "region": "Malaysia",
+        "status": "Firm",
+        "id": "noble-viking-e7ff69d9e1"
+      },
+      {
+        "vesselId": "noble-viking",
+        "startDate": "2028-01-01",
+        "endDate": "2028-09-30",
+        "dayRate": 0,
+        "client": "Undisclosed",
+        "region": "Asia Pac",
+        "status": "Firm",
+        "id": "noble-viking-008ba8cd5a"
+      },
+      {
+        "vesselId": "noble-viking",
+        "startDate": "2028-10-01",
+        "endDate": "2028-12-31",
+        "dayRate": 0,
+        "client": "Undisclosed",
+        "region": "Asia Pac",
+        "status": "Option",
+        "id": "noble-viking-3713509662"
+      }
+    ]
+  },
+  {
+    "id": "noble-voyager",
+    "name": "Noble Voyager",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2015,
+    "contracts": [
+      {
+        "vesselId": "noble-voyager",
+        "startDate": "2026-07-01",
+        "endDate": "2030-06-30",
+        "dayRate": 0,
+        "client": "Shell",
+        "region": "US Gulf",
+        "status": "Firm",
+        "id": "noble-voyager-2e1f880e11"
+      },
+      {
+        "vesselId": "noble-voyager",
+        "startDate": "2030-07-01",
+        "endDate": "2034-06-30",
+        "dayRate": 0,
+        "client": "Shell",
+        "region": "US Gulf",
+        "status": "Option",
+        "id": "noble-voyager-0d0344b4f0"
+      }
+    ]
+  },
+  {
+    "id": "noble-tom-madden",
+    "name": "Noble Tom Madden",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      {
+        "vesselId": "noble-tom-madden",
+        "startDate": "2019-12-01",
+        "endDate": "2029-01-31",
+        "dayRate": 0,
+        "client": "ExxonMobil",
+        "region": "Guyana",
+        "status": "Firm",
+        "id": "noble-tom-madden-77476a732f"
+      }
+    ]
+  },
+  {
+    "id": "noble-sam-croft",
+    "name": "Noble Sam Croft",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      {
+        "vesselId": "noble-sam-croft",
+        "startDate": "2019-04-01",
+        "endDate": "2029-01-31",
+        "dayRate": 0,
+        "client": "ExxonMobil",
+        "region": "Guyana",
+        "status": "Firm",
+        "id": "noble-sam-croft-2047ad4413"
+      }
+    ]
+  },
+  {
+    "id": "noble-don-taylor",
+    "name": "Noble Don Taylor",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2013,
+    "contracts": [
+      {
+        "vesselId": "noble-don-taylor",
+        "startDate": "2019-11-01",
+        "endDate": "2029-01-31",
+        "dayRate": 0,
+        "client": "ExxonMobil",
+        "region": "Guyana",
+        "status": "Firm",
+        "id": "noble-don-taylor-7f08c6b6e4"
+      }
+    ]
+  },
+  {
+    "id": "noble-bob-douglas",
+    "name": "Noble Bob Douglas",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2013,
+    "contracts": [
+      {
+        "vesselId": "noble-bob-douglas",
+        "startDate": "2018-04-01",
+        "endDate": "2029-01-31",
+        "dayRate": 0,
+        "client": "ExxonMobil",
+        "region": "Guyana",
+        "status": "Firm",
+        "id": "noble-bob-douglas-d3495f8ec3"
+      }
+    ]
+  },
+  {
+    "id": "noble-blackhawk",
+    "name": "Noble BlackHawk",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      {
+        "vesselId": "noble-blackhawk",
+        "startDate": "2024-11-01",
+        "endDate": "2026-10-31",
+        "dayRate": 0,
+        "client": "Occidental",
+        "region": "US Gulf",
+        "status": "Firm",
+        "id": "noble-blackhawk-0adc4f5264"
+      },
+      {
+        "vesselId": "noble-blackhawk",
+        "startDate": "2026-11-01",
+        "endDate": "2029-10-31",
+        "dayRate": 0,
+        "client": "Occidental",
+        "region": "US Gulf",
+        "status": "Option",
+        "id": "noble-blackhawk-2882232a6e"
+      }
+    ]
+  },
+  {
+    "id": "noble-blackhornet",
+    "name": "Noble BlackHornet",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      {
+        "vesselId": "noble-blackhornet",
+        "startDate": "2025-02-01",
+        "endDate": "2027-01-31",
+        "dayRate": 0,
+        "client": "bp",
+        "region": "US Gulf",
+        "status": "Firm",
+        "id": "noble-blackhornet-da57fd4e74"
+      },
+      {
+        "vesselId": "noble-blackhornet",
+        "startDate": "2027-02-01",
+        "endDate": "2029-01-31",
+        "dayRate": 0,
+        "client": "bp",
+        "region": "US Gulf",
+        "status": "Firm",
+        "id": "noble-blackhornet-4adea1d559"
+      },
+      {
+        "vesselId": "noble-blackhornet",
+        "startDate": "2029-02-01",
+        "endDate": "2030-01-31",
+        "dayRate": 0,
+        "client": "bp",
+        "region": "US Gulf",
+        "status": "Option",
+        "id": "noble-blackhornet-834f095b0a"
+      }
+    ]
+  },
+  {
+    "id": "noble-blacklion",
+    "name": "Noble BlackLion",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2015,
+    "contracts": [
+      {
+        "vesselId": "noble-blacklion",
+        "startDate": "2024-09-01",
+        "endDate": "2026-08-31",
+        "dayRate": 0,
+        "client": "bp",
+        "region": "US Gulf",
+        "status": "Firm",
+        "id": "noble-blacklion-3dddbdde8f"
+      },
+      {
+        "vesselId": "noble-blacklion",
+        "startDate": "2026-09-01",
+        "endDate": "2028-08-31",
+        "dayRate": 0,
+        "client": "bp",
+        "region": "US Gulf",
+        "status": "Firm",
+        "id": "noble-blacklion-e00f033cdf"
+      },
+      {
+        "vesselId": "noble-blacklion",
+        "startDate": "2028-09-01",
+        "endDate": "2029-08-31",
+        "dayRate": 0,
+        "client": "bp",
+        "region": "US Gulf",
+        "status": "Option",
+        "id": "noble-blacklion-ec6ec15e81"
+      }
+    ]
+  },
+  {
+    "id": "noble-blackrhino",
+    "name": "Noble BlackRhino",
+    "company": "Noble",
+    "generation": "7G",
+    "status": "Idle",
+    "yearBuilt": 2014,
+    "contracts": []
+  },
+  {
+    "id": "noble-globetrotter-i",
+    "name": "Noble Globetrotter I",
+    "company": "Noble",
+    "generation": "6G",
+    "status": "Idle",
+    "yearBuilt": 2011,
+    "contracts": [
+      {
+        "vesselId": "noble-globetrotter-i",
+        "startDate": "2025-12-01",
+        "endDate": "2026-03-31",
+        "dayRate": 0,
+        "client": "OMV Petrom",
+        "region": "Bulgaria",
+        "status": "Firm",
+        "id": "noble-globetrotter-i-bbbcc10bac"
+      }
+    ]
+  },
+  {
+    "id": "noble-globetrotter-ii",
+    "name": "Noble Globetrotter II",
+    "company": "Noble",
+    "generation": "6G",
+    "status": "Idle",
+    "yearBuilt": 2013,
+    "contracts": []
+  },
+  {
+    "id": "noble-gerry-de-souza",
+    "name": "Noble Gerry de Souza",
+    "company": "Noble",
+    "generation": "6G",
+    "status": "Idle",
+    "yearBuilt": 2011,
+    "contracts": [
+      {
+        "vesselId": "noble-gerry-de-souza",
+        "startDate": "2026-08-01",
+        "endDate": "2028-06-30",
+        "dayRate": 0,
+        "client": "ExxonMobil",
+        "region": "Nigeria",
+        "status": "Firm",
+        "id": "noble-gerry-de-souza-7aa86809f4"
+      },
+      {
+        "vesselId": "noble-gerry-de-souza",
+        "startDate": "2028-07-01",
+        "endDate": "2031-06-30",
+        "dayRate": 0,
+        "client": "ExxonMobil",
+        "region": "Nigeria",
+        "status": "Option",
+        "id": "noble-gerry-de-souza-8f405eb5f9"
+      }
+    ]
+  },
+  {
+    "id": "west-capella",
+    "name": "West Capella",
+    "company": "Seadrill",
+    "generation": "6G",
+    "status": "Active",
+    "yearBuilt": 2008,
+    "contracts": [
+      {
+        "vesselId": "west-capella",
+        "startDate": "2026-03-01",
+        "endDate": "2027-08-31",
+        "dayRate": 0,
+        "client": "PTTEP",
+        "region": "Malaysia",
+        "status": "Firm",
+        "id": "west-capella-80422e397b"
+      }
+    ]
+  },
+  {
+    "id": "west-carina",
+    "name": "West Carina",
+    "company": "Seadrill",
+    "generation": "7G",
+    "status": "Idle",
+    "yearBuilt": 2015,
+    "contracts": [
+      {
+        "vesselId": "west-carina",
+        "startDate": "2022-11-01",
+        "endDate": "2026-01-31",
+        "dayRate": 0,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "west-carina-060af7d14a"
+      }
+    ]
+  },
+  {
+    "id": "sonangol-quenguela",
+    "name": "Sonangol Quenguela",
+    "company": "Seadrill",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2019,
+    "contracts": [
+      {
+        "vesselId": "sonangol-quenguela",
+        "startDate": "2024-05-01",
+        "endDate": "2028-07-31",
+        "dayRate": 0,
+        "client": "TotalEnergies",
+        "region": "Angola",
+        "status": "Firm",
+        "id": "sonangol-quenguela-b899c57352"
+      }
+    ]
+  },
+  {
+    "id": "west-neptune",
+    "name": "West Neptune",
+    "company": "Seadrill",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      {
+        "vesselId": "west-neptune",
+        "startDate": "2025-11-01",
+        "endDate": "2026-05-31",
+        "dayRate": 0,
+        "client": "LLOG",
+        "region": "U.S. Gulf",
+        "status": "Firm",
+        "id": "west-neptune-aa16f62a12"
+      },
+      {
+        "vesselId": "west-neptune",
+        "startDate": "2026-05-01",
+        "endDate": "2026-10-31",
+        "dayRate": 0,
+        "client": "LLOG",
+        "region": "U.S. Gulf",
+        "status": "Firm",
+        "id": "west-neptune-0b48660015"
+      },
+      {
+        "vesselId": "west-neptune",
+        "startDate": "2026-10-01",
+        "endDate": "2027-10-31",
+        "dayRate": 0,
+        "client": "LLOG",
+        "region": "U.S. Gulf",
+        "status": "Firm",
+        "id": "west-neptune-91d87b94bc"
+      }
+    ]
+  },
+  {
+    "id": "west-vela",
+    "name": "West Vela",
+    "company": "Seadrill",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2013,
+    "contracts": [
+      {
+        "vesselId": "west-vela",
+        "startDate": "2025-11-01",
+        "endDate": "2026-03-31",
+        "dayRate": 0,
+        "client": "Talos",
+        "region": "US Gulf",
+        "status": "Firm",
+        "id": "west-vela-c1e44181b4"
+      },
+      {
+        "vesselId": "west-vela",
+        "startDate": "2026-05-01",
+        "endDate": "2026-08-31",
+        "dayRate": 0,
+        "client": "Talos",
+        "region": "U.S. Gulf",
+        "status": "Firm",
+        "id": "west-vela-77fba77016"
+      },
+      {
+        "vesselId": "west-vela",
+        "startDate": "2026-09-01",
+        "endDate": "2027-06-30",
+        "dayRate": 0,
+        "client": "LLOG",
+        "region": "U.S. Gulf",
+        "status": "Firm",
+        "id": "west-vela-17387c5be0"
+      },
+      {
+        "vesselId": "west-vela",
+        "startDate": "2027-06-01",
+        "endDate": "2028-06-30",
+        "dayRate": 0,
+        "client": "Talos",
+        "region": "U.S. Gulf",
+        "status": "Firm",
+        "id": "west-vela-2bc3dea2ad"
+      }
+    ]
+  },
+  {
+    "id": "west-gemini",
+    "name": "West Gemini",
+    "company": "Seadrill",
+    "generation": "6G",
+    "status": "Active",
+    "yearBuilt": 2010,
+    "contracts": [
+      {
+        "vesselId": "west-gemini",
+        "startDate": "2026-02-01",
+        "endDate": "2026-11-30",
+        "dayRate": 0,
+        "client": "Sonangol",
+        "region": "Angola",
+        "status": "Firm",
+        "id": "west-gemini-92bdf3a911"
+      }
+    ]
+  },
+  {
+    "id": "west-saturn",
+    "name": "West Saturn",
+    "company": "Seadrill",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      {
+        "vesselId": "west-saturn",
+        "startDate": "2022-10-01",
+        "endDate": "2027-10-31",
+        "dayRate": 0,
+        "client": "Equinor",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "west-saturn-a73231a41b"
+      },
+      {
+        "vesselId": "west-saturn",
+        "startDate": "2027-11-01",
+        "endDate": "2030-10-31",
+        "dayRate": 0,
+        "client": "Equinor",
+        "region": "Brazil",
+        "status": "Option",
+        "id": "west-saturn-a52ad4b9c4"
+      }
+    ]
+  },
+  {
+    "id": "sonangol-libongos",
+    "name": "Sonangol Libongos",
+    "company": "Seadrill",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2019,
+    "contracts": [
+      {
+        "vesselId": "sonangol-libongos",
+        "startDate": "2020-12-01",
+        "endDate": "2027-02-28",
+        "dayRate": 0,
+        "client": "Undisclosed",
+        "region": "Angola",
+        "status": "Firm",
+        "id": "sonangol-libongos-3adb0be48f"
+      },
+      {
+        "vesselId": "sonangol-libongos",
+        "startDate": "2027-03-01",
+        "endDate": "2030-01-31",
+        "dayRate": 0,
+        "client": "Undisclosed",
+        "region": "Angola",
+        "status": "Option",
+        "id": "sonangol-libongos-ab56518373"
+      }
+    ]
+  },
+  {
+    "id": "west-auriga",
+    "name": "West Auriga",
+    "company": "Seadrill",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2013,
+    "contracts": [
+      {
+        "vesselId": "west-auriga",
+        "startDate": "2024-12-01",
+        "endDate": "2027-11-30",
+        "dayRate": 0,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "west-auriga-66763d29c1"
+      }
+    ]
+  },
+  {
+    "id": "west-polaris",
+    "name": "West Polaris",
+    "company": "Seadrill",
+    "generation": "6G",
+    "status": "Active",
+    "yearBuilt": 2008,
+    "contracts": [
+      {
+        "vesselId": "west-polaris",
+        "startDate": "2025-02-01",
+        "endDate": "2026-03-31",
+        "dayRate": 0,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "west-polaris-30e979dc04"
+      },
+      {
+        "vesselId": "west-polaris",
+        "startDate": "2026-04-01",
+        "endDate": "2027-03-31",
+        "dayRate": 413400,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "west-polaris-f2ac061c43"
+      },
+      {
+        "vesselId": "west-polaris",
+        "startDate": "2027-04-01",
+        "endDate": "2028-01-15",
+        "dayRate": 459400,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "west-polaris-6daf925ac7"
+      },
+      {
+        "vesselId": "west-polaris",
+        "startDate": "2028-01-16",
+        "endDate": "2031-01-15",
+        "dayRate": 441500,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "west-polaris-6e32c7fdd7"
+      }
+    ]
+  },
+  {
+    "id": "west-jupiter",
+    "name": "West Jupiter",
+    "company": "Seadrill",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      {
+        "vesselId": "west-jupiter",
+        "startDate": "2022-12-01",
+        "endDate": "2025-12-31",
+        "dayRate": 0,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "west-jupiter-0feb2c9b76"
+      },
+      {
+        "vesselId": "west-jupiter",
+        "startDate": "2026-03-01",
+        "endDate": "2029-03-31",
+        "dayRate": 0,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "west-jupiter-326198347b"
+      }
+    ]
+  },
+  {
+    "id": "west-tellus",
+    "name": "West Tellus",
+    "company": "Seadrill",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2013,
+    "contracts": [
+      {
+        "vesselId": "west-tellus",
+        "startDate": "2023-01-01",
+        "endDate": "2026-02-28",
+        "dayRate": 0,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "west-tellus-9851c691cf"
+      },
+      {
+        "vesselId": "west-tellus",
+        "startDate": "2026-06-01",
+        "endDate": "2029-06-30",
+        "dayRate": 0,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "west-tellus-bc51c53d38"
+      }
+    ]
+  },
+  {
+    "id": "deepwater-titan",
+    "name": "Deepwater Titan",
+    "company": "Transocean",
+    "generation": "8G",
+    "status": "Active",
+    "yearBuilt": 2023,
+    "contracts": [
+      {
+        "vesselId": "deepwater-titan",
+        "startDate": "2023-04-01",
+        "endDate": "2028-04-30",
+        "dayRate": 463000,
+        "client": "Chevron",
+        "region": "USGOM",
+        "status": "Firm",
+        "id": "deepwater-titan-0498ab8d5a"
+      }
+    ]
+  },
+  {
+    "id": "deepwater-atlas",
+    "name": "Deepwater Atlas",
+    "company": "Transocean",
+    "generation": "8G",
+    "status": "Active",
+    "yearBuilt": 2022,
+    "contracts": [
+      {
+        "vesselId": "deepwater-atlas",
+        "startDate": "2025-08-01",
+        "endDate": "2026-03-31",
+        "dayRate": 0,
+        "client": "Beacon",
+        "region": "USGOM",
+        "status": "Firm",
+        "id": "deepwater-atlas-cf7d93c05d"
+      },
+      {
+        "vesselId": "deepwater-atlas",
+        "startDate": "2026-08-01",
+        "endDate": "2026-10-31",
+        "dayRate": 580000,
+        "client": "Beacon",
+        "region": "USGOM",
+        "status": "Firm",
+        "id": "deepwater-atlas-e5e064efb5"
+      },
+      {
+        "vesselId": "deepwater-atlas",
+        "startDate": "2026-10-01",
+        "endDate": "2026-12-31",
+        "dayRate": 650000,
+        "client": "Beacon",
+        "region": "USGOM",
+        "status": "Contingent",
+        "id": "deepwater-atlas-991f0699ec"
+      },
+      {
+        "vesselId": "deepwater-atlas",
+        "startDate": "2026-12-01",
+        "endDate": "2026-12-31",
+        "dayRate": 580000,
+        "client": "Beacon",
+        "region": "USGOM",
+        "status": "Firm",
+        "id": "deepwater-atlas-8f38821144"
+      },
+      {
+        "vesselId": "deepwater-atlas",
+        "startDate": "2026-12-01",
+        "endDate": "2027-02-28",
+        "dayRate": 650000,
+        "client": "Beacon",
+        "region": "USGOM",
+        "status": "Contingent",
+        "id": "deepwater-atlas-950ba82235"
+      },
+      {
+        "vesselId": "deepwater-atlas",
+        "startDate": "2027-02-01",
+        "endDate": "2027-02-28",
+        "dayRate": 580000,
+        "client": "Beacon",
+        "region": "USGOM",
+        "status": "Firm",
+        "id": "deepwater-atlas-fc99127caa"
+      },
+      {
+        "vesselId": "deepwater-atlas",
+        "startDate": "2027-02-01",
+        "endDate": "2027-07-31",
+        "dayRate": 505000,
+        "client": "Beacon",
+        "region": "USGOM",
+        "status": "Firm",
+        "id": "deepwater-atlas-fc99127caa-2"
+      },
+      {
+        "vesselId": "deepwater-atlas",
+        "startDate": "2028-06-01",
+        "endDate": "2030-06-30",
+        "dayRate": 635000,
+        "client": "bp",
+        "region": "USGOM",
+        "status": "Firm",
+        "id": "deepwater-atlas-8f5a34ab13"
+      }
+    ]
+  },
+  {
+    "id": "deepwater-aquila",
+    "name": "Deepwater Aquila",
+    "company": "Transocean",
+    "generation": "7G+",
+    "status": "Active",
+    "yearBuilt": 2024,
+    "contracts": [
+      {
+        "vesselId": "deepwater-aquila",
+        "startDate": "2026-04-01",
+        "endDate": "2026-12-31",
+        "dayRate": 438000,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "deepwater-aquila-1c5c082351"
+      },
+      {
+        "vesselId": "deepwater-aquila",
+        "startDate": "2027-01-01",
+        "endDate": "2028-06-30",
+        "dayRate": 443000,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "deepwater-aquila-a5203b95e1"
+      }
+    ]
+  },
+  {
+    "id": "deepwater-poseidon",
+    "name": "Deepwater Poseidon",
+    "company": "Transocean",
+    "generation": "7G+",
+    "status": "Active",
+    "yearBuilt": 2018,
+    "contracts": [
+      {
+        "vesselId": "deepwater-poseidon",
+        "startDate": "2018-09-01",
+        "endDate": "2028-02-29",
+        "dayRate": 501000,
+        "client": "Shell",
+        "region": "USGOM",
+        "status": "Firm",
+        "id": "deepwater-poseidon-a20ac37fab"
+      }
+    ]
+  },
+  {
+    "id": "deepwater-pontus",
+    "name": "Deepwater Pontus",
+    "company": "Transocean",
+    "generation": "7G+",
+    "status": "Active",
+    "yearBuilt": 2017,
+    "contracts": [
+      {
+        "vesselId": "deepwater-pontus",
+        "startDate": "2017-10-01",
+        "endDate": "2027-10-31",
+        "dayRate": 499000,
+        "client": "Shell",
+        "region": "USGOM",
+        "status": "Firm",
+        "id": "deepwater-pontus-077654e4b6"
+      }
+    ]
+  },
+  {
+    "id": "deepwater-conqueror",
+    "name": "Deepwater Conqueror",
+    "company": "Transocean",
+    "generation": "7G+",
+    "status": "Active",
+    "yearBuilt": 2016,
+    "contracts": [
+      {
+        "vesselId": "deepwater-conqueror",
+        "startDate": "2025-10-01",
+        "endDate": "2027-01-31",
+        "dayRate": 530000,
+        "client": "Not Disclosed",
+        "region": "USGOM",
+        "status": "Firm",
+        "id": "deepwater-conqueror-98c1fbaf6b"
+      }
+    ]
+  },
+  {
+    "id": "deepwater-proteus",
+    "name": "Deepwater Proteus",
+    "company": "Transocean",
+    "generation": "7G+",
+    "status": "Active",
+    "yearBuilt": 2016,
+    "contracts": [
+      {
+        "vesselId": "deepwater-proteus",
+        "startDate": "2016-08-01",
+        "endDate": "2026-05-31",
+        "dayRate": 0,
+        "client": "Shell",
+        "region": "USGOM",
+        "status": "Firm",
+        "id": "deepwater-proteus-5d7f655c34"
+      },
+      {
+        "vesselId": "deepwater-proteus",
+        "startDate": "2026-07-01",
+        "endDate": "2026-11-30",
+        "dayRate": 0,
+        "client": "Not Disclosed",
+        "region": "USGOM",
+        "status": "Firm",
+        "id": "deepwater-proteus-4d9499f260"
+      },
+      {
+        "vesselId": "deepwater-proteus",
+        "startDate": "2026-11-01",
+        "endDate": "2027-01-31",
+        "dayRate": 0,
+        "client": "Not Disclosed",
+        "region": "USGOM",
+        "status": "Option",
+        "id": "deepwater-proteus-723ee53cd3"
+      }
+    ]
+  },
+  {
+    "id": "deepwater-thalassa",
+    "name": "Deepwater Thalassa",
+    "company": "Transocean",
+    "generation": "7G+",
+    "status": "Active",
+    "yearBuilt": 2016,
+    "contracts": [
+      {
+        "vesselId": "deepwater-thalassa",
+        "startDate": "2026-03-01",
+        "endDate": "2029-02-28",
+        "dayRate": 495000,
+        "client": "Woodside",
+        "region": "Mexico",
+        "status": "Firm",
+        "id": "deepwater-thalassa-b89b1c6af3"
+      }
+    ]
+  },
+  {
+    "id": "deepwater-asgard",
+    "name": "Deepwater Asgard",
+    "company": "Transocean",
+    "generation": "7G+",
+    "status": "Idle",
+    "yearBuilt": 2014,
+    "contracts": [
+      {
+        "vesselId": "deepwater-asgard",
+        "startDate": "2025-06-01",
+        "endDate": "2026-06-30",
+        "dayRate": 0,
+        "client": "Hess Corporation",
+        "region": "USGOM",
+        "status": "Firm",
+        "id": "deepwater-asgard-a618ef8cd3"
+      },
+      {
+        "vesselId": "deepwater-asgard",
+        "startDate": "2026-12-01",
+        "endDate": "2027-12-31",
+        "dayRate": 405000,
+        "client": "Not Disclosed",
+        "region": "Eastern Med",
+        "status": "Firm",
+        "id": "deepwater-asgard-cbf073698c"
+      }
+    ]
+  },
+  {
+    "id": "deepwater-invictus",
+    "name": "Deepwater Invictus",
+    "company": "Transocean",
+    "generation": "7G+",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      {
+        "vesselId": "deepwater-invictus",
+        "startDate": "2025-04-01",
+        "endDate": "2028-04-30",
+        "dayRate": 485000,
+        "client": "bp",
+        "region": "USGOM",
+        "status": "Firm",
+        "id": "deepwater-invictus-848f8f4d84"
+      }
+    ]
+  },
+  {
+    "id": "deepwater-skyros",
+    "name": "Deepwater Skyros",
+    "company": "Transocean",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2013,
+    "contracts": [
+      {
+        "vesselId": "deepwater-skyros",
+        "startDate": "2025-01-01",
+        "endDate": "2025-10-31",
+        "dayRate": 0,
+        "client": "TotalEnergies",
+        "region": "Angola",
+        "status": "Firm",
+        "id": "deepwater-skyros-6a034c30b7"
+      },
+      {
+        "vesselId": "deepwater-skyros",
+        "startDate": "2025-12-01",
+        "endDate": "2026-09-30",
+        "dayRate": 361000,
+        "client": "Murphy",
+        "region": "Ivory Coast",
+        "status": "Firm",
+        "id": "deepwater-skyros-10d5a769cd"
+      },
+      {
+        "vesselId": "deepwater-skyros",
+        "startDate": "2026-09-01",
+        "endDate": "2026-11-30",
+        "dayRate": 361000,
+        "client": "Murphy",
+        "region": "Ivory Coast",
+        "status": "Option",
+        "id": "deepwater-skyros-425f51b4a7"
+      },
+      {
+        "vesselId": "deepwater-skyros",
+        "startDate": "2027-04-01",
+        "endDate": "2028-03-31",
+        "dayRate": 0,
+        "client": "Not Disclosed",
+        "region": "Australia",
+        "status": "Firm",
+        "id": "deepwater-skyros-0f632f7c30"
+      },
+      {
+        "vesselId": "deepwater-skyros",
+        "startDate": "2028-03-01",
+        "endDate": "2030-08-31",
+        "dayRate": 0,
+        "client": "Not Disclosed",
+        "region": "Australia",
+        "status": "Option",
+        "id": "deepwater-skyros-06b9e6a26a"
+      }
+    ]
+  },
+  {
+    "id": "deepwater-mykonos",
+    "name": "Deepwater Mykonos",
+    "company": "Transocean",
+    "generation": "6G",
+    "status": "Idle",
+    "yearBuilt": 2011,
+    "contracts": [
+      {
+        "vesselId": "deepwater-mykonos",
+        "startDate": "2023-10-01",
+        "endDate": "2025-10-31",
+        "dayRate": 0,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "deepwater-mykonos-33c89d1b35"
+      },
+      {
+        "vesselId": "deepwater-mykonos",
+        "startDate": "2025-10-01",
+        "endDate": "2025-12-31",
+        "dayRate": 0,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "deepwater-mykonos-fad57ccb24"
+      },
+      {
+        "vesselId": "deepwater-mykonos",
+        "startDate": "2025-12-01",
+        "endDate": "2026-01-30",
+        "dayRate": 0,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "deepwater-mykonos-692b3c4d30"
+      },
+      {
+        "vesselId": "deepwater-mykonos",
+        "startDate": "2026-01-01",
+        "endDate": "2026-04-30",
+        "dayRate": 0,
+        "client": "bp",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "deepwater-mykonos-c064cbc5f5"
+      },
+      {
+        "vesselId": "deepwater-mykonos",
+        "startDate": "2026-09-01",
+        "endDate": "2027-06-30",
+        "dayRate": 426000,
+        "client": "bp",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "deepwater-mykonos-b884914197"
+      }
+    ]
+  },
+  {
+    "id": "deepwater-corcovado",
+    "name": "Deepwater Corcovado",
+    "company": "Transocean",
+    "generation": "6G",
+    "status": "Active",
+    "yearBuilt": 2011,
+    "contracts": [
+      {
+        "vesselId": "deepwater-corcovado",
+        "startDate": "2026-04-01",
+        "endDate": "2026-12-31",
+        "dayRate": 379000,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "deepwater-corcovado-8be36e7ec8"
+      },
+      {
+        "vesselId": "deepwater-corcovado",
+        "startDate": "2027-01-01",
+        "endDate": "2030-11-30",
+        "dayRate": 390000,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "deepwater-corcovado-bd50f24775"
+      }
+    ]
+  },
+  {
+    "id": "deepwater-orion",
+    "name": "Deepwater Orion",
+    "company": "Transocean",
+    "generation": "6G",
+    "status": "Active",
+    "yearBuilt": 2011,
+    "contracts": [
+      {
+        "vesselId": "deepwater-orion",
+        "startDate": "2026-04-01",
+        "endDate": "2026-12-31",
+        "dayRate": 375000,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "deepwater-orion-ffa9ece533"
+      },
+      {
+        "vesselId": "deepwater-orion",
+        "startDate": "2027-01-01",
+        "endDate": "2030-03-31",
+        "dayRate": 390000,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "deepwater-orion-63acbabd02"
+      }
+    ]
+  },
+  {
+    "id": "dhirubhai-deepwater-kg2",
+    "name": "Dhirubhai Deepwater KG2",
+    "company": "Transocean",
+    "generation": "6G",
+    "status": "Idle",
+    "yearBuilt": 2010,
+    "contracts": [
+      {
+        "vesselId": "dhirubhai-deepwater-kg2",
+        "startDate": "2024-06-01",
+        "endDate": "2026-05-31",
+        "dayRate": 0,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "dhirubhai-deepwater-kg2-98fde0c097"
+      }
+    ]
+  },
+  {
+    "id": "petrobras-10000",
+    "name": "Petrobras 10000",
+    "company": "Transocean",
+    "generation": "6G",
+    "status": "Active",
+    "yearBuilt": 2009,
+    "contracts": [
+      {
+        "vesselId": "petrobras-10000",
+        "startDate": "2025-10-01",
+        "endDate": "2026-10-31",
+        "dayRate": 416000,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "petrobras-10000-fea1eb119e"
+      },
+      {
+        "vesselId": "petrobras-10000",
+        "startDate": "2026-10-01",
+        "endDate": "2027-10-31",
+        "dayRate": 428000,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "petrobras-10000-43cfd4b9b6"
+      },
+      {
+        "vesselId": "petrobras-10000",
+        "startDate": "2027-10-01",
+        "endDate": "2028-10-31",
+        "dayRate": 441000,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "petrobras-10000-91cabb7037"
+      },
+      {
+        "vesselId": "petrobras-10000",
+        "startDate": "2028-10-01",
+        "endDate": "2029-08-31",
+        "dayRate": 454000,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "petrobras-10000-0149fc2786"
+      }
+    ]
+  },
+  {
+    "id": "dhirubhai-deepwater-kg1",
+    "name": "Dhirubhai Deepwater KG1",
+    "company": "Transocean",
+    "generation": "6G",
+    "status": "Idle",
+    "yearBuilt": 2009,
+    "contracts": [
+      {
+        "vesselId": "dhirubhai-deepwater-kg1",
+        "startDate": "2024-05-01",
+        "endDate": "2026-02-28",
+        "dayRate": 0,
+        "client": "ONGC",
+        "region": "India",
+        "status": "Firm",
+        "id": "dhirubhai-deepwater-kg1-e7d4e6d0d5"
+      },
+      {
+        "vesselId": "dhirubhai-deepwater-kg1",
+        "startDate": "2026-08-01",
+        "endDate": "2028-03-31",
+        "dayRate": 410000,
+        "client": "Reliance Industries",
+        "region": "India",
+        "status": "Firm",
+        "id": "dhirubhai-deepwater-kg1-d31d9733b1"
+      },
+      {
+        "vesselId": "dhirubhai-deepwater-kg1",
+        "startDate": "2028-03-01",
+        "endDate": "2029-08-31",
+        "dayRate": 0,
+        "client": "Reliance Industries",
+        "region": "India",
+        "status": "Option",
+        "id": "dhirubhai-deepwater-kg1-18fafc4de2"
+      }
+    ]
+  },
+  {
+    "id": "ocean-rig-apollo",
+    "name": "Ocean Rig Apollo",
+    "company": "Transocean",
+    "generation": "7G",
+    "status": "Cold-Stacked",
+    "yearBuilt": 2015,
+    "contracts": []
+  },
+  {
+    "id": "ocean-rig-athena",
+    "name": "Ocean Rig Athena",
+    "company": "Transocean",
+    "generation": "7G",
+    "status": "Cold-Stacked",
+    "yearBuilt": 2014,
+    "contracts": []
+  },
+  {
+    "id": "ocean-rig-mylos",
+    "name": "Ocean Rig Mylos",
+    "company": "Transocean",
+    "generation": "7G",
+    "status": "Cold-Stacked",
+    "yearBuilt": 2013,
+    "contracts": []
+  },
+  {
+    "id": "valaris-ds-18",
+    "name": "VALARIS DS-18",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Idle",
+    "yearBuilt": 2015,
+    "contracts": [
+      {
+        "vesselId": "valaris-ds-18",
+        "startDate": "2022-08-01",
+        "endDate": "2025-08-31",
+        "dayRate": 0,
+        "client": "Chevron / Occidental",
+        "region": "USGOM",
+        "status": "Firm",
+        "id": "valaris-ds-18-03257b2e84"
+      },
+      {
+        "vesselId": "valaris-ds-18",
+        "startDate": "2027-06-01",
+        "endDate": "2029-12-31",
+        "dayRate": 0,
+        "client": "Occidental",
+        "region": "Gulf of America",
+        "status": "Firm",
+        "id": "valaris-ds-18-982da24b82"
+      }
+    ]
+  },
+  {
+    "id": "valaris-ds-17",
+    "name": "VALARIS DS-17",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      {
+        "vesselId": "valaris-ds-17",
+        "startDate": "2025-05-01",
+        "endDate": "2025-12-31",
+        "dayRate": 0,
+        "client": "Equinor",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "valaris-ds-17-3060350495"
+      },
+      {
+        "vesselId": "valaris-ds-17",
+        "startDate": "2026-03-01",
+        "endDate": "2028-01-31",
+        "dayRate": 0,
+        "client": "Equinor",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "valaris-ds-17-4e15f5bfca"
+      }
+    ]
+  },
+  {
+    "id": "valaris-ds-16",
+    "name": "VALARIS DS-16",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2014,
+    "contracts": [
+      {
+        "vesselId": "valaris-ds-16",
+        "startDate": "2024-06-01",
+        "endDate": "2026-06-30",
+        "dayRate": 0,
+        "client": "Occidental",
+        "region": "Gulf of America",
+        "status": "Firm",
+        "id": "valaris-ds-16-47cf644805"
+      },
+      {
+        "vesselId": "valaris-ds-16",
+        "startDate": "2026-06-01",
+        "endDate": "2028-12-31",
+        "dayRate": 0,
+        "client": "Occidental",
+        "region": "Gulf of America",
+        "status": "Firm",
+        "id": "valaris-ds-16-31f3dea8b8"
+      }
+    ]
+  },
+  {
+    "id": "valaris-ds-15",
+    "name": "VALARIS DS-15",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Warm-Stacked",
+    "yearBuilt": 2014,
+    "contracts": [
+      {
+        "vesselId": "valaris-ds-15",
+        "startDate": "2024-12-01",
+        "endDate": "2025-08-31",
+        "dayRate": 0,
+        "client": "TotalEnergies",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "valaris-ds-15-c68f6b31f5"
+      },
+      {
+        "vesselId": "valaris-ds-15",
+        "startDate": "2026-09-01",
+        "endDate": "2027-05-31",
+        "dayRate": 0,
+        "client": "CNR",
+        "region": "Cote d'Ivoire",
+        "status": "Firm",
+        "id": "valaris-ds-15-9f5aba7a23"
+      }
+    ]
+  },
+  {
+    "id": "valaris-ds-12",
+    "name": "VALARIS DS-12",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2013,
+    "contracts": [
+      {
+        "vesselId": "valaris-ds-12",
+        "startDate": "2026-04-01",
+        "endDate": "2027-04-30",
+        "dayRate": 0,
+        "client": "BP",
+        "region": "Egypt",
+        "status": "Firm",
+        "id": "valaris-ds-12-a3cb519857"
+      }
+    ]
+  },
+  {
+    "id": "valaris-ds-10",
+    "name": "VALARIS DS-10",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2017,
+    "contracts": [
+      {
+        "vesselId": "valaris-ds-10",
+        "startDate": "2026-06-01",
+        "endDate": "2028-07-31",
+        "dayRate": 0,
+        "client": "Shell",
+        "region": "Nigeria",
+        "status": "Firm",
+        "id": "valaris-ds-10-69b08bc5cd"
+      }
+    ]
+  },
+  {
+    "id": "valaris-ds-9",
+    "name": "VALARIS DS-9",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2015,
+    "contracts": [
+      {
+        "vesselId": "valaris-ds-9",
+        "startDate": "2022-07-01",
+        "endDate": "2026-07-31",
+        "dayRate": 0,
+        "client": "ExxonMobil",
+        "region": "Angola",
+        "status": "Firm",
+        "id": "v100 43730  100 43730    0     0  32.5M      0 --:--:-- --:--:-- --:--:-- 41.7M
+alaris-ds-9-02d9f91048"
+      },
+      {
+        "vesselId": "valaris-ds-9",
+        "startDate": "2026-07-01",
+        "endDate": "2028-07-31",
+        "dayRate": 0,
+        "client": "ExxonMobil",
+        "region": "Angola",
+        "status": "Firm",
+        "id": "valaris-ds-9-c7494ad887"
+      }
+    ]
+  },
+  {
+    "id": "valaris-ds-8",
+    "name": "VALARIS DS-8",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2015,
+    "contracts": [
+      {
+        "vesselId": "valaris-ds-8",
+        "startDate": "2023-12-01",
+        "endDate": "2026-12-31",
+        "dayRate": 428000,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "valaris-ds-8-da0348a4fb"
+      },
+      {
+        "vesselId": "valaris-ds-8",
+        "startDate": "2027-03-01",
+        "endDate": "2029-05-31",
+        "dayRate": 0,
+        "client": "Shell",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "valaris-ds-8-12e785487f"
+      }
+    ]
+  },
+  {
+    "id": "valaris-ds-7",
+    "name": "VALARIS DS-7",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2013,
+    "contracts": [
+      {
+        "vesselId": "valaris-ds-7",
+        "startDate": "2024-06-01",
+        "endDate": "2026-10-31",
+        "dayRate": 0,
+        "client": "Azule Energy",
+        "region": "Angola",
+        "status": "Firm",
+        "id": "valaris-ds-7-a983bd0661"
+      },
+      {
+        "vesselId": "valaris-ds-7",
+        "startDate": "2026-10-01",
+        "endDate": "2027-09-30",
+        "dayRate": 0,
+        "client": "Azule Energy",
+        "region": "Angola",
+        "status": "Firm",
+        "id": "valaris-ds-7-1ebbaf6700"
+      }
+    ]
+  },
+  {
+    "id": "valaris-ds-4",
+    "name": "VALARIS DS-4",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Active",
+    "yearBuilt": 2010,
+    "contracts": [
+      {
+        "vesselId": "valaris-ds-4",
+        "startDate": "2024-12-01",
+        "endDate": "2027-11-30",
+        "dayRate": 0,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "valaris-ds-4-eaf3fb18a1"
+      },
+      {
+        "vesselId": "valaris-ds-4",
+        "startDate": "2027-11-01",
+        "endDate": "2030-10-31",
+        "dayRate": 0,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "id": "valaris-ds-4-3e029d35a7"
+      }
+    ]
+  },
+  {
+    "id": "valaris-ds-14",
+    "name": "VALARIS DS-14",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Cold-Stacked",
+    "yearBuilt": 2023,
+    "contracts": []
+  },
+  {
+    "id": "valaris-ds-13",
+    "name": "VALARIS DS-13",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Cold-Stacked",
+    "yearBuilt": 2023,
+    "contracts": []
+  },
+  {
+    "id": "valaris-ds-11",
+    "name": "VALARIS DS-11",
+    "company": "Valaris",
+    "generation": "7G",
+    "status": "Cold-Stacked",
+    "yearBuilt": 2013,
+    "contracts": []
+  }
+]

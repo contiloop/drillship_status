@@ -1,0 +1,30 @@
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   652  100   652    0     0   139k      0 --:--:-- --:--:-- --:--:--  159k
+HTTP/1.1 200 OK
+Vary: Origin
+Content-Type: text/html
+Cache-Control: no-cache
+Etag: W/"28c-9EPzzCFiO2MhXaFewLRKeEzd7K4"
+Date: Sun, 23 Aug 2026 17:05:56 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Content-Length: 652
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drillship Fleet Analyst</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script type="module" crossorigin src="./assets/index-N7BETMpd.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-D4W4jgKu.css">
+</head>
+<body>
+    <div id="root"></div>
+</body>
+</html>

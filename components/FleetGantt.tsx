@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Drillship, Contract } from '../types';
+import { Drillship } from '../types';
 import { getComputedStatus } from '../utils/shipStatus';
 
 interface FleetGanttProps {
@@ -64,6 +64,7 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships }) => {
         <div className="flex flex-wrap gap-4 text-[10px] uppercase font-black tracking-widest text-slate-400">
           <span className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-600 rounded-sm"></div> Firm</span>
           <span className="flex items-center gap-2"><div className="w-3 h-3 bg-sky-400/20 border border-sky-400 rounded-sm"></div> Option</span>
+          <span className="flex items-center gap-2"><div className="w-3 h-3 bg-amber-400/20 border border-amber-400 rounded-sm"></div> Contingent</span>
           <span className="flex items-center gap-2"><div className="w-3 h-3 bg-slate-950 border border-slate-800 rounded-sm"></div> Idle/Gap</span>
           <span className="flex items-center gap-2"><div className="w-3 h-3 bg-slate-800 border border-slate-700 rounded-sm cold-stacked-legend"></div> Cold-Stacked</span>
         </div>
@@ -93,7 +94,7 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships }) => {
               ))}
             </div>
 
-            {ships
+            {[...ships]
               .sort((a,b) => {
                 const genOrder = { '8G': 4, '7G+': 3, '7G': 2, '6G': 1 };
                 const aVal = genOrder[a.generation as keyof typeof genOrder] || 0;
@@ -144,7 +145,7 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships }) => {
                       if (width <= 0) return null;
                       
                       return (
-                        <div key={c.id} className={`absolute top-1.5 bottom-1.5 rounded-lg border border-black/20 transition-all hover:scale-y-110 hover:z-50 cursor-help ${c.status === 'Firm' ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]' : 'bg-sky-400/20 border-dashed border-sky-400/60 shadow-inner'}`} style={{ left: `${start}%`, width: `${width}%` }} title={`${c.client}: ${c.startDate} ~ ${c.endDate} ($${Math.round(c.dayRate/1000)}k)`}>
+                        <div key={c.id} className={`absolute top-1.5 bottom-1.5 rounded-lg border border-black/20 transition-all hover:scale-y-110 hover:z-50 cursor-help ${c.status === 'Firm' ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]' : c.status === 'Contingent' ? 'bg-amber-400/20 border-dashed border-amber-400/70 shadow-inner' : 'bg-sky-400/20 border-dashed border-sky-400/60 shadow-inner'}`} style={{ left: `${start}%`, width: `${width}%` }} title={`${c.status} · ${c.client}: ${c.startDate} ~ ${c.endDate}${c.dayRate > 0 ? ` ($${Math.round(c.dayRate/1000)}k)` : ''}`}>
                           <div className="h-full w-full flex items-center px-3 overflow-hidden whitespace-nowrap">
                             <span className="text-[10px] font-black text-white/95 truncate drop-shadow-sm">
                               {c.client} {c.dayRate > 0 ? `• $${Math.round(c.dayRate/1000)}k` : ''}

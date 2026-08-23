@@ -1,0 +1,19 @@
+manifest {"contractCount": 116, "dataHash": "5680482f4c85610e7bd4", "eventsFile": "events.34353369fb5a85727f01.json", "eventsHash": "34353369fb5a85727f01", "fleetFile": "fleet.5680482f4c85610e7bd4.json", "generatedAt": "2026-08-23T17:04:41Z", "pendingEventCount": 28, "schemaVersion": 1, "shipCount": 62, "sourceCount": 4, "sources": [{"byteSize": 195253, "company": "Noble", "contentType": "application/pdf", "discovery": "official-index", "documentUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-3/?wpdmdl=3701", "indexUrl": "https://noblecorp.com/our-investors/reports-filings/fleet-status-report/", "parserVersion": "2026.08.24.1", "reportDate": "2026-07-27", "sha256": "ddfdfe43090fe4f2589352abb7bf14cb292ee7323569f29a9f89e20c079807a6"}, {"byteSize": 408026, "company": "Seadrill", "contentType": "application/pdf", "discovery": "official-wordpress-api", "documentUrl": "https://www.seadrill.com/wp-content/uploads/2026/08/Seadrill-Fleet-Status-Report-August-2026-vF.pdf", "indexUrl": "https://www.seadrill.com/wp-json/wp/v2/pages/987508015", "parserVersion": "2026.08.24.1", "reportDate": "2026-08-10", "sha256": "b774357daafdb62dcc8c371fe5f5d118fb8d7d51c91badd05cd6cae3c9a39cb1"}, {"byteSize": 633637, "company": "Transocean", "contentType": "application/pdf", "discovery": "official-index", "documentUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/August%202026%20Fleet%20Status%20Report.pdf", "indexUrl": "https://www.deepwater.com/investors/fleet-status-report", "parserVersion": "2026.08.24.1", "reportDate": "2026-08-05", "sha256": "f2f98b03f750b5c4f6d299bff9b55d0ecc4dbeb0cb4f069054193968894db8b6"}, {"byteSize": 974321, "company": "Valaris", "contentType": "application/pdf", "discovery": "official-index-after-sec-HTTPError", "documentUrl": "https://s23.q4cdn.com/956522167/files/doc_financials/2026/q2/08052026-Fleet-Status-Report_FINAL.pdf", "indexUrl": "https://www.valaris.com/investors/", "parserVersion": "2026.08.24.1", "reportDate": "2026-08-05", "sha256": "c94713719e350294eb91b0361212df7e5951c8d00b9e108ff7afa4a797e55e80"}], "stateFingerprint": "7112a586ac3ec61104a5", "updatedAsOf": "2026-08-10", "warningsCount": 13}
+fleet_path public/data/fleet.5680482f4c85610e7bd4.json
+fleet_sha256 3a309081264f34baf35d2f587ff0a0b0cbf16104e43cc612c4cef9f39519f4c4
+events_path public/data/events.34353369fb5a85727f01.json
+ship_count 62
+company_counts {'Noble': 17, 'Seadrill': 12, 'Transocean': 20, 'Valaris': 13}
+vessel_status_counts {'Active': 43, 'Cold-Stacked': 6, 'Idle': 12, 'Warm-Stacked': 1}
+contract_status_counts {'Contingent': 2, 'Firm': 101, 'Option': 13}
+contract_count 116
+source_count_manifest 4
+source_count_provenance 4
+observation_count 129
+event_count 28
+pending_event_count_manifest 28
+changes_keys ['companies', 'fromDataHash', 'generatedAt', 'shipsAdded', 'shipsRemoved', 'toDataHash']
+source Noble 2026-07-27 ddfdfe43090fe4f2589352abb7bf14cb292ee7323569f29a9f89e20c079807a6 https://noblecorp.com/download/noble-corporation-fleet-status-report-3/?wpdmdl=3701
+source Seadrill 2026-08-10 b774357daafdb62dcc8c371fe5f5d118fb8d7d51c91badd05cd6cae3c9a39cb1 https://www.seadrill.com/wp-content/uploads/2026/08/Seadrill-Fleet-Status-Report-August-2026-vF.pdf
+source Transocean 2026-08-05 f2f98b03f750b5c4f6d299bff9b55d0ecc4dbeb0cb4f069054193968894db8b6 https://www.deepwater.com/documents/FleetStatusReport/2026/August%202026%20Fleet%20Status%20Report.pdf
+source Valaris 2026-08-05 c94713719e350294eb91b0361212df7e5951c8d00b9e108ff7afa4a797e55e80 https://s23.q4cdn.com/956522167/files/doc_financials/2026/q2/08052026-Fleet-Status-Report_FINAL.pdf

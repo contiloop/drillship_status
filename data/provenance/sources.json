@@ -1,0 +1,67 @@
+{
+  "generatedAt": "2026-08-23T17:04:41Z",
+  "documents": [
+    {
+      "company": "Noble",
+      "index_url": "https://noblecorp.com/our-investors/reports-filings/fleet-status-report/",
+      "document_url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-3/?wpdmdl=3701",
+      "report_date": "2026-07-27",
+      "sha256": "ddfdfe43090fe4f2589352abb7bf14cb292ee7323569f29a9f89e20c079807a6",
+      "byte_size": 195253,
+      "retrieved_at": "2026-08-23T17:04:39Z",
+      "parser_version": "2026.08.24.1",
+      "discovery": "official-index",
+      "content_type": "application/pdf"
+    },
+    {
+      "company": "Seadrill",
+      "index_url": "https://www.seadrill.com/wp-json/wp/v2/pages/987508015",
+      "document_url": "https://www.seadrill.com/wp-content/uploads/2026/08/Seadrill-Fleet-Status-Report-August-2026-vF.pdf",
+      "report_date": "2026-08-10",
+      "sha256": "b774357daafdb62dcc8c371fe5f5d118fb8d7d51c91badd05cd6cae3c9a39cb1",
+      "byte_size": 408026,
+      "retrieved_at": "2026-08-23T17:04:39Z",
+      "parser_version": "2026.08.24.1",
+      "discovery": "official-wordpress-api",
+      "content_type": "application/pdf"
+    },
+    {
+      "company": "Transocean",
+      "index_url": "https://www.deepwater.com/investors/fleet-status-report",
+      "document_url": "https://www.deepwater.com/documents/FleetStatusReport/2026/August%202026%20Fleet%20Status%20Report.pdf",
+      "report_date": "2026-08-05",
+      "sha256": "f2f98b03f750b5c4f6d299bff9b55d0ecc4dbeb0cb4f069054193968894db8b6",
+      "byte_size": 633637,
+      "retrieved_at": "2026-08-23T17:04:30Z",
+      "parser_version": "2026.08.24.1",
+      "discovery": "official-index",
+      "content_type": "application/pdf"
+    },
+    {
+      "company": "Valaris",
+      "index_url": "https://www.valaris.com/investors/",
+      "document_url": "https://s23.q4cdn.com/956522167/files/doc_financials/2026/q2/08052026-Fleet-Status-Report_FINAL.pdf",
+      "report_date": "2026-08-05",
+      "sha256": "c94713719e350294eb91b0361212df7e5951c8d00b9e108ff7afa4a797e55e80",
+      "byte_size": 974321,
+      "retrieved_at": "2026-08-23T17:04:34Z",
+      "parser_version": "2026.08.24.1",
+      "discovery": "official-index-after-sec-HTTPError",
+      "content_type": "application/pdf"
+    }
+  ],
+  "warnings": [
+    "21 completed legacy history records have no source evidence; dayrates are serialized as zero.",
+    "Noble Valiant: option language has no exact date interval and was not synthesized",
+    "Source dates have month precision; same-month transitions may overlap in ISO projection.",
+    "The report has no dayrate column; contract values were not divided by durations.",
+    "VALARIS DS-10: undated option language is retained as a warning, not an invented interval",
+    "VALARIS DS-12: undated option language is retained as a warning, not an invented interval",
+    "VALARIS DS-15: undated option language is retained as a warning, not an invented interval",
+    "VALARIS DS-16: undated option language is retained as a warning, not an invented interval",
+    "VALARIS DS-17: undated option language is retained as a warning, not an invented interval",
+    "VALARIS DS-18: undated option language is retained as a warning, not an invented interval",
+    "VALARIS DS-8: undated option language is retained as a warning, not an invented interval",
+    "VALARIS DS-9: undated option language is retained as a warning, not an invented interval"
+  ]
+}

@@ -1,66 +1,65 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   LayoutGrid, Ship, Download, FileJson, Database, BarChart3,
-  AlertTriangle, TrendingUp, Code, Trash2
+  AlertTriangle, TrendingUp, Code
 } from 'lucide-react';
 import { Analytics } from '@vercel/analytics/react';
-import { Drillship, Company, Generation } from './types';
+import { Drillship, FleetManifest, OfficialEvent } from './types';
 import MarketChart from './components/MarketChart';
 import FleetGantt from './components/FleetGantt';
 import defaultData from './data/data_as_of_26_01_07.json';
+import { countFirmCoveredDays, getComputedStatus } from './utils/shipStatus';
 
 const BASE_URL = import.meta.env.BASE_URL || '/';
-const REMOTE_DATA_URL = import.meta.env.VITE_FLEET_DATA_URL || `${BASE_URL}fleet-data.json`;
-const REMOTE_META_URL = import.meta.env.VITE_FLEET_DATA_META_URL || `${BASE_URL}fleet-data.meta.json`;
-const REMOTE_SOURCE_STATUS_URL = `${BASE_URL}fleet-sources.json`;
+const MANIFEST_URL = `${BASE_URL}data/manifest.json`;
 
 type TabType = 'overview' | 'transocean' | 'valaris' | 'noble' | 'seadrill' | 'readme';
 
 export default function App() {
   const [ships, setShips] = useState<Drillship[]>([]);
-  const [dataSource, setDataSource] = useState<'remote' | 'cached' | 'bundled'>('bundled');
-  const [syncMeta, setSyncMeta] = useState<{ updatedAt?: string; source?: string } | null>(null);
-  const [sourceStatus, setSourceStatus] = useState<{ generatedAt: string; results: Array<{ company: string; latestUrl: string | null; reportedAt: string | null; found: number; error?: string; status?: string; }>; }>({ generatedAt: '', results: [] });
+  const [dataSource, setDataSource] = useState<'live' | 'custom' | 'bundled'>('bundled');
+  const [manifest, setManifest] = useState<FleetManifest | null>(null);
+  const [officialEvents, setOfficialEvents] = useState<OfficialEvent[]>([]);
+  const [syncError, setSyncError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [utilizationMode, setUtilizationMode] = useState<'fleet' | 'market' | 'economic'>('market');
-  const isLoaded = useRef(false);
 
   useEffect(() => {
     const loadRemoteData = async () => {
       try {
-        const metaResponse = await fetch(REMOTE_META_URL, { cache: 'no-store' });
-        if (metaResponse.ok) {
-          const meta = await metaResponse.json();
-          setSyncMeta(meta);
+        const manifestResponse = await fetch(MANIFEST_URL, { cache: 'no-store' });
+        if (!manifestResponse.ok) throw new Error(`manifest HTTP ${manifestResponse.status}`);
+        const nextManifest = await manifestResponse.json() as FleetManifest;
+        if (!nextManifest.fleetFile || nextManifest.shipCount !== 62 || nextManifest.sourceCount !== 4) {
+          throw new Error('manifest validation failed');
         }
-
-        const sourcesResponse = await fetch(REMOTE_SOURCE_STATUS_URL, { cache: 'no-store' });
-        if (sourcesResponse.ok) {
-          const sources = await sourcesResponse.json();
-          setSourceStatus({
-            generatedAt: sources.generatedAt || '',
-            results: Array.isArray(sources.results) ? sources.results : []
-          });
-        }
-
-        const response = await fetch(REMOTE_DATA_URL, { cache: 'no-store' });
+        const response = await fetch(`${BASE_URL}data/${nextManifest.fleetFile}`, { cache: 'force-cache' });
         if (!response.ok) throw new Error(`remote data HTTP ${response.status}`);
 
         const remoteShips = await response.json();
-        if (Array.isArray(remoteShips) && remoteShips.length > 0) {
+        if (Array.isArray(remoteShips) && remoteShips.length === nextManifest.shipCount) {
+          if (nextManifest.eventsFile) {
+            const eventsResponse = await fetch(`${BASE_URL}data/${nextManifest.eventsFile}`, { cache: 'force-cache' });
+            if (eventsResponse.ok) {
+              const feed = await eventsResponse.json();
+              setOfficialEvents(Array.isArray(feed.events) ? feed.events : []);
+            }
+          }
           setShips(remoteShips as Drillship[]);
-          setDataSource('remote');
-          isLoaded.current = true;
+          setManifest(nextManifest);
+          setDataSource('live');
+          setSyncError(null);
           return;
         }
+        throw new Error('fleet payload validation failed');
       } catch (error) {
         console.warn('Remote fleet data unavailable, falling back to bundled data.', error);
+        setSyncError(error instanceof Error ? error.message : 'unknown sync error');
       }
 
       setShips(defaultData as Drillship[]);
       setDataSource('bundled');
-      isLoaded.current = true;
     };
 
     loadRemoteData();
@@ -82,7 +81,9 @@ export default function App() {
     reader.onload = (ev) => {
       try {
         const data = JSON.parse(ev.target?.result as string);
-        setShips(data);
+        if (!Array.isArray(data) || data.length === 0) throw new Error('JSON array required');
+        setShips(data as Drillship[]);
+        setDataSource('custom');
         alert("데이터를 성공적으로 불러왔습니다.");
         setActiveTab('overview');
       } catch (e) {
@@ -92,13 +93,8 @@ export default function App() {
     reader.readAsText(file);
   };
 
-  const resetToDefaultData = () => {
-    if (confirm("기본 데이터로 초기화하시겠습니까? 현재 데이터는 삭제됩니다.")) {
-      setShips(defaultData as Drillship[]);
-      localStorage.removeItem(STORAGE_KEY);
-      alert("기본 데이터로 초기화되었습니다.");
-      setActiveTab('overview');
-    }
+  const reloadLiveData = () => {
+    window.location.reload();
   };
 
   // 회사별 필터링
@@ -113,10 +109,14 @@ export default function App() {
   const filteredShips = getFilteredShips();
 
   const totalShips = filteredShips.length;
-  const activeShips = filteredShips.filter(s => s.status === 'Active').length;
-  const allContracts = filteredShips.flatMap(s => s.contracts);
+  const today = new Date();
+  const activeShips = filteredShips.filter(s => getComputedStatus(s, today) === 'Active').length;
+  const todayStr = today.toISOString().slice(0, 10);
+  const allContracts = filteredShips.flatMap(s => s.contracts).filter(c =>
+    c.status === 'Firm' && c.startDate <= todayStr && c.endDate >= todayStr
+  );
   const avgDayrate = allContracts.filter(c => c.dayRate > 0).reduce((a, b, _, arr) => a + (b.dayRate / arr.length), 0);
-  const coldStacked = filteredShips.filter(s => s.status === 'Cold-Stacked').length;
+  const coldStacked = filteredShips.filter(s => getComputedStatus(s, today) === 'Cold-Stacked').length;
 
   // Utilization 계산
   const marketedFleet = totalShips - coldStacked;
@@ -124,27 +124,18 @@ export default function App() {
   const marketUtilization = marketedFleet > 0 ? Math.round((activeShips / marketedFleet) * 100) : 0;
 
   // Economic Utilization: 유상 계약 일수 기준 (간단 계산)
-  const today = new Date();
-  const yearStart = new Date(today.getFullYear(), 0, 1);
-  const daysSinceYearStart = Math.floor((today.getTime() - yearStart.getTime()) / (1000 * 60 * 60 * 24));
+  const yearStart = new Date(Date.UTC(today.getUTCFullYear(), 0, 1));
+  const todayUtc = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+  const daysSinceYearStart = Math.floor((todayUtc.getTime() - yearStart.getTime()) / 86_400_000) + 1;
   const totalPossibleDays = marketedFleet * daysSinceYearStart;
-
-  let totalContractDays = 0;
-  filteredShips.forEach(ship => {
-    if (ship.status === 'Cold-Stacked') return;
-    ship.contracts.forEach(contract => {
-      const start = new Date(contract.startDate);
-      const end = new Date(contract.endDate);
-      const contractStart = start < yearStart ? yearStart : start;
-      const contractEnd = end > today ? today : end;
-      if (contractEnd >= contractStart) {
-        const days = Math.floor((contractEnd.getTime() - contractStart.getTime()) / (1000 * 60 * 60 * 24));
-        totalContractDays += days;
-      }
-    });
-  });
+  const totalContractDays = filteredShips
+    .filter(ship => getComputedStatus(ship, today) !== 'Cold-Stacked')
+    .reduce((sum, ship) => sum + countFirmCoveredDays(ship, yearStart, todayUtc), 0);
 
   const economicUtilization = totalPossibleDays > 0 ? Math.round((totalContractDays / totalPossibleDays) * 100) : 0;
+  const recentEvents = [...officialEvents]
+    .sort((a, b) => (Date.parse(b.publishedAt || '') || 0) - (Date.parse(a.publishedAt || '') || 0))
+    .slice(0, 5);
 
   return (
     <>
@@ -198,7 +189,7 @@ export default function App() {
         <div className="pt-8 border-t border-slate-800 opacity-50">
           <div className="hidden md:block p-4 bg-slate-800/30 rounded-2xl">
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Auto Sync</p>
-            <p className="text-[10px] text-slate-400">Remote sync refreshes from official fleet pages; local JSON remains fallback.</p>
+            <p className="text-[10px] text-slate-400">Official FSR, SEC and IR sources are checked every six hours.</p>
           </div>
         </div>
       </div>
@@ -219,11 +210,20 @@ export default function App() {
                activeTab === 'overview' ? 'Offshore Drillship Fleet Status & Pricing Intelligence' :
                `${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Drillship Fleet Analysis`}
             </p>
-            {syncMeta?.updatedAt && (
+            <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900/70 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400">
+              Official sync
+              <span className="text-slate-200">{manifest?.sourceCount ?? 0}/4 verified</span>
+              <span className="text-slate-600">·</span>
+              <span className="text-slate-500">
+                {manifest?.updatedAsOf ? `as of ${manifest.updatedAsOf}` : 'bundled fallback'}
+              </span>
+            </p>
+            {manifest?.generatedAt && (
               <p className="text-[11px] text-slate-600 mt-2">
-                Auto-sync {new Date(syncMeta.updatedAt).toLocaleString()} · {syncMeta.source || 'official sources'}
+                Checked {new Date(manifest.generatedAt).toLocaleString()} · {manifest.contractCount} contract records · {manifest.pendingEventCount} review signals
               </p>
             )}
+            {syncError && <p className="text-[11px] text-amber-500/80 mt-2">Live sync fallback: {syncError}</p>}
             <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.24em] mt-2">
               Data source: {dataSource}
             </p>
@@ -237,8 +237,8 @@ export default function App() {
                  <FileJson size={18} /> <span className="text-xs font-bold">Upload JSON</span>
                  <input type="file" onChange={importData} className="hidden" />
                </label>
-               <button onClick={resetToDefaultData} className="p-2 bg-orange-900/50 hover:bg-orange-800 border border-orange-800 rounded-lg text-orange-400 hover:text-orange-300 transition-all flex items-center gap-2 px-3">
-                 <Trash2 size={18} /> <span className="text-xs font-bold">Reset Data</span>
+               <button onClick={reloadLiveData} className="p-2 bg-orange-900/50 hover:bg-orange-800 border border-orange-800 rounded-lg text-orange-400 hover:text-orange-300 transition-all flex items-center gap-2 px-3">
+                 <Database size={18} /> <span className="text-xs font-bold">Reload Live</span>
                </button>
             </div>
           )}
@@ -246,6 +246,34 @@ export default function App() {
 
         {(activeTab === 'overview' || activeTab === 'transocean' || activeTab === 'valaris' || activeTab === 'noble' || activeTab === 'seadrill') ? (
           <div className="space-y-10 max-w-7xl">
+            {activeTab === 'overview' && recentEvents.length > 0 && (
+              <section className="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 shadow-xl">
+                <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2 mb-5">
+                  <div>
+                    <h3 className="text-lg font-black text-white">Official update monitor</h3>
+                    <p className="text-xs text-slate-500 mt-1">FSR에 아직 반영되지 않았거나 날짜가 모호한 공식 공지는 검토 신호로만 표시합니다.</p>
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-amber-400">No inferred dates or dayrates</span>
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-3">
+                  {recentEvents.map((event, index) => {
+                    const label = event.title || `${event.vessel || event.company} · ${event.classification}`;
+                    const content = (
+                      <>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-blue-400">{event.company}</span>
+                        <span className="block text-xs font-bold text-slate-200 mt-2 leading-snug">{label}</span>
+                        <span className="block text-[10px] text-slate-600 mt-2">{event.publishedAt || 'Date pending'}{event.vessels?.length ? ` · ${event.vessels.join(', ')}` : ''}</span>
+                      </>
+                    );
+                    return event.url ? (
+                      <a key={`${event.url}-${index}`} href={event.url} target="_blank" rel="noreferrer" className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4 hover:border-blue-500/40 transition-colors">{content}</a>
+                    ) : (
+                      <div key={`${event.company}-${event.vessel || index}`} className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">{content}</div>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
                 { label: 'Total Fleet', value: totalShips, icon: Ship },
@@ -460,7 +488,7 @@ export default function App() {
                         <tr className="border-b border-slate-800">
                           <td className="p-3 font-medium">status (contract)</td>
                           <td className="p-3 text-slate-500">string</td>
-                          <td className="p-3">Firm, Option</td>
+                          <td className="p-3">Firm, Option, Contingent</td>
                         </tr>
                         <tr className="border-b border-slate-800">
                           <td className="p-3 font-medium">dayRate</td>
@@ -500,11 +528,15 @@ export default function App() {
                 <ul className="text-sm text-slate-400 space-y-3 leading-relaxed">
                   <li className="flex gap-2">
                     <span className="text-amber-500">•</span>
+                    공식 FSR/IR/SEC 소스는 GitHub Actions가 6시간마다 확인하고, 검증을 모두 통과한 경우에만 공개 JSON을 갱신합니다.
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-amber-500">•</span>
                     JSON 파일은 Dashboard 탭에서 업로드/다운로드 가능합니다.
                   </li>
                   <li className="flex gap-2">
                     <span className="text-amber-500">•</span>
-                    데이터는 로컬 브라우저에 저장되며, 다른 기기와 동기화되지 않습니다.
+                    기본 데이터는 브라우저 저장소가 아니라 빌드에 포함된 최신 공개 JSON을 사용합니다.
                   </li>
                   <li className="flex gap-2">
                     <span className="text-amber-500">•</span>
@@ -550,10 +582,10 @@ export default function App() {
               </div>
 
               <button 
-                onClick={() => { if(confirm("초기화하시겠습니까? 로컬 데이터가 모두 삭제됩니다.")) { localStorage.removeItem(STORAGE_KEY); setShips([]); } }} 
+                onClick={reloadLiveData}
                 className="w-full py-4 bg-slate-900 border border-slate-800 text-red-500/50 hover:text-red-500 hover:border-red-500/30 rounded-2xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-all"
               >
-                <Trash2 size={16} /> Reset Local Database
+                <Database size={16} /> Reload Verified Live Data
               </button>
             </div>
           </div>

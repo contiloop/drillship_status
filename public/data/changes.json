@@ -1,0 +1,33 @@
+{
+  "generatedAt": "2026-08-23T17:04:41Z",
+  "fromDataHash": "5680482f4c85610e7bd4",
+  "toDataHash": "5680482f4c85610e7bd4",
+  "companies": {
+    "Transocean": {
+      "statusChanges": 0,
+      "contractsAdded": 0,
+      "contractsRemoved": 0,
+      "contractsChanged": 0
+    },
+    "Valaris": {
+      "statusChanges": 0,
+      "contractsAdded": 0,
+      "contractsRemoved": 0,
+      "contractsChanged": 0
+    },
+    "Noble": {
+      "statusChanges": 0,
+      "contractsAdded": 0,
+      "contractsRemoved": 0,
+      "contractsChanged": 0
+    },
+    "Seadrill": {
+      "statusChanges": 0,
+      "contractsAdded": 0,
+      "contractsRemoved": 0,
+      "contractsChanged": 0
+    }
+  },
+  "shipsAdded": 0,
+  "shipsRemoved": 0
+}
