@@ -391,6 +391,15 @@ def _dedupe_warnings(warnings: list[str]) -> list[str]:
     return sorted(set(warnings))
 
 
+def _prune_obsolete_payloads(public_data: Path, keep: set[str]) -> None:
+    """Keep only the content-addressed payloads referenced by the manifest."""
+
+    for pattern in ("fleet.*.json", "events.*.json"):
+        for path in public_data.glob(pattern):
+            if path.name not in keep:
+                path.unlink()
+
+
 def _semantic_changes(before: list[dict[str, Any]], after: list[dict[str, Any]]) -> dict[str, Any]:
     old = {ship["id"]: ship for ship in before}
     new = {ship["id"]: ship for ship in after}
@@ -854,9 +863,16 @@ def run(root: Path, *, write: bool, offline: bool = False) -> dict[str, Any]:
         dump_json(public_data / "changes.json", changes)
         dump_json(root / "data" / "provenance" / "sources.json", source_provenance)
         dump_json(root / "data" / "provenance" / "observations.json", observation_provenance)
-        # Publish the manifest last so clients never see a pointer to a missing
-        # content-addressed payload during a deployment.
+        # Publish the manifest only after its content-addressed payloads exist.
         dump_json(existing_manifest_path, manifest)
+
+    if write:
+        # Vercel deploys each Git revision atomically, so payloads referenced by
+        # older deployments remain available there without accumulating in main.
+        _prune_obsolete_payloads(
+            public_data,
+            {manifest["fleetFile"], manifest["eventsFile"]},
+        )
 
     return {
         "ok": True,

@@ -17,6 +17,7 @@ from automation.fleet_sync.pipeline import (
     _fleet_source_health,
     _merge_news_events,
     _next_fallback_streak,
+    _prune_obsolete_payloads,
     _restore_verified_history_rate,
     _validate_contract_coverage,
 )
@@ -209,6 +210,25 @@ def test_only_post_report_news_is_pending() -> None:
 
 def test_warning_count_input_is_deduplicated_deterministically() -> None:
     assert _dedupe_warnings(["b", "a", "b"]) == ["a", "b"]
+
+
+def test_obsolete_content_addressed_payloads_are_pruned(tmp_path) -> None:
+    for name in (
+        "fleet.keep.json",
+        "events.keep.json",
+        "fleet.old.json",
+        "events.old.json",
+        "manifest.json",
+    ):
+        (tmp_path / name).write_text("{}", encoding="utf-8")
+
+    _prune_obsolete_payloads(tmp_path, {"fleet.keep.json", "events.keep.json"})
+
+    assert sorted(path.name for path in tmp_path.iterdir()) == [
+        "events.keep.json",
+        "fleet.keep.json",
+        "manifest.json",
+    ]
 
 
 def test_kg2_review_facts_do_not_infer_dates_or_dayrate() -> None:

@@ -164,6 +164,7 @@ jobs:
           path: ${{ runner.temp }}/fleet-refresh-download
 
       - name: Validate artifact, commit generated paths, and push safely
+        id: publish
         shell: bash
         env:
           EXPECTED_BASE_SHA: ${{ needs.validate.outputs.base_sha }}
@@ -252,6 +253,7 @@ jobs:
 
           if git diff --cached --quiet; then
             echo "Official data is unchanged; nothing to publish."
+            echo "published=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -265,3 +267,54 @@ jobs:
             exit 1
           fi
           git -c core.hooksPath=/dev/null push origin HEAD:refs/heads/main
+
+          manifest="$ARTIFACT_ROOT/payload/public/data/manifest.json"
+          echo "published=true" >> "$GITHUB_OUTPUT"
+          echo "data_hash=$(jq -er '.dataHash' "$manifest")" >> "$GITHUB_OUTPUT"
+          echo "state_fingerprint=$(jq -er '.stateFingerprint' "$manifest")" >> "$GITHUB_OUTPUT"
+          echo "fleet_file=$(jq -er '.fleetFile' "$manifest")" >> "$GITHUB_OUTPUT"
+          echo "events_file=$(jq -er '.eventsFile' "$manifest")" >> "$GITHUB_OUTPUT"
+
+      - name: Verify canonical Vercel deployment
+        if: steps.publish.outputs.published == 'true'
+        shell: bash
+        env:
+          EXPECTED_DATA_HASH: ${{ steps.publish.outputs.data_hash }}
+          EXPECTED_STATE_FINGERPRINT: ${{ steps.publish.outputs.state_fingerprint }}
+          EXPECTED_FLEET_FILE: ${{ steps.publish.outputs.fleet_file }}
+          EXPECTED_EVENTS_FILE: ${{ steps.publish.outputs.events_file }}
+          PRODUCTION_URL: https://offshore-drillship-fleet-analyst.vercel.app
+        run: |
+          set -euo pipefail
+          live_manifest="$(mktemp "$RUNNER_TEMP/live-manifest.XXXXXX")"
+
+          for attempt in $(seq 1 24); do
+            if curl --fail --silent --show-error \
+              --connect-timeout 10 --max-time 20 \
+              -H 'Cache-Control: no-cache' \
+              "$PRODUCTION_URL/data/manifest.json?expected=$EXPECTED_DATA_HASH" \
+              --output "$live_manifest"; then
+              live_hash="$(jq -er '.dataHash' "$live_manifest" 2>/dev/null || true)"
+              live_state="$(jq -er '.stateFingerprint' "$live_manifest" 2>/dev/null || true)"
+              live_fleet="$(jq -er '.fleetFile' "$live_manifest" 2>/dev/null || true)"
+              live_events="$(jq -er '.eventsFile' "$live_manifest" 2>/dev/null || true)"
+              if [[ "$live_hash" == "$EXPECTED_DATA_HASH" \
+                    && "$live_state" == "$EXPECTED_STATE_FINGERPRINT" \
+                    && "$live_fleet" == "$EXPECTED_FLEET_FILE" \
+                    && "$live_events" == "$EXPECTED_EVENTS_FILE" ]] \
+                && curl --fail --silent --show-error --max-time 20 \
+                  "$PRODUCTION_URL/" --output /dev/null \
+                && curl --fail --silent --show-error --max-time 20 \
+                  "$PRODUCTION_URL/data/$EXPECTED_FLEET_FILE" --output /dev/null \
+                && curl --fail --silent --show-error --max-time 20 \
+                  "$PRODUCTION_URL/data/$EXPECTED_EVENTS_FILE" --output /dev/null; then
+                echo "Vercel is serving verified state $EXPECTED_STATE_FINGERPRINT."
+                exit 0
+              fi
+            fi
+            echo "Deployment not ready (attempt $attempt/24); retrying in 10 seconds."
+            sleep 10
+          done
+
+          echo "Vercel did not serve expected data hash $EXPECTED_DATA_HASH within four minutes." >&2
+          exit 1
