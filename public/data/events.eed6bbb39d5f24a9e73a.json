@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-23T17:18:27Z",
+  "generatedAt": "2026-08-31T22:55:11Z",
   "events": [
     {
       "company": "Noble",
@@ -25,17 +25,6 @@
     },
     {
       "company": "Noble",
-      "title": "Quarterly Results",
-      "url": "https://noblecorp.com/our-investors/reports-filings/quarterly-results/",
-      "publishedAt": "July 27, 2026",
-      "vessels": [],
-      "classification": "official-news-signal",
-      "autoApplied": false,
-      "pendingReview": false,
-      "reviewStatus": "acknowledged"
-    },
-    {
-      "company": "Noble",
       "title": "NOBLE CORPORATION PLC ANNOUNCES SECOND QUARTER 2026 RESULTS",
       "url": "https://noblecorp.com/press-release/noble-corporation-plc-announces-second-quarter-2026-results/",
       "publishedAt": "July 27, 2026",
@@ -47,6 +36,17 @@
       "autoApplied": false,
       "pendingReview": false,
       "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Noble",
+      "title": "Quarterly Results",
+      "url": "https://noblecorp.com/our-investors/reports-filings/quarterly-results/",
+      "publishedAt": null,
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "date-unverified"
     },
     {
       "company": "Seadrill",
