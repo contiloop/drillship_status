@@ -41,7 +41,9 @@ jobs:
           npm ci
 
       - name: Test
-        run: python -m pytest automation/tests -q
+        run: |
+          python -m pytest automation/tests -q
+          npm run test:ui
 
       - name: Build
         run: npm run build

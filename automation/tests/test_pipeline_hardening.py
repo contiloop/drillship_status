@@ -237,7 +237,8 @@ def test_kg2_review_facts_do_not_infer_dates_or_dayrate() -> None:
         "Dhirubhai Deepwater KG2 with ONGC in India. The campaign is expected "
         "to commence in the first quarter of 2027 and contribute approximately "
         "$300 million, inclusive of additional services and mobilization fees. "
-        "The contract includes two years of priced options."
+        "The contract includes two years of priced options that, if fully exercised, "
+        "would result in the drillship working in India into early 2031."
     )
     facts = _extract_review_facts(
         "Transocean",
@@ -256,7 +257,23 @@ def test_kg2_review_facts_do_not_infer_dates_or_dayrate() -> None:
         "valueIncludes": ["additional services", "mobilization fee"],
         "exactDatesInferred": False,
         "dayRateInferred": False,
+        "optionEndIfFullyExercised": "early 2031",
+        "dayRateDisclosure": "undisclosed",
     }
+    # A changed release mentioning a rate must not be labelled undisclosed.
+    updated = _extract_review_facts(
+        "Transocean",
+        "Transocean Ltd. Announces $300 Million Contract For Ultra-Deepwater Drillship",
+        text + " A daily rate is now provided in the fleet report.",
+    )
+    assert updated["dayRateDisclosure"] == "not-extracted"
+    assert "dayRateUsd" not in updated
+    without_option_end = _extract_review_facts(
+        "Transocean",
+        "Transocean Ltd. Announces $300 Million Contract For Ultra-Deepwater Drillship",
+        text.replace("into early 2031", "for a longer period"),
+    )
+    assert "optionEndIfFullyExercised" not in without_option_end
 
 
 class _FakeSession:

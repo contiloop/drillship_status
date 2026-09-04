@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-31T22:55:11Z",
+  "generatedAt": "2026-09-04T08:24:14Z",
   "events": [
     {
       "company": "Noble",
@@ -231,7 +231,9 @@
           "mobilization fee"
         ],
         "exactDatesInferred": false,
-        "dayRateInferred": false
+        "dayRateInferred": false,
+        "optionEndIfFullyExercised": "early 2031",
+        "dayRateDisclosure": "undisclosed"
       }
     },
     {
@@ -302,17 +304,6 @@
     },
     {
       "company": "Valaris",
-      "vessel": "VALARIS DS-18",
-      "classification": "letter-of-award",
-      "start": "Nov 26",
-      "end": "May 27",
-      "autoApplied": false,
-      "reason": "The report explicitly labels this period as an LOA, not firm backlog.",
-      "pendingReview": true,
-      "reviewStatus": "pending"
-    },
-    {
-      "company": "Valaris",
       "title": "Valaris Issues Fleet Status Report",
       "url": "https://www.valaris.com/news/news-details/2026/Valaris-Issues-Fleet-Status-Report/default.aspx",
       "publishedAt": "2026-02-17",
@@ -373,6 +364,33 @@
       "autoApplied": false,
       "pendingReview": false,
       "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Valaris",
+      "vessel": "VALARIS DS-18",
+      "classification": "letter-of-award",
+      "start": "Nov 26",
+      "end": "May 27",
+      "autoApplied": false,
+      "reason": "The report explicitly labels this period as an LOA, not firm backlog.",
+      "page": 4,
+      "row": "row=1,slot=1",
+      "facts": {
+        "counterparty": "Undisclosed",
+        "location": "Undisclosed",
+        "awardType": "letter-of-award",
+        "expectedStart": "Nov 26",
+        "expectedEnd": "May 27",
+        "startPrecision": "month",
+        "dayRateDisclosure": "undisclosed",
+        "exactDatesInferred": false,
+        "dayRateInferred": false
+      },
+      "url": "https://s23.q4cdn.com/956522167/files/doc_financials/2026/q2/08052026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": "2026-08-05",
+      "sourceSha256": "c94713719e350294eb91b0361212df7e5951c8d00b9e108ff7afa4a797e55e80",
+      "pendingReview": true,
+      "reviewStatus": "pending"
     },
     {
       "company": "Valaris",

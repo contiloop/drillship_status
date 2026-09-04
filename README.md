@@ -13,7 +13,11 @@ Transocean, Valaris, Noble, Seadrill의 공식 fleet status report와 공식 IR/
 5. 검증을 모두 통과한 경우에만 `public/data/manifest.json`과 content-addressed fleet JSON을 커밋합니다.
 6. 기존 Vercel Git 연동이 `main`의 새 커밋을 프로덕션으로 배포합니다.
 
-모호한 뉴스, LOA, 정확한 날짜가 없는 option은 계약으로 추정하지 않습니다. `public/data/events.<hash>.json`의 review signal로만 남기며, 기존 검증 데이터를 덮어쓰지 않습니다. 공개되지 않은 dayrate는 기존 UI 호환을 위해 `0`으로 직렬화하되 provenance에는 `undisclosed`로 기록합니다. 6시간 주기의 공식 원천 polling이며 스트리밍 실시간 피드는 아닙니다.
+모호한 뉴스, LOA, 정확한 날짜가 없는 option은 계약으로 추정하지 않습니다. `public/data/events.<hash>.json`에 별도 공지로 남기며, 기존 검증 데이터를 덮어쓰지 않습니다. 공개되지 않은 dayrate는 기존 UI 호환을 위해 `0`으로 직렬화하되 provenance에는 `undisclosed`로 기록합니다. 6시간 주기의 공식 원천 polling이며 스트리밍 실시간 피드는 아닙니다.
+
+## 공식 발표 카드
+
+화면의 **공식 발표 · 상세 조건 미확정** 카드는 고객·지역, 수주 형태, 시작 시점, 기본 기간, 옵션, 계약 가치, dayrate와 원문 출처를 항목별로 표시합니다. 분기/월 단위 날짜는 그대로 유지하며, 미공개 값과 아직 추출하지 못한 값은 구분합니다. 이 공지는 승인 대기가 아니며 계약표·가동률·평균 dayrate 계산과 분리됩니다. 기사 해석에 LLM을 호출하지 않으며, KG2 상세 추출은 해당 공식 발표에 한정된 규칙입니다.
 
 ## 공식 원천
 

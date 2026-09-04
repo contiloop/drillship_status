@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-31T22:55:11Z",
+  "generatedAt": "2026-09-04T08:24:14Z",
   "documents": [
     {
       "company": "Noble",
@@ -8,8 +8,8 @@
       "report_date": "2026-07-27",
       "sha256": "ddfdfe43090fe4f2589352abb7bf14cb292ee7323569f29a9f89e20c079807a6",
       "byte_size": 195253,
-      "retrieved_at": "2026-08-31T22:55:07Z",
-      "parser_version": "2026.08.24.2",
+      "retrieved_at": "2026-09-04T08:24:10Z",
+      "parser_version": "2026.09.04.1",
       "discovery": "official-index",
       "content_type": "application/pdf"
     },
@@ -20,8 +20,8 @@
       "report_date": "2026-08-10",
       "sha256": "b774357daafdb62dcc8c371fe5f5d118fb8d7d51c91badd05cd6cae3c9a39cb1",
       "byte_size": 408026,
-      "retrieved_at": "2026-08-31T22:55:09Z",
-      "parser_version": "2026.08.24.2",
+      "retrieved_at": "2026-09-04T08:24:11Z",
+      "parser_version": "2026.09.04.1",
       "discovery": "official-wordpress-api",
       "content_type": "application/pdf"
     },
@@ -32,8 +32,8 @@
       "report_date": "2026-08-05",
       "sha256": "f2f98b03f750b5c4f6d299bff9b55d0ecc4dbeb0cb4f069054193968894db8b6",
       "byte_size": 633637,
-      "retrieved_at": "2026-08-31T22:55:00Z",
-      "parser_version": "2026.08.24.2",
+      "retrieved_at": "2026-09-04T08:23:59Z",
+      "parser_version": "2026.09.04.1",
       "discovery": "official-index",
       "content_type": "application/pdf"
     },
@@ -44,8 +44,8 @@
       "report_date": "2026-08-05",
       "sha256": "c94713719e350294eb91b0361212df7e5951c8d00b9e108ff7afa4a797e55e80",
       "byte_size": 974321,
-      "retrieved_at": "2026-08-31T22:55:04Z",
-      "parser_version": "2026.08.24.2",
+      "retrieved_at": "2026-09-04T08:24:04Z",
+      "parser_version": "2026.09.04.1",
       "discovery": "official-index",
       "content_type": "application/pdf"
     }

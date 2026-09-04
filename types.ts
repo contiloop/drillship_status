@@ -74,12 +74,16 @@ export interface OfficialEvent {
     counterparty?: string;
     location?: string;
     expectedStart?: string;
+    expectedEnd?: string;
     startPrecision?: string;
     awardType?: string;
     awardTermYears?: number;
     optionTermYears?: number;
+    optionEndIfFullyExercised?: string;
     announcedValueUsdApprox?: number;
     valueIncludes?: string[];
+    dayRateDisclosure?: 'reported' | 'undisclosed' | 'not-extracted';
+    dayRateUsd?: number;
     exactDatesInferred?: boolean;
     dayRateInferred?: boolean;
   };

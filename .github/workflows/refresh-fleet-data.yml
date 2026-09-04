@@ -76,6 +76,9 @@ jobs:
       - name: Discover, parse, validate, and write generated JSON
         run: python -m automation.fleet_sync --write
 
+      - name: Test official announcement cards against generated data
+        run: npm run test:ui
+
       - name: Build dashboard against generated data
         run: npm run build
 

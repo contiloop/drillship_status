@@ -458,7 +458,7 @@ def _extract_review_facts(company: str, title: str, detail_text: str) -> dict | 
         and re.search(r"inclusive of additional services and mobilization fees", detail_text, re.I)
     ):
         return None
-    return {
+    facts = {
         "counterparty": "ONGC",
         "location": "India",
         "expectedStart": "Q1 2027",
@@ -471,6 +471,17 @@ def _extract_review_facts(company: str, title: str, detail_text: str) -> dict | 
         "exactDatesInferred": False,
         "dayRateInferred": False,
     }
+    # This remains a bounded rule for this release, not a general news reader.
+    # Preserve the source's approximate option horizon, never synthesize a day.
+    option_end = re.search(r"into\s+early\s+(\d{4})", detail_text, re.I)
+    if option_end:
+        facts["optionEndIfFullyExercised"] = f"early {option_end.group(1)}"
+    facts["dayRateDisclosure"] = (
+        "not-extracted"
+        if re.search(r"\b(?:day[ -]?rate|daily rate|per day)\b", detail_text, re.I)
+        else "undisclosed"
+    )
+    return facts
 
 
 def _collect_q4_news(

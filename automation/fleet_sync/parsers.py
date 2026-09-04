@@ -317,6 +317,19 @@ def _valaris_rows_to_result(
                         "end": ends[index],
                         "autoApplied": False,
                         "reason": "The report explicitly labels this period as an LOA, not firm backlog.",
+                        "page": source_page,
+                        "row": f"{row_locator},slot={index + 1}",
+                        "facts": {
+                            "counterparty": clients[index] or None,
+                            "location": locations[index] or None,
+                            "awardType": "letter-of-award",
+                            "expectedStart": starts[index],
+                            "expectedEnd": ends[index],
+                            "startPrecision": "month",
+                            "dayRateDisclosure": "undisclosed" if not clean_text(rates[index]) else "not-extracted",
+                            "exactDatesInferred": False,
+                            "dayRateInferred": False,
+                        },
                     }
                 )
                 continue

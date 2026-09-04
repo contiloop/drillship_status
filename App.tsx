@@ -8,6 +8,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { Drillship, FleetManifest, OfficialEvent } from './types';
 import MarketChart from './components/MarketChart';
 import FleetGantt from './components/FleetGantt';
+import OfficialAnnouncementCard from './components/OfficialAnnouncementCard';
 import defaultData from './data/data_as_of_26_01_07.json';
 import { countFirmCoveredDays, getComputedStatus } from './utils/shipStatus';
 
@@ -134,7 +135,7 @@ export default function App() {
 
   const economicUtilization = totalPossibleDays > 0 ? Math.round((totalContractDays / totalPossibleDays) * 100) : 0;
   const recentEvents = [...officialEvents]
-    .filter(event => event.pendingReview !== false)
+    .filter(event => event.pendingReview !== false && !event.autoApplied)
     .sort((a, b) => (Date.parse(b.publishedAt || '') || 0) - (Date.parse(a.publishedAt || '') || 0))
     .slice(0, 5);
   const reportSources = [...(manifest?.sources ?? [])]
@@ -234,7 +235,7 @@ export default function App() {
             )}
             {manifest?.generatedAt && (
               <p className="text-[11px] text-slate-600 mt-2">
-                Generated {new Date(manifest.generatedAt).toLocaleString()} · {manifest.contractCount} contract records · {manifest.pendingEventCount} review signals
+                Generated {new Date(manifest.generatedAt).toLocaleString()} · {manifest.contractCount} contract records · 상세 조건 미확정 공지 {manifest.pendingEventCount}건
               </p>
             )}
             {syncError && <p className="text-[11px] text-amber-500/80 mt-2">Live sync fallback: {syncError}</p>}
@@ -264,43 +265,19 @@ export default function App() {
               <section className="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 shadow-xl">
                 <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2 mb-5">
                   <div>
-                    <h3 className="text-lg font-black text-white">Official update monitor</h3>
-                    <p className="text-xs text-slate-500 mt-1">FSR에 아직 반영되지 않았거나 날짜가 모호한 공식 공지는 검토 신호로만 표시합니다.</p>
+                    <h3 className="text-lg font-black text-white">공식 발표 · 상세 조건 미확정</h3>
+                    <p className="text-sm leading-relaxed text-slate-400 mt-2">공식 자료에서 확인된 조건을 먼저 보여줍니다. 승인 대기가 아니라, 상세 조건이 추가로 공개되기를 기다리는 항목입니다.</p>
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-amber-400">No inferred dates or dayrates</span>
                 </div>
-                <div className="grid grid-cols-1 lg:grid-cols-5 gap-3">
-                  {recentEvents.map((event, index) => {
-                    const label = event.title || `${event.vessel || event.company} · ${event.classification}`;
-                    const facts = event.facts;
-                    const factSummary = facts
-                      ? [
-                          facts.counterparty,
-                          facts.location,
-                          facts.expectedStart,
-                          facts.awardTermYears ? `${facts.awardTermYears}y award` : null,
-                          facts.optionTermYears ? `${facts.optionTermYears}y options` : null,
-                          facts.announcedValueUsdApprox
-                            ? `~$${Math.round(facts.announcedValueUsdApprox / 1_000_000)}m`
-                            : null,
-                        ].filter(Boolean).join(' · ')
-                      : event.start && event.end
-                        ? `${event.start}–${event.end}`
-                        : null;
-                    const content = (
-                      <>
-                        <span className="text-[9px] font-black uppercase tracking-widest text-blue-400">{event.company}</span>
-                        <span className="block text-xs font-bold text-slate-200 mt-2 leading-snug">{label}</span>
-                        <span className="block text-[10px] text-slate-600 mt-2">{event.publishedAt || 'Date pending'}{event.vessels?.length ? ` · ${event.vessels.join(', ')}` : ''}</span>
-                        {factSummary && <span className="block text-[10px] text-amber-300/80 mt-2 leading-relaxed">{factSummary}</span>}
-                      </>
-                    );
-                    return event.url ? (
-                      <a key={`${event.url}-${index}`} href={event.url} target="_blank" rel="noreferrer" className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4 hover:border-blue-500/40 transition-colors">{content}</a>
-                    ) : (
-                      <div key={`${event.company}-${event.vessel || index}`} className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">{content}</div>
-                    );
-                  })}
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                  {recentEvents.map((event, index) => (
+                    <div key={`${event.company}-${event.url || event.vessel || index}`} className="min-w-0">
+                      <OfficialAnnouncementCard
+                        event={event}
+                        source={reportSources.find(source => source.company === event.company)}
+                      />
+                    </div>
+                  ))}
                 </div>
               </section>
             )}

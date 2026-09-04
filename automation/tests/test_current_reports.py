@@ -46,3 +46,26 @@ def test_current_noble_held_for_sale_note_is_preserved() -> None:
     assert vessel.notes == ["Held for sale."]
     assert vessel.operational_observations[0].page == 4
     assert vessel.operational_observations[0].row == "row=9"
+
+
+def test_valaris_loa_card_keeps_source_precision_and_provenance() -> None:
+    from automation.fleet_sync.pipeline import _build_outputs
+
+    fleet, sources, _, events, _, _ = _build_outputs(ROOT, offline=True)
+    event = next(item for item in events if item.get("vessel") == "VALARIS DS-18")
+    source = next(item for item in sources if item.company == "Valaris")
+    assert event["url"] == source.document_url
+    assert event["publishedAt"] == "2026-08-05"
+    assert event["sourceSha256"] == source.sha256
+    assert event["page"] == 4
+    assert event["row"]
+    assert event["facts"]["expectedStart"] == "Nov 26"
+    assert event["facts"]["expectedEnd"] == "May 27"
+    assert event["facts"]["startPrecision"] == "month"
+    assert event["facts"]["awardType"] == "letter-of-award"
+    assert event["autoApplied"] is False
+    assert not any(
+        contract["startDate"].startswith("2026-11")
+        for ship in fleet if ship["name"] == "VALARIS DS-18"
+        for contract in ship["contracts"]
+    )

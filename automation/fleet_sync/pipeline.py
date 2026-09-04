@@ -736,8 +736,17 @@ def _build_outputs(
                 }
             )
 
-    for result, _ in parsed.values():
-        pending_events.extend(result.pending_events)
+    for company, (result, report_date) in parsed.items():
+        source = source_by_company[company]
+        pending_events.extend(
+            {
+                **event,
+                "url": source.document_url,
+                "publishedAt": report_date,
+                "sourceSha256": source.sha256,
+            }
+            for event in result.pending_events
+        )
         monitor_warnings.extend(result.warnings)
     if legacy_history_count:
         monitor_warnings.append(
