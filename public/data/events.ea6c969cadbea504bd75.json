@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-04T08:24:14Z",
+  "generatedAt": "2026-09-15T11:52:26Z",
   "events": [
     {
       "company": "Noble",
@@ -301,6 +301,19 @@
       "autoApplied": false,
       "pendingReview": false,
       "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Transocean",
+      "title": "Transocean Ltd. Announces $80 Million Contract For Ultra-Deepwater Drillship",
+      "url": "https://investor.deepwater.com/news-releases/news-release-details/transocean-ltd-announces-80-million-contract-ultra-deepwater",
+      "publishedAt": "September 15, 2026",
+      "vessels": [
+        "Deepwater Conqueror"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": true,
+      "reviewStatus": "pending"
     },
     {
       "company": "Valaris",
