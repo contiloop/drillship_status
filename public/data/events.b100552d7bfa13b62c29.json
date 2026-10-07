@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-15T11:52:26Z",
+  "generatedAt": "2026-10-07T13:34:46Z",
   "events": [
     {
       "company": "Noble",
@@ -429,6 +429,19 @@
       "autoApplied": false,
       "pendingReview": false,
       "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Valaris",
+      "title": "Valaris Announces Contract Awards and Fleet Status Updates",
+      "url": "https://www.valaris.com/news/news-details/2026/Valaris-Announces-Contract-Awards-and-Fleet-Status-Updates/default.aspx",
+      "publishedAt": "2026-10-07",
+      "vessels": [
+        "VALARIS DS-18"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": true,
+      "reviewStatus": "pending"
     }
   ]
 }
