@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-07T13:34:46Z",
+  "generatedAt": "2026-10-09T18:24:44Z",
   "updatedAsOf": "2026-08-10",
   "dataHash": "06d7348ab9cd5c01f447",
-  "stateFingerprint": "a03759e15f7d7892b5b4",
+  "stateFingerprint": "1dca8ac518d76a071704",
   "fleetFile": "fleet.06d7348ab9cd5c01f447.json",
   "eventsFile": "events.b100552d7bfa13b62c29.json",
   "eventsHash": "b100552d7bfa13b62c29",
@@ -48,7 +48,7 @@
       "discovery": "official-index",
       "contentType": "application/pdf",
       "health": "healthy",
-      "newsMonitor": "healthy"
+      "newsMonitor": "degraded-preserved"
     },
     {
       "company": "Valaris",
@@ -91,8 +91,8 @@
       "company": "Transocean",
       "fleetReport": "healthy",
       "discovery": "official-index",
-      "newsMonitor": "healthy",
-      "preservedNewsEvents": 0,
+      "newsMonitor": "degraded-preserved",
+      "preservedNewsEvents": 9,
       "reportDate": "2026-08-05",
       "documentUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/August%202026%20Fleet%20Status%20Report.pdf",
       "sha256": "f2f98b03f750b5c4f6d299bff9b55d0ecc4dbeb0cb4f069054193968894db8b6",
@@ -110,7 +110,7 @@
       "fallbackStreak": 0
     }
   ],
-  "warningsCount": 12,
+  "warningsCount": 13,
   "eventCount": 30,
   "pendingEventCount": 4
 }

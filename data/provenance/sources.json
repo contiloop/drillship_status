@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-07T13:34:46Z",
+  "generatedAt": "2026-10-09T18:24:44Z",
   "documents": [
     {
       "company": "Noble",
@@ -8,7 +8,7 @@
       "report_date": "2026-07-27",
       "sha256": "ddfdfe43090fe4f2589352abb7bf14cb292ee7323569f29a9f89e20c079807a6",
       "byte_size": 195253,
-      "retrieved_at": "2026-10-07T13:34:44Z",
+      "retrieved_at": "2026-10-09T18:24:42Z",
       "parser_version": "2026.09.04.1",
       "discovery": "official-index",
       "content_type": "application/pdf"
@@ -20,7 +20,7 @@
       "report_date": "2026-08-10",
       "sha256": "b774357daafdb62dcc8c371fe5f5d118fb8d7d51c91badd05cd6cae3c9a39cb1",
       "byte_size": 408026,
-      "retrieved_at": "2026-10-07T13:34:45Z",
+      "retrieved_at": "2026-10-09T18:24:43Z",
       "parser_version": "2026.09.04.1",
       "discovery": "official-wordpress-api",
       "content_type": "application/pdf"
@@ -32,7 +32,7 @@
       "report_date": "2026-08-05",
       "sha256": "f2f98b03f750b5c4f6d299bff9b55d0ecc4dbeb0cb4f069054193968894db8b6",
       "byte_size": 633637,
-      "retrieved_at": "2026-10-07T13:34:32Z",
+      "retrieved_at": "2026-10-09T18:24:35Z",
       "parser_version": "2026.09.04.1",
       "discovery": "official-index",
       "content_type": "application/pdf"
@@ -44,7 +44,7 @@
       "report_date": "2026-08-05",
       "sha256": "c94713719e350294eb91b0361212df7e5951c8d00b9e108ff7afa4a797e55e80",
       "byte_size": 974321,
-      "retrieved_at": "2026-10-07T13:34:36Z",
+      "retrieved_at": "2026-10-09T18:24:37Z",
       "parser_version": "2026.09.04.1",
       "discovery": "official-index",
       "content_type": "application/pdf"
@@ -77,8 +77,8 @@
       "company": "Transocean",
       "fleetReport": "healthy",
       "discovery": "official-index",
-      "newsMonitor": "healthy",
-      "preservedNewsEvents": 0,
+      "newsMonitor": "degraded-preserved",
+      "preservedNewsEvents": 9,
       "reportDate": "2026-08-05",
       "documentUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/August%202026%20Fleet%20Status%20Report.pdf",
       "sha256": "f2f98b03f750b5c4f6d299bff9b55d0ecc4dbeb0cb4f069054193968894db8b6",
@@ -101,6 +101,7 @@
     "Noble Valiant: option language has no exact date interval and was not synthesized",
     "Source dates have month precision; same-month transitions may overlap in ISO projection.",
     "The report has no dayrate column; contract values were not divided by durations.",
+    "Transocean news monitor degraded: HTTPError(403); preserved 9 last-known official news events.",
     "VALARIS DS-10: undated option language is retained as a warning, not an invented interval",
     "VALARIS DS-12: undated option language is retained as a warning, not an invented interval",
     "VALARIS DS-15: undated option language is retained as a warning, not an invented interval",
