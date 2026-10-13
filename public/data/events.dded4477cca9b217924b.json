@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-09T18:24:44Z",
+  "generatedAt": "2026-10-13T00:48:51Z",
   "events": [
     {
       "company": "Noble",
@@ -175,6 +175,21 @@
       "autoApplied": false,
       "pendingReview": false,
       "reviewStatus": "acknowledged"
+    },
+    {
+      "company": "Seadrill",
+      "title": "Seadrill Announces Contract Awards and Extensions in Indonesia, Malaysia, Angola, and the U.S. Gulf",
+      "url": "https://ir.seadrill.com/news/news-details/2026/Seadrill-Announces-Contract-Awards-and-Extensions-in-Indonesia-Malaysia-Angola-and-the-U-S--Gulf/default.aspx",
+      "publishedAt": "2026-10-12",
+      "vessels": [
+        "Sonangol Libongos",
+        "West Capella",
+        "West Carina"
+      ],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": true,
+      "reviewStatus": "pending"
     },
     {
       "company": "Transocean",

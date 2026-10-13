@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-09T18:24:44Z",
+  "generatedAt": "2026-10-13T00:48:51Z",
   "updatedAsOf": "2026-08-10",
   "dataHash": "06d7348ab9cd5c01f447",
-  "stateFingerprint": "1dca8ac518d76a071704",
+  "stateFingerprint": "0c11087fbfaa3ca4d82f",
   "fleetFile": "fleet.06d7348ab9cd5c01f447.json",
-  "eventsFile": "events.b100552d7bfa13b62c29.json",
-  "eventsHash": "b100552d7bfa13b62c29",
+  "eventsFile": "events.dded4477cca9b217924b.json",
+  "eventsHash": "dded4477cca9b217924b",
   "shipCount": 62,
   "contractCount": 116,
   "sourceCount": 4,
@@ -111,6 +111,6 @@
     }
   ],
   "warningsCount": 13,
-  "eventCount": 30,
-  "pendingEventCount": 4
+  "eventCount": 31,
+  "pendingEventCount": 5
 }
