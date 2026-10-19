@@ -1,5 +1,6 @@
 import React from 'react';
 import type { FleetSource, OfficialEvent } from '../types';
+import { economicsDetails, estimatedRateLabel, newsEconomics } from '../utils/newsEconomics';
 
 const UNKNOWN = '확인된 정보 없음';
 const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -96,6 +97,7 @@ export default function OfficialAnnouncementCard({ event, source }: { event: Off
   // Only report-derived events may fall back to the company's FSR provenance.
   const href = sourceHref(event.url || (isReport ? source?.documentUrl : undefined));
   const publishedAt = publicationLabel(event.publishedAt || (isReport ? source?.reportDate : undefined));
+  const economics = newsEconomics(event);
   return (
     <details className="min-w-0 rounded-xl border border-slate-800 bg-slate-900/50 p-4">
       <summary className="cursor-pointer rounded text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400">
@@ -112,6 +114,7 @@ export default function OfficialAnnouncementCard({ event, source }: { event: Off
           </div>
         ))}
       </dl>
+      {economics && <p className="mt-4 text-sm text-amber-200">{estimatedRateLabel(economics)}<span className="mt-1 block text-xs text-slate-400">{economicsDetails(economics)}</span></p>}
       <div className="mt-5 border-t border-slate-800 pt-4 text-sm leading-relaxed text-slate-300">
         {href ? (
           <a href={href} target="_blank" rel="noopener noreferrer" className="inline-block rounded py-2 text-blue-300 underline underline-offset-4 hover:text-blue-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-400">
@@ -119,7 +122,7 @@ export default function OfficialAnnouncementCard({ event, source }: { event: Off
           </a>
         ) : <p>출처 원문 링크 확인되지 않음 · {publishedAt}</p>}
         {event.reason && <p className="mt-2 text-slate-300">{event.reason}</p>}
-        <p className="mt-2 text-slate-400">{event.autoApplied ? '근거가 확인된 기간·계약 상태를 계약표에 반영했습니다. 월 단위 날짜는 월초·월말로 표시하며 정확한 일자는 아닙니다. 미공개 일당은 평균에서 제외합니다.' : '별도 공지로 표시하며 계약표·가동률·평균 dayrate 계산에는 포함하지 않습니다.'} 계약 가치를 일당으로 환산하지 않습니다.</p>
+        <p className="mt-2 text-slate-400">{event.autoApplied ? '근거가 확인된 기간·계약 상태를 계약표에 반영했습니다. 월 단위 날짜는 월초·월말로 표시하며 정확한 일자는 아닙니다. 미공개 일당은 평균에서 제외합니다.' : '확정 계약·가동률·평균 dayrate 계산에는 포함하지 않습니다. 시작 구간과 기간이 확인되면 계약표의 점선 예상 범위로 표시합니다.'} 추정 요율은 공시 dayrate와 구분하며 계산 가능한 동일 수주의 금액·기본 기간만 사용합니다.</p>
       </div>
     </details>
   );

@@ -9,7 +9,7 @@ const { renderToStaticMarkup } = require('react-dom/server');
 // No browser, extra test runner, or production loader is needed.
 const compile = (module, filename) => {
   const { outputText } = ts.transpileModule(fs.readFileSync(filename, 'utf8'), {
-    compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true },
+    compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true },
   });
   module._compile(outputText, filename);
 };
@@ -46,7 +46,7 @@ test('KG2 renders all announced terms without inventing exact dates or a dayrate
   assert.equal((html.match(/<dt /g) || []).length, 7);
   assert.match(html, /Dhirubhai Deepwater KG2/);
   assert.match(html, /2026-08-20/);
-  assert.match(html, /계약표·가동률·평균 dayrate 계산에는 포함하지 않습니다/);
+  assert.match(html, /확정 계약·가동률·평균 dayrate 계산에는 포함하지 않습니다/);
   assert.doesNotMatch(html, /2027-01-01|2029-01-01|411,|\$0/);
 });
 
@@ -110,7 +110,7 @@ test('applied announcements are archived and every detail stays collapsed', () =
   assert.equal(grouped.unresolved.length, 6);
   assert(grouped.unresolved.every(e => !e.autoApplied));
   const html = renderToStaticMarkup(React.createElement(Announcements, {events, sources: manifest.sources}));
-  assert.match(html, /미반영 조건 6건/);
+  assert.match(html, /미확정 조건 6건/);
   assert.match(html, /계약표 반영 이력 2건/);
   assert.doesNotMatch(html, /<details[^>]*\sopen(?:\s|=|>)|Codex|gpt-6-luna/);
 });
@@ -147,7 +147,7 @@ test('generated feed renders separately without mutating fleet or announcement d
   for (const event of pending) {
     const html = render(event, manifest.sources.find(source => source.company === event.company));
     assert.equal((html.match(/<dt /g) || []).length, 7);
-    assert.match(html, /계약표·가동률·평균 dayrate 계산에는 포함하지 않습니다/);
+    assert.match(html, /확정 계약·가동률·평균 dayrate 계산에는 포함하지 않습니다/);
   }
   assert.equal(JSON.stringify({ fleet, events }), before);
 });

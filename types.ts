@@ -74,6 +74,7 @@ export interface OfficialEvent {
   reviewStatus?: 'pending' | 'acknowledged' | 'date-unverified' | 'applied' | 'details-incomplete' | 'reviewed' | 'conflict' | 'superseded' | 'covered-by-report' | 'not-contract-news';
   needsDetails?: boolean;
   llmReview?: { engine: string; model: string; reasoningEffort: string; fast: boolean; reviewedAt: string };
+  evidence?: { field: string; quote: string }[];
   start?: string;
   end?: string;
   reason?: string;

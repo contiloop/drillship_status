@@ -1,22 +1,45 @@
 
-import React, { useState } from 'react';
-import { Drillship } from '../types';
+import React, { useMemo, useState } from 'react';
+import { Drillship, OfficialEvent } from '../types';
 import { getComputedStatus } from '../utils/shipStatus';
 import { contractPeriod, contractSource, contractSpan } from '../utils/contractTimeline';
+import { economicsDetails, estimatedRateLabel, timelineContracts, TimelineContract } from '../utils/newsEconomics';
 
 interface FleetGanttProps {
   ships: Drillship[];
+  events?: OfficialEvent[];
 }
 
-const FleetGantt: React.FC<FleetGanttProps> = ({ ships }) => {
+const periodLabel = (row: TimelineContract) => row.forecast?.windowLabel || contractPeriod(row);
+const rateLabel = (row: TimelineContract, compact = false) => row.dayRate > 0
+  ? (compact ? `$${Math.round(row.dayRate / 1000)}k` : `$${row.dayRate.toLocaleString()} / 일 (공시)`)
+  : row.economics ? estimatedRateLabel(row.economics, compact) : '일당 미공개';
+
+export function ContractDetails({ selected, shipName, onClose }: { selected: TimelineContract; shipName: string; onClose: () => void }) {
+  return (
+    <div role="status" className="fixed bottom-3 left-[4.25rem] right-3 md:left-[14.5rem] md:right-6 z-[60] flex max-h-[45vh] overflow-y-auto flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-xs text-slate-300 shadow-2xl">
+      <strong className="text-white">{shipName}</strong>
+      <span>{selected.forecast ? `${selected.forecast.awardLabel} · 예상 범위` : selected.status} · {selected.client} · {selected.region}</span>
+      <span>{periodLabel(selected)}{!selected.forecast && (selected.datePrecision?.start !== 'day' || selected.datePrecision?.end !== 'day') ? ' (월 단위)' : ''}</span>
+      <span className={selected.dayRate <= 0 && selected.economics ? 'text-amber-200' : ''}>{rateLabel(selected)}</span>
+      {contractSource(selected.sourceUrl) && <a className="text-blue-300 underline" href={contractSource(selected.sourceUrl)} target="_blank" rel="noopener noreferrer">원문 ↗</a>}
+      <button className="ml-auto rounded px-3 py-2 text-slate-400 hover:text-white" onClick={onClose} aria-label="계약 상세 닫기">닫기</button>
+      {selected.economics && <p className="w-full text-slate-400">{economicsDetails(selected.economics)}</p>}
+      {selected.forecast && <p className="w-full text-slate-400">점선 바는 가능한 시작부터 종료까지의 예상 범위이며, 전체 폭이 작업 기간은 아닙니다. 정확한 일자는 미공개이며 확정 계약·가동률·평균 dayrate에는 포함하지 않습니다.</p>}
+    </div>
+  );
+}
+
+const FleetGantt: React.FC<FleetGanttProps> = ({ ships, events = [] }) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const selectedShip = ships.find(s => s.contracts.some(c => c.id === selectedId));
+  const timelineShips = useMemo(() => ships.map(s => ({ ...s, contracts: timelineContracts(s, events) })), [ships, events]);
+  const selectedShip = timelineShips.find(s => s.contracts.some(c => c.id === selectedId));
   const selected = selectedShip?.contracts.find(c => c.id === selectedId);
   const now = new Date();
   const yearStart = new Date(now.getFullYear(), 0, 1);
   
   let maxEndDate = new Date(now.getFullYear() + 2, 11, 31);
-  ships.forEach(ship => {
+  timelineShips.forEach(ship => {
     ship.contracts.forEach(contract => {
       const d = new Date(contract.endDate);
       if (d > maxEndDate) maxEndDate = d;
@@ -62,20 +85,14 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships }) => {
           <span className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-600 rounded-sm"></div> Firm</span>
           <span className="flex items-center gap-2"><div className="w-3 h-3 bg-sky-400/20 border border-sky-400 rounded-sm"></div> Option</span>
           <span className="flex items-center gap-2"><div className="w-3 h-3 bg-amber-400/20 border border-amber-400 rounded-sm"></div> Contingent</span>
+          <span className="flex items-center gap-2"><div className="w-3 h-3 bg-amber-400/10 border border-dashed border-amber-300 rounded-sm"></div> 예상 범위 · 추정 요율</span>
           <span className="flex items-center gap-2"><div className="w-3 h-3 bg-slate-950 border border-slate-800 rounded-sm"></div> Idle/Gap</span>
           <span className="flex items-center gap-2"><div className="w-3 h-3 bg-slate-800 border border-slate-700 rounded-sm cold-stacked-legend"></div> Cold-Stacked</span>
         </div>
       </div>
 
       {selected && selectedShip && (
-        <div role="status" className="fixed bottom-3 left-[4.25rem] right-3 md:left-[14.5rem] md:right-6 z-[60] flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-xs text-slate-300 shadow-2xl">
-          <strong className="text-white">{selectedShip.name}</strong>
-          <span>{selected.status} · {selected.client} · {selected.region}</span>
-          <span>{contractPeriod(selected)}{selected.datePrecision?.start !== 'day' || selected.datePrecision?.end !== 'day' ? ' (월 단위)' : ''}</span>
-          <span>{selected.dayRate > 0 ? `$${selected.dayRate.toLocaleString()} / 일` : '일당 미공개'}</span>
-          {contractSource(selected.sourceUrl) && <a className="text-blue-300 underline" href={contractSource(selected.sourceUrl)} target="_blank" rel="noopener noreferrer">원문 ↗</a>}
-          <button className="ml-auto rounded px-3 py-2 text-slate-400 hover:text-white" onClick={() => setSelectedId(null)} aria-label="계약 상세 닫기">닫기</button>
-        </div>
+        <ContractDetails selected={selected} shipName={selectedShip.name} onClose={() => setSelectedId(null)} />
       )}
       
       <div role="region" aria-label="선박별 계약 타임라인, 좌우 스크롤" tabIndex={0} className="p-3 md:p-4 overflow-x-auto custom-scrollbar relative focus-visible:outline focus-visible:outline-blue-400">
@@ -102,7 +119,7 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships }) => {
               ))}
             </div>
 
-            {[...ships]
+            {[...timelineShips]
               .sort((a,b) => {
                 const genOrder = { '8G': 4, '7G+': 3, '7G': 2, '6G': 1 };
                 const aVal = genOrder[a.generation as keyof typeof genOrder] || 0;
@@ -111,8 +128,11 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships }) => {
                 return a.company.localeCompare(b.company);
               })
               .map((ship) => {
-                const computedStatus = getComputedStatus(ship, now);
+                // View-only forecasts must never change the vessel's active status.
+                const canonicalShip = ships.find(s => s.id === ship.id)!;
+                const computedStatus = getComputedStatus(canonicalShip, now);
                 const isColdStacked = computedStatus === 'Cold-Stacked';
+                const forecasts = ship.contracts.filter(c => c.forecast);
                 return (
                 <div key={ship.id} className="flex items-center group transition-all relative">
                   {/* Sticky Vessel Information - Opaque Background */}
@@ -127,7 +147,7 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships }) => {
                   </div>
 
                   {/* Timeline Row Section */}
-                  <div className={`flex-1 relative h-10 rounded-xl overflow-hidden border z-10 mx-2 ${
+                  <div style={{ height: 40 + forecasts.length * 36 }} className={`flex-1 relative rounded-xl overflow-hidden border z-10 mx-2 ${
                     isColdStacked
                       ? 'bg-slate-800 border-slate-700'
                       : 'bg-slate-950/60 border-slate-800'
@@ -150,11 +170,12 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships }) => {
                       const span = contractSpan(c, yearStart.getFullYear(), yearEnd.getFullYear());
                       if (!span) return null;
                       
+                      const kind = c.forecast ? `${c.forecast.awardLabel} · 예상 범위` : c.status;
                       return (
-                        <button type="button" key={c.id} aria-pressed={selectedId === c.id} onClick={() => setSelectedId(c.id)} aria-label={`${ship.name} · ${c.status} · ${c.client} · ${contractPeriod(c)} · ${c.dayRate > 0 ? `$${c.dayRate.toLocaleString()} / 일` : '일당 미공개'}`} className={`absolute top-1 bottom-1 text-left rounded-md border border-black/20 hover:brightness-125 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${selectedId === c.id ? 'ring-2 ring-white' : ''} ${c.status === 'Firm' ? 'bg-blue-600' : c.status === 'Contingent' ? 'bg-amber-400/20 border-dashed border-amber-400/70' : 'bg-sky-400/20 border-dashed border-sky-400/60'}`} style={{ left: `${span.left}%`, width: `${span.width}%` }} title={`${c.status} · ${c.client}: ${contractPeriod(c)}${c.dayRate > 0 ? ` ($${Math.round(c.dayRate/1000)}k)` : ' · 일당 미공개'}`}>
-                          <div className="h-full w-full flex items-center px-3 overflow-hidden whitespace-nowrap">
+                        <button type="button" key={c.id} aria-pressed={selectedId === c.id} onClick={() => setSelectedId(c.id)} aria-label={`${ship.name} · ${kind} · ${c.client} · ${periodLabel(c)} · ${rateLabel(c)}`} className={`absolute text-left rounded-md border hover:brightness-125 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${selectedId === c.id ? 'ring-2 ring-white' : ''} ${c.forecast ? 'bg-amber-400/10 border-dashed border-amber-300/80' : c.status === 'Firm' ? 'bg-blue-600 border-black/20' : c.status === 'Contingent' ? 'bg-amber-400/20 border-dashed border-amber-400/70' : 'bg-sky-400/20 border-dashed border-sky-400/60'}`} style={{ left: `${span.left}%`, width: `${span.width}%`, height: 30, top: c.forecast ? 42 + forecasts.indexOf(c) * 36 : 4 }} title={`${kind} · ${c.client}: ${periodLabel(c)} · ${rateLabel(c)}`}>
+                          <div className={`h-full w-full flex items-center ${c.forecast ? 'justify-center' : ''} px-3 overflow-hidden whitespace-nowrap`}>
                             <span className="text-[10px] font-black text-white/95 truncate drop-shadow-sm">
-                              {c.client} {c.dayRate > 0 ? `• $${Math.round(c.dayRate/1000)}k` : ''}
+                              {c.forecast ? `${c.forecast.awardLabel} · ${c.forecast.startLabel} · ${c.forecast.duration.label}` : c.client} {(c.dayRate > 0 || c.economics) ? `• ${rateLabel(c, true)}` : ''}
                             </span>
                           </div>
                         </button>
@@ -168,7 +189,7 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships }) => {
         </div>
       </div>
       <div className="px-4 py-3 bg-slate-900 border-t border-slate-800">
-        <p className="text-[10px] text-slate-500">공식 보고서·계약 발표 기준. 월 단위 기간은 월초·월말로 표시합니다. 날짜 미확정 수주는 뉴스·공시 탭에서 확인할 수 있습니다.</p>
+        <p className="text-[10px] text-slate-500">파란 바: 보고서 기준 계약 · 노란 점선 예상 범위: 개시 시점 미확정 수주/LOA · 추정 요율: 계약 가치÷작업 기간, 공시 dayrate와 다름. 예상 범위·추정 요율은 가동률·평균 dayrate에서 제외합니다.</p>
       </div>
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }

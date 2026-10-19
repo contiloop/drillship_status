@@ -303,7 +303,7 @@ export default function App() {
 
             {filteredShips.length > 0 ? (
               <>
-                <FleetGantt ships={filteredShips} />
+                <FleetGantt ships={filteredShips} events={officialEvents} />
                 <details className="rounded-xl border border-slate-800 p-4">
                   <summary className="cursor-pointer text-sm font-bold text-slate-400">시장 분석 차트</summary>
                   <div className="mt-4"><MarketChart ships={filteredShips} /></div>
