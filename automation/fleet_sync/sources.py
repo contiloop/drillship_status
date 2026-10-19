@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from .core import clean_text
+from .core import clean_text, file_sha256
 from .model import Company
 
 
@@ -43,7 +43,9 @@ SOURCE_SPECS = (
         company="Transocean",
         index_url="https://www.deepwater.com/investors/fleet-status-report",
         fallback_document_url="https://www.deepwater.com/documents/FleetStatusReport/2026/August%202026%20Fleet%20Status%20Report.pdf",
-        news_url="https://investor.deepwater.com/press-releases",
+        # Corporate mirror carries the same issuer releases without the IR
+        # host's Akamai denial of automated requests. No anti-bot bypass.
+        news_url="https://www.deepwater.com/news",
     ),
     SourceSpec(
         company="Valaris",
@@ -350,12 +352,25 @@ def _discover_valaris_sec(client: HttpClient) -> str:
     raise ValueError("SEC submissions did not expose a Valaris fleet-status exhibit")
 
 
+def fetch_article(client: HttpClient, url: str) -> tuple[str, str]:
+    """Read an issuer article, not a listing snippet; return text and its hash."""
+    response = client.get(url)
+    soup = BeautifulSoup(response.text, "lxml")
+    for node in soup.select("script,style,nav,header,footer"):
+        node.decompose()
+    article = soup.select_one("article.news,article,.module-news-details,main") or soup
+    text = clean_text(article.get_text(" ", strip=True))
+    if len(text) < 300:
+        raise ValueError("article body is empty or unexpectedly short")
+    return text, file_sha256(text.encode("utf-8"))
+
+
 def collect_official_news(
     client: HttpClient,
     spec: SourceSpec,
     vessel_names: list[str],
     *,
-    limit: int = 8,
+    limit: int = 20,
 ) -> tuple[list[dict], str | None]:
     q4_warning: str | None = None
     if spec.company in {"Valaris", "Seadrill"}:
@@ -389,7 +404,7 @@ def collect_official_news(
         if url in seen or parsed_url.scheme != "https" or parsed_url.hostname not in ALLOWED_HOSTS:
             continue
         seen.add(url)
-        parent_text = clean_text((link.find_parent(["article", "li", "div"]) or link).get_text(" "))
+        parent_text = clean_text((link.find_parent(["tr", "article", "li", "div"]) or link).get_text(" "))
         detail_text = parent_text
         date_match = re.search(
             r"\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2},\s+\d{4}\b",
@@ -397,15 +412,11 @@ def collect_official_news(
             re.I,
         )
         matched_vessels = [name for name in vessel_names if name.casefold() in parent_text.casefold()]
-        needs_detail_facts = (
-            spec.company == "Transocean"
-            and "300 Million Contract" in title
-        )
-        if (not matched_vessels or needs_detail_facts) and parsed_url.path not in {"", "/"}:
+        body_hash = None
+        article_error = None
+        if parsed_url.path not in {"", "/"}:
             try:
-                detail_text = clean_text(
-                    BeautifulSoup(client.get(url).text, "lxml").get_text(" ")
-                )
+                detail_text, body_hash = fetch_article(client, url)
                 matched_vessels = [
                     name for name in vessel_names if name.casefold() in detail_text.casefold()
                 ]
@@ -415,10 +426,10 @@ def collect_official_news(
                         detail_text,
                         re.I,
                     )
-            except Exception:
+            except Exception as error:
                 # A listing item is still a useful review signal when the
                 # detail page temporarily rejects automated access.
-                pass
+                article_error = _error_summary(error)
         event = {
             "company": spec.company,
             "title": title,
@@ -427,10 +438,9 @@ def collect_official_news(
             "vessels": matched_vessels,
             "classification": "official-news-signal",
             "autoApplied": False,
+            "articleSha256": body_hash,
+            "articleReadError": article_error,
         }
-        facts = _extract_review_facts(spec.company, title, detail_text)
-        if facts:
-            event["facts"] = facts
         events.append(event)
         if len(events) >= limit:
             break
@@ -440,48 +450,6 @@ def collect_official_news(
             detail = f"{q4_warning}; {detail}"
         return [], detail
     return events, q4_warning
-
-
-def _extract_review_facts(company: str, title: str, detail_text: str) -> dict | None:
-    """Extract only the bounded, deterministic facts needed for manual review."""
-
-    if not (
-        company == "Transocean"
-        and "300 Million Contract" in title
-        and re.search(r"\b(?:ONGC|Oil and Natural Gas Corporation)\b", detail_text, re.I)
-        and re.search(r"\bIndia\b", detail_text, re.I)
-        and re.search(r"\b(?:first quarter(?: of)?|Q1)\s+2027\b", detail_text, re.I)
-        and re.search(r"\b(?:two|2)[- ]year\b", detail_text, re.I)
-        and re.search(r"binding\s+Letter of Award", detail_text, re.I)
-        and re.search(r"two years of priced options", detail_text, re.I)
-        and re.search(r"\$?300\s+million", detail_text, re.I)
-        and re.search(r"inclusive of additional services and mobilization fees", detail_text, re.I)
-    ):
-        return None
-    facts = {
-        "counterparty": "ONGC",
-        "location": "India",
-        "expectedStart": "Q1 2027",
-        "startPrecision": "quarter",
-        "awardType": "binding-letter-of-award",
-        "awardTermYears": 2,
-        "optionTermYears": 2,
-        "announcedValueUsdApprox": 300_000_000,
-        "valueIncludes": ["additional services", "mobilization fee"],
-        "exactDatesInferred": False,
-        "dayRateInferred": False,
-    }
-    # This remains a bounded rule for this release, not a general news reader.
-    # Preserve the source's approximate option horizon, never synthesize a day.
-    option_end = re.search(r"into\s+early\s+(\d{4})", detail_text, re.I)
-    if option_end:
-        facts["optionEndIfFullyExercised"] = f"early {option_end.group(1)}"
-    facts["dayRateDisclosure"] = (
-        "not-extracted"
-        if re.search(r"\b(?:day[ -]?rate|daily rate|per day)\b", detail_text, re.I)
-        else "undisclosed"
-    )
-    return facts
 
 
 def _collect_q4_news(
@@ -532,14 +500,15 @@ def _collect_q4_news(
             )
         )
         matched_vessels = [name for name in vessel_names if name.casefold() in text.casefold()]
-        if not matched_vessels:
-            try:
-                detail = clean_text(BeautifulSoup(client.get(url).text, "lxml").get_text(" "))
-                matched_vessels = [
-                    name for name in vessel_names if name.casefold() in detail.casefold()
-                ]
-            except Exception:
-                pass
+        body_hash = None
+        article_error = None
+        try:
+            detail, body_hash = fetch_article(client, url)
+            matched_vessels = [
+                name for name in vessel_names if name.casefold() in detail.casefold()
+            ]
+        except Exception as error:
+            article_error = _error_summary(error)
         raw_date = clean_text(item.get("PressReleaseDate"))
         try:
             published_at = datetime.strptime(raw_date, "%m/%d/%Y %H:%M:%S").date().isoformat()
@@ -554,6 +523,8 @@ def _collect_q4_news(
                 "vessels": matched_vessels,
                 "classification": "official-news-signal",
                 "autoApplied": False,
+                "articleSha256": body_hash,
+                "articleReadError": article_error,
             }
         )
         if len(events) >= limit:

@@ -19,6 +19,7 @@ from .core import (
     validate_iso_date,
 )
 from .model import ParseResult, SourceDocument
+from .news_review import reconcile_reviews
 from .parsers import (
     parse_noble_pdf,
     parse_seadrill_pdf,
@@ -306,6 +307,9 @@ def _restore_verified_history_rate(
 
 
 def _event_identity(event: dict[str, Any]) -> tuple[str, ...]:
+    if event.get("classification") == "official-news-signal" and event.get("title"):
+        # The corporate/IR mirrors use different URLs for the same issuer release.
+        return (str(event.get("company")), "official-news-signal", str(event["title"]).casefold())
     url = str(event.get("url") or "")
     if url:
         return (str(event.get("company") or ""), str(event.get("classification") or ""), url)
@@ -332,6 +336,9 @@ def _merge_news_events(
         identity = _event_identity(event)
         prior = merged.get(identity, {})
         combined = {**prior, **event}
+        if not event.get("articleSha256") and prior.get("articleSha256"):
+            # A transient detail-page error cannot revoke verified awards.
+            combined["articleSha256"] = prior["articleSha256"]
         prior_vessels = prior.get("vessels")
         current_vessels = event.get("vessels")
         combined["vessels"] = sorted(
@@ -484,6 +491,7 @@ def _build_outputs(
     root: Path,
     *,
     offline: bool,
+    include_news_reviews: bool = True,
 ) -> tuple[
     list[dict[str, Any]],
     list[SourceDocument],
@@ -596,6 +604,11 @@ def _build_outputs(
             )
             merged_events = _merge_news_events(previous_company_news, events)
             news_events.extend(merged_events)
+            article_errors = [event for event in events if event.get("articleReadError")
+                              and (_parse_event_date(event.get("publishedAt")) or date.min).isoformat() > report_date]
+            if article_errors:
+                source_health[spec.company]["newsMonitor"] = "degraded-article-read"
+                monitor_warnings.extend(f"{spec.company} article unreadable: {event['url']}: {event['articleReadError']}" for event in article_errors)
             if error:
                 preserved_count = len(previous_company_news)
                 source_health[spec.company]["newsMonitor"] = (
@@ -757,6 +770,26 @@ def _build_outputs(
         pending_events,
         {company: report_date for company, (_, report_date) in parsed.items()},
     )
+    if include_news_reviews:
+        pending_events, review_warnings = reconcile_reviews(
+            root, fleet, pending_events,
+            {company: report_date for company, (_, report_date) in parsed.items()},
+        )
+        monitor_warnings.extend(review_warnings)
+    live_contract_ids = {c["id"] for ship in fleet for c in ship["contracts"]}
+    observations = [o for o in observations if not o.get("canonicalContractId") or o["canonicalContractId"] in live_contract_ids]
+    for ship in fleet:
+        for contract in ship["contracts"]:
+            if contract.get("newsReviewed"):
+                # News provenance lives alongside PDF/SEC observations.
+                observations = [o for o in observations if o.get("canonicalContractId") != contract["id"]]
+                observations.append({"company": ship["company"], "vesselId": ship["id"], "vessel": ship["name"],
+                                     "canonicalContractId": contract["id"], "provenanceClass": "official-news-codex-reviewed",
+                                     "sourceUrl": contract["sourceUrl"], "reportDate": contract["sourcePublishedAt"],
+                                     "sourceSha256": contract["sourceSha256"],
+                                     "day_rate": contract["dayRate"],
+                                     "rate_disclosure": "reported" if contract["dayRate"] else "undisclosed",
+                                     **contract})
     pending_events.sort(
         key=lambda item: (
             str(item.get("company", "")),
@@ -843,6 +876,12 @@ def run(root: Path, *, write: bool, offline: bool = False) -> dict[str, Any]:
         "warningsCount": len(warnings),
         "eventCount": len(events),
         "pendingEventCount": sum(event.get("pendingReview") is True for event in events),
+        "newsReview": {
+            "engine": "Codex CLI / ChatGPT login", "model": "gpt-6-luna",
+            "reasoningEffort": "medium", "fast": False,
+            "reviewedVesselEvents": sum(bool(e.get("llmReview")) and bool(e.get("vessel")) for e in events),
+            "detailsIncompleteCount": sum(bool(e.get("needsDetails")) for e in events),
+        },
     }
     changes = {
         "generatedAt": generated_at,

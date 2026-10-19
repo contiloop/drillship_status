@@ -22,7 +22,7 @@ from automation.fleet_sync.pipeline import (
     _validate_contract_coverage,
 )
 from automation.fleet_sync import sources as source_module
-from automation.fleet_sync.sources import HttpClient, SOURCE_SPECS, _extract_review_facts
+from automation.fleet_sync.sources import HttpClient, SOURCE_SPECS, fetch_article
 
 
 def _observation() -> ContractObservation:
@@ -231,49 +231,18 @@ def test_obsolete_content_addressed_payloads_are_pruned(tmp_path) -> None:
     ]
 
 
-def test_kg2_review_facts_do_not_infer_dates_or_dayrate() -> None:
-    text = (
-        "Transocean announced a two-year binding Letter of Award for the "
-        "Dhirubhai Deepwater KG2 with ONGC in India. The campaign is expected "
-        "to commence in the first quarter of 2027 and contribute approximately "
-        "$300 million, inclusive of additional services and mobilization fees. "
-        "The contract includes two years of priced options that, if fully exercised, "
-        "would result in the drillship working in India into early 2031."
-    )
-    facts = _extract_review_facts(
-        "Transocean",
-        "Transocean Ltd. Announces $300 Million Contract For Ultra-Deepwater Drillship",
-        text,
-    )
-    assert facts == {
-        "counterparty": "ONGC",
-        "location": "India",
-        "expectedStart": "Q1 2027",
-        "startPrecision": "quarter",
-        "awardType": "binding-letter-of-award",
-        "awardTermYears": 2,
-        "optionTermYears": 2,
-        "announcedValueUsdApprox": 300_000_000,
-        "valueIncludes": ["additional services", "mobilization fee"],
-        "exactDatesInferred": False,
-        "dayRateInferred": False,
-        "optionEndIfFullyExercised": "early 2031",
-        "dayRateDisclosure": "undisclosed",
-    }
-    # A changed release mentioning a rate must not be labelled undisclosed.
-    updated = _extract_review_facts(
-        "Transocean",
-        "Transocean Ltd. Announces $300 Million Contract For Ultra-Deepwater Drillship",
-        text + " A daily rate is now provided in the fleet report.",
-    )
-    assert updated["dayRateDisclosure"] == "not-extracted"
-    assert "dayRateUsd" not in updated
-    without_option_end = _extract_review_facts(
-        "Transocean",
-        "Transocean Ltd. Announces $300 Million Contract For Ultra-Deepwater Drillship",
-        text.replace("into early 2031", "for a longer period"),
-    )
-    assert "optionEndIfFullyExercised" not in without_option_end
+def test_news_reader_extracts_article_not_navigation_or_scripts() -> None:
+    class Client:
+        def get(self, url):
+            return _response(url, 200, (
+                '<nav>unrelated stock data</nav><article class="news">'
+                + 'An official contract announcement with source terms. ' * 10
+                + '<script>untrusted script</script></article>'
+            ).encode())
+    text, sha = fetch_article(Client(), "https://www.deepwater.com/news/detail?ID=1")
+    assert "official contract" in text
+    assert "unrelated stock" not in text and "untrusted script" not in text
+    assert len(sha) == 64
 
 
 class _FakeSession:

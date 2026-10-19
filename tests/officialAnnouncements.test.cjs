@@ -80,6 +80,20 @@ test('a missing option horizon is not computed and reported rates remain separat
   assert.equal(Object.fromEntries(announcementDetails({ ...kg2, facts: { ...facts, dayRateUsd: 0 } })).Dayrate, '확인된 정보 없음');
 });
 
+test('Codex-reviewed incomplete terms are distinct from unread articles', () => {
+  const reviewed = { ...kg2, pendingReview: false, reviewStatus: 'details-incomplete',
+    llmReview: { model: 'gpt-6-luna', reasoningEffort: 'medium', fast: false, reviewedAt: '2026-10-20T00:00:00Z' },
+    facts: { ...kg2.facts, expectedStart: 'H1 2027', startPrecision: 'half-year', termText: '기본 880일', optionText: '추가 최대 880일', valueText: '약 4.2억 달러 · 이동 포함 · 서비스 제외' } };
+  const html = render(reviewed);
+  assert.match(html, /원문 확인 · 상세 조건 미공개/);
+  assert.match(html, /2027년 상반기 예정/);
+  assert.match(html, /기본 880일|추가 최대 880일/);
+  assert.match(html, /gpt-6-luna.*medium.*Fast off/);
+  assert.match(render({ ...reviewed, autoApplied: true }), /Codex 대조 · 계약표 반영/);
+  assert.match(render({ ...reviewed, reviewStatus: 'conflict' }), /계약 대조 충돌/);
+  assert.match(render({ ...kg2, llmReview: undefined }), /원문 대조 대기/);
+});
+
 test('generated feed renders separately without mutating fleet or announcement data', () => {
   const manifest = JSON.parse(fs.readFileSync('public/data/manifest.json', 'utf8'));
   const { events } = JSON.parse(fs.readFileSync(`public/data/${manifest.eventsFile}`, 'utf8'));

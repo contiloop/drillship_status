@@ -101,6 +101,10 @@ def merge_completed_history(
     observed_intervals.sort()
 
     for contract in existing:
+        if contract.get("newsReviewed") and contract.get("endDate", "") >= report_date:
+            # Replay source-bound news overlays after the authoritative FSR;
+            # never absorb an overlay into source-less legacy history.
+            continue
         if contract.get("status") != "Firm":
             continue
         start_day = date.fromisoformat(contract.get("startDate", ""))

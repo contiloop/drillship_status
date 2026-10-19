@@ -135,9 +135,9 @@ export default function App() {
 
   const economicUtilization = totalPossibleDays > 0 ? Math.round((totalContractDays / totalPossibleDays) * 100) : 0;
   const recentEvents = [...officialEvents]
-    .filter(event => event.pendingReview !== false && !event.autoApplied)
-    .sort((a, b) => (Date.parse(b.publishedAt || '') || 0) - (Date.parse(a.publishedAt || '') || 0))
-    .slice(0, 5);
+    .filter(event => Boolean(event.llmReview && event.vessel) || (event.pendingReview !== false && !event.autoApplied))
+    .filter(event => activeTab === 'overview' || event.company.toLowerCase() === activeTab)
+    .sort((a, b) => (Date.parse(b.publishedAt || '') || 0) - (Date.parse(a.publishedAt || '') || 0));
   const reportSources = [...(manifest?.sources ?? [])]
     .sort((a, b) => a.company.localeCompare(b.company));
   const reportDates = reportSources.map(source => source.reportDate).sort();
@@ -199,7 +199,7 @@ export default function App() {
         <div className="pt-8 border-t border-slate-800 opacity-50">
           <div className="hidden md:block p-4 bg-slate-800/30 rounded-2xl">
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Auto Sync</p>
-            <p className="text-[10px] text-slate-400">Official FSR, SEC and IR sources are checked every six hours.</p>
+            <p className="text-[10px] text-slate-400">6시간마다 공식 자료 수집 · 뉴스는 로컬 Codex로 원문 대조 (Mac·앱 실행 필요).</p>
           </div>
         </div>
       </div>
@@ -235,7 +235,7 @@ export default function App() {
             )}
             {manifest?.generatedAt && (
               <p className="text-[11px] text-slate-600 mt-2">
-                Generated {new Date(manifest.generatedAt).toLocaleString()} · {manifest.contractCount} contract records · 상세 조건 미확정 공지 {manifest.pendingEventCount}건
+                Generated {new Date(manifest.generatedAt).toLocaleString()} · {manifest.contractCount} contract records · 대조 대기·충돌 {manifest.pendingEventCount}건{manifest.newsReview ? ` · Codex 원문 대조 ${manifest.newsReview.reviewedVesselEvents}건` : ''}
               </p>
             )}
             {syncError && <p className="text-[11px] text-amber-500/80 mt-2">Live sync fallback: {syncError}</p>}
@@ -261,12 +261,12 @@ export default function App() {
 
         {(activeTab === 'overview' || activeTab === 'transocean' || activeTab === 'valaris' || activeTab === 'noble' || activeTab === 'seadrill') ? (
           <div className="space-y-10 max-w-7xl">
-            {activeTab === 'overview' && recentEvents.length > 0 && (
+            {recentEvents.length > 0 && (
               <section className="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 shadow-xl">
                 <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2 mb-5">
                   <div>
-                    <h3 className="text-lg font-black text-white">공식 발표 · 상세 조건 미확정</h3>
-                    <p className="text-sm leading-relaxed text-slate-400 mt-2">공식 자료에서 확인된 조건을 먼저 보여줍니다. 승인 대기가 아니라, 상세 조건이 추가로 공개되기를 기다리는 항목입니다.</p>
+                    <h3 className="text-lg font-black text-white">공식 발표 · Codex 계약 대조</h3>
+                    <p className="text-sm leading-relaxed text-slate-400 mt-2">원문을 읽고 기존 계약과 비교합니다. 확인된 변경은 계약표에 반영하고, 날짜·일당이 미공개인 조건은 별도 공지로 보존합니다. 원문 대조 대기와 실제 미공개를 구분합니다.</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">

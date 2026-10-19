@@ -13,6 +13,10 @@ export interface Contract {
   client: string;
   region: string;
   status: ContractStatus;
+  newsReviewed?: boolean;
+  sourceUrl?: string;
+  sourcePublishedAt?: string;
+  datePrecision?: { start: string; end: string };
 }
 
 export interface Drillship {
@@ -54,6 +58,7 @@ export interface FleetManifest {
   sources: FleetSource[];
   warningsCount: number;
   pendingEventCount: number;
+  newsReview?: { engine: string; model: string; reasoningEffort: string; fast: boolean; reviewedVesselEvents: number; detailsIncompleteCount: number };
 }
 
 export interface OfficialEvent {
@@ -66,7 +71,9 @@ export interface OfficialEvent {
   classification: string;
   autoApplied: boolean;
   pendingReview?: boolean;
-  reviewStatus?: 'pending' | 'acknowledged' | 'date-unverified' | 'applied';
+  reviewStatus?: 'pending' | 'acknowledged' | 'date-unverified' | 'applied' | 'details-incomplete' | 'reviewed' | 'conflict' | 'superseded' | 'covered-by-report' | 'not-contract-news';
+  needsDetails?: boolean;
+  llmReview?: { engine: string; model: string; reasoningEffort: string; fast: boolean; reviewedAt: string };
   start?: string;
   end?: string;
   reason?: string;
@@ -82,6 +89,10 @@ export interface OfficialEvent {
     optionEndIfFullyExercised?: string;
     announcedValueUsdApprox?: number;
     valueIncludes?: string[];
+    valueExcludes?: string[];
+    termText?: string;
+    optionText?: string;
+    valueText?: string;
     dayRateDisclosure?: 'reported' | 'undisclosed' | 'not-extracted';
     dayRateUsd?: number;
     exactDatesInferred?: boolean;

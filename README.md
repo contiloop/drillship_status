@@ -17,7 +17,25 @@ Transocean, Valaris, Noble, Seadrill의 공식 fleet status report와 공식 IR/
 
 ## 공식 발표 카드
 
-화면의 **공식 발표 · 상세 조건 미확정** 카드는 고객·지역, 수주 형태, 시작 시점, 기본 기간, 옵션, 계약 가치, dayrate와 원문 출처를 항목별로 표시합니다. 분기/월 단위 날짜는 그대로 유지하며, 미공개 값과 아직 추출하지 못한 값은 구분합니다. 이 공지는 승인 대기가 아니며 계약표·가동률·평균 dayrate 계산과 분리됩니다. 기사 해석에 LLM을 호출하지 않으며, KG2 상세 추출은 해당 공식 발표에 한정된 규칙입니다.
+화면의 **공식 발표 · Codex 계약 대조** 카드는 고객·지역, 수주 형태, 시작 시점, 기본 기간, 옵션, 계약 가치, dayrate와 원문 출처를 표시합니다. 원문 대조 대기/충돌, Codex 대조 완료, 계약표 반영을 구분합니다. 분기·반기·일당 미공개 조건은 별도 공지로 보존하며 승인 대기가 아닙니다. 기간이 충분히 특정된 확정 계약·옵션 행사만 계약표에 반영합니다.
+
+## Codex 뉴스 원문 대조 (API 아님)
+
+Mac의 Codex 자동화가 6시간마다 아래 명령을 실행합니다. Mac이 켜져 있고 Codex 앱이 실행 중이어야 합니다. GitHub Actions의 PDF/뉴스 수집은 이 Mac과 독립적으로 계속 실행되지만 **새 기사 해석은 로컬 Codex 실행이 필요합니다**.
+
+```bash
+codex login                         # ChatGPT 계정 로그인 (API key 로그인 불가)
+.venv/bin/python -m automation.update_news
+```
+
+재설치 시 Python 3.12, Node 22, Codex CLI 0.162.1 이상을 설치하고 위 로컬 실행 절차로 의존성을 복원한 뒤 Codex 앱에서 이 프로젝트에 6시간 주기 자동화를 등록합니다. 실행 프롬프트는 `.venv/bin/python -m automation.update_news`를 호출하면 됩니다. 인증 파일을 GitHub secret으로 복사하지 않습니다.
+
+- `codex_reader.py`: ChatGPT 인증 여부 확인, `gpt-6-luna`, `model_reasoning_effort=medium`, `service_tier=default`(Fast off)를 실행마다 명시. API 키 환경 변수 제거. 원문+기존 계약을 입력하며 도구/쓰기 권한 없는 읽기 전용 실행으로 구조화 JSON만 받습니다.
+- `news_review.py`: 원문 SHA-256, 선박 registry, 원문 직접 인용, 날짜 정밀도, 일당 공개 여부를 검증하고 결정론적으로 대조합니다. 모델 출력이 임의 파일 편집이나 배포 명령이 될 수 없습니다.
+- `data/news/reviews.json`: 기사별 Codex 해석·직접 인용·모델 설정·확인 시각을 보존합니다. 원문·기존 계약·이전 발표·읽기 지침이 같으면 재호출하지 않고, 변경되면 다시 읽습니다. 기사 시점보다 앞선 증거만 비교에 사용하여 자기 자신의 수정 내용을 다시 근거로 삼지 않습니다. 후속 FSR이 발표일을 넘으면 FSR을 우선합니다.
+- `update_news.py`: 임시 clone에서 수집/대조/테스트/빌드 후 데이터 경로만 커밋·push하고 실제 Vercel manifest/payload를 확인합니다. 사용자의 작업 파일은 수정하지 않습니다. 동시 push 충돌은 강제 덮어쓰기 없이 실패하고 다음 실행에서 최신 main으로 재시도합니다.
+- Transocean은 IR 호스트의 403을 우회 조작하지 않고 같은 발행사의 `https://www.deepwater.com/news` 공식 원문을 사용합니다.
+- 미공개 일당을 계약 가치÷기간으로 채우지 않습니다. 분기·반기 시작을 특정 날짜로 바꾸지 않습니다. 기존 옵션 행사와 새 수주를 구별하고, 합산 수주액을 개별 선박에 중복 배정하지 않습니다.
 
 ## 공식 원천
 
