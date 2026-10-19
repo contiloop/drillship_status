@@ -504,14 +504,22 @@
     "yearBuilt": 2008,
     "contracts": [
       {
-        "vesselId": "west-capella",
         "startDate": "2026-03-01",
-        "endDate": "2027-08-31",
+        "endDate": "2028-02-29",
         "dayRate": 0,
         "client": "PTTEP",
         "region": "Malaysia",
         "status": "Firm",
-        "id": "west-capella-80422e397b"
+        "sourceUrl": "https://ir.seadrill.com/news/news-details/2026/Seadrill-Announces-Contract-Awards-and-Extensions-in-Indonesia-Malaysia-Angola-and-the-U-S--Gulf/default.aspx",
+        "sourcePublishedAt": "2026-10-12",
+        "sourceSha256": "6f9a6cfef5ed1ea521cb3c582fe7f7ab37672b934672b7533e2f70c78b1b6943",
+        "datePrecision": {
+          "start": "month",
+          "end": "month"
+        },
+        "newsReviewed": true,
+        "id": "west-capella-80422e397b",
+        "vesselId": "west-capella"
       }
     ]
   },
@@ -721,14 +729,22 @@
         "id": "sonangol-libongos-3adb0be48f"
       },
       {
-        "vesselId": "sonangol-libongos",
         "startDate": "2027-03-01",
         "endDate": "2030-01-31",
         "dayRate": 0,
         "client": "Undisclosed",
         "region": "Angola",
-        "status": "Option",
-        "id": "sonangol-libongos-ab56518373"
+        "status": "Firm",
+        "sourceUrl": "https://ir.seadrill.com/news/news-details/2026/Seadrill-Announces-Contract-Awards-and-Extensions-in-Indonesia-Malaysia-Angola-and-the-U-S--Gulf/default.aspx",
+        "sourcePublishedAt": "2026-10-12",
+        "sourceSha256": "6f9a6cfef5ed1ea521cb3c582fe7f7ab37672b934672b7533e2f70c78b1b6943",
+        "datePrecision": {
+          "start": "month",
+          "end": "month"
+        },
+        "newsReviewed": true,
+        "id": "sonangol-libongos-75324c4808",
+        "vesselId": "sonangol-libongos"
       }
     ]
   },

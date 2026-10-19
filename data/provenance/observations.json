@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-13T00:48:51Z",
+  "generatedAt": "2026-10-19T16:39:45Z",
   "parserVersion": "2026.09.04.1",
   "observations": [
     {
@@ -651,26 +651,6 @@
     },
     {
       "company": "Seadrill",
-      "vesselId": "west-capella",
-      "vessel": "West Capella",
-      "canonicalContractId": "west-capella-80422e397b",
-      "provenanceClass": "official-current-report",
-      "sourceSha256": "b774357daafdb62dcc8c371fe5f5d118fb8d7d51c91badd05cd6cae3c9a39cb1",
-      "sourceUrl": "https://www.seadrill.com/wp-content/uploads/2026/08/Seadrill-Fleet-Status-Report-August-2026-vF.pdf",
-      "reportDate": "2026-08-10",
-      "client": "PTTEP",
-      "region": "Malaysia",
-      "start_date": "2026-03-01",
-      "end_date": "2027-08-31",
-      "day_rate": 0,
-      "status": "Firm",
-      "page": 3,
-      "row": "row=6,slot=1",
-      "date_precision": "month",
-      "rate_disclosure": "undisclosed"
-    },
-    {
-      "company": "Seadrill",
       "vesselId": "west-carina",
       "vessel": "West Carina",
       "canonicalContractId": "west-carina-060af7d14a",
@@ -933,26 +913,6 @@
       "status": "Firm",
       "page": 4,
       "row": "row=7,slot=1",
-      "date_precision": "month",
-      "rate_disclosure": "undisclosed"
-    },
-    {
-      "company": "Seadrill",
-      "vesselId": "sonangol-libongos",
-      "vessel": "Sonangol Libongos",
-      "canonicalContractId": "sonangol-libongos-ab56518373",
-      "provenanceClass": "official-current-report",
-      "sourceSha256": "b774357daafdb62dcc8c371fe5f5d118fb8d7d51c91badd05cd6cae3c9a39cb1",
-      "sourceUrl": "https://www.seadrill.com/wp-content/uploads/2026/08/Seadrill-Fleet-Status-Report-August-2026-vF.pdf",
-      "reportDate": "2026-08-10",
-      "client": "Undisclosed",
-      "region": "Angola",
-      "start_date": "2027-03-01",
-      "end_date": "2030-01-31",
-      "day_rate": 0,
-      "status": "Option",
-      "page": 4,
-      "row": "priced-option-through-comments",
       "date_precision": "month",
       "rate_disclosure": "undisclosed"
     },
@@ -2440,6 +2400,56 @@
       "operationalNote": "Listed in the official stacked-rig section",
       "page": 4,
       "row": "row=3"
+    },
+    {
+      "company": "Seadrill",
+      "vesselId": "west-capella",
+      "vessel": "West Capella",
+      "canonicalContractId": "west-capella-80422e397b",
+      "provenanceClass": "official-news-codex-reviewed",
+      "sourceUrl": "https://ir.seadrill.com/news/news-details/2026/Seadrill-Announces-Contract-Awards-and-Extensions-in-Indonesia-Malaysia-Angola-and-the-U-S--Gulf/default.aspx",
+      "reportDate": "2026-10-12",
+      "sourceSha256": "6f9a6cfef5ed1ea521cb3c582fe7f7ab37672b934672b7533e2f70c78b1b6943",
+      "day_rate": 0,
+      "rate_disclosure": "undisclosed",
+      "startDate": "2026-03-01",
+      "endDate": "2028-02-29",
+      "dayRate": 0,
+      "client": "PTTEP",
+      "region": "Malaysia",
+      "status": "Firm",
+      "sourcePublishedAt": "2026-10-12",
+      "datePrecision": {
+        "start": "month",
+        "end": "month"
+      },
+      "newsReviewed": true,
+      "id": "west-capella-80422e397b"
+    },
+    {
+      "company": "Seadrill",
+      "vesselId": "sonangol-libongos",
+      "vessel": "Sonangol Libongos",
+      "canonicalContractId": "sonangol-libongos-75324c4808",
+      "provenanceClass": "official-news-codex-reviewed",
+      "sourceUrl": "https://ir.seadrill.com/news/news-details/2026/Seadrill-Announces-Contract-Awards-and-Extensions-in-Indonesia-Malaysia-Angola-and-the-U-S--Gulf/default.aspx",
+      "reportDate": "2026-10-12",
+      "sourceSha256": "6f9a6cfef5ed1ea521cb3c582fe7f7ab37672b934672b7533e2f70c78b1b6943",
+      "day_rate": 0,
+      "rate_disclosure": "undisclosed",
+      "startDate": "2027-03-01",
+      "endDate": "2030-01-31",
+      "dayRate": 0,
+      "client": "Undisclosed",
+      "region": "Angola",
+      "status": "Firm",
+      "sourcePublishedAt": "2026-10-12",
+      "datePrecision": {
+        "start": "month",
+        "end": "month"
+      },
+      "newsReviewed": true,
+      "id": "sonangol-libongos-75324c4808"
     }
   ]
 }
