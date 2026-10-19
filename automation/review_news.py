@@ -6,13 +6,13 @@ The scheduler calls this command; the model has no write or deployment tools.
 from __future__ import annotations
 
 import argparse
-import copy
 import json
 from pathlib import Path
 
-from .fleet_sync.codex_reader import PROMPT, SCHEMA, CodexReader
-from .fleet_sync.core import content_hash, dump_json
-from .fleet_sync.news_review import MODEL, REVIEW_PATH, REVIEW_VERSION, event_date, read_reviews, reconcile_reviews, validate_reading
+from .fleet_sync.codex_reader import CodexReader
+from .fleet_sync.core import dump_json
+from .fleet_sync.news_jobs import eligible_events, reading_context, reading_needed
+from .fleet_sync.news_review import MODEL, REVIEW_PATH, REVIEW_VERSION, event_date, read_reviews, validate_reading
 from .fleet_sync.pipeline import _build_outputs, run
 from .fleet_sync.sources import HttpClient, fetch_article, retrieved_at
 
@@ -22,26 +22,12 @@ def review_news(root: Path, reader=None, *, reread_urls: set[str] | None = None)
     dates = {s.company: s.report_date for s in sources}
     reviews = read_reviews(root)
     client, reader = HttpClient(), reader or CodexReader()
-    reviewed, failures, seen = [], [], set()
-    for event in sorted(events, key=lambda e: (event_date(e.get("publishedAt")) or "", e.get("url", ""))):
-        if event.get("classification") != "official-news-signal":
-            continue
+    reviewed, failures = [], []
+    for event in eligible_events(events, dates):
         published = event_date(event.get("publishedAt"))
-        if not published or published <= dates[event["company"]] or event["url"] in seen:
-            continue
-        seen.add(event["url"])
-        earlier = [r for r in reviews if (r["publishedAt"], r["url"]) < (published, event["url"])
-                   and any(e.get("url") == r["url"] and e.get("articleSha256") == r["sourceSha256"] for e in events)]
-        earlier.sort(key=lambda r: (r["publishedAt"], r["url"]))
-        fleet = copy.deepcopy(baseline)
-        reconcile_reviews(root, fleet, copy.deepcopy(events), dates, reviews=earlier)
-        company_fleet = [s for s in fleet if s["company"] == event["company"]]
-        announcements = [{"publishedAt": r["publishedAt"], "url": r["url"], "result": r["result"]}
-                         for r in earlier if r["company"] == event["company"] and r["publishedAt"] > dates[event["company"]]]
-        context_hash = content_hash({"fleet": company_fleet, "announcements": announcements,
-                                     "readerPolicy": content_hash({"prompt": PROMPT, "schema": SCHEMA})}, length=64)
+        company_fleet, announcements, context_hash = reading_context(root, baseline, events, dates, reviews, event)
         prior = next((r for r in reviews if r["url"] == event["url"]), None)
-        if prior and prior["sourceSha256"] == event.get("articleSha256") and prior.get("contextSha256") == context_hash and prior["version"] == REVIEW_VERSION and not event.get("articleReadError") and event["url"] not in (reread_urls or set()):
+        if not reading_needed(event, prior, context_hash) and not event.get("articleReadError") and event["url"] not in (reread_urls or set()):
             continue
         try:
             print(f"Reading with {MODEL} / medium / fast off: {event['title']}", flush=True)

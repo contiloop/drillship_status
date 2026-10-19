@@ -1,21 +1,25 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  LayoutGrid, Ship, Download, FileJson, Database, BarChart3,
+  LayoutGrid, Ship, Download, FileJson, Database, BarChart3, Newspaper,
   AlertTriangle, TrendingUp, Code
 } from 'lucide-react';
 import { Analytics } from '@vercel/analytics/react';
 import { Drillship, FleetManifest, OfficialEvent } from './types';
 import MarketChart from './components/MarketChart';
 import FleetGantt from './components/FleetGantt';
-import OfficialAnnouncementCard from './components/OfficialAnnouncementCard';
+import Announcements from './components/Announcements';
 import defaultData from './data/data_as_of_26_01_07.json';
 import { countFirmCoveredDays, getComputedStatus } from './utils/shipStatus';
 
 const BASE_URL = import.meta.env.BASE_URL || '/';
 const MANIFEST_URL = `${BASE_URL}data/manifest.json`;
 
-type TabType = 'overview' | 'transocean' | 'valaris' | 'noble' | 'seadrill' | 'readme';
+type TabType = 'overview' | 'transocean' | 'valaris' | 'noble' | 'seadrill' | 'news' | 'readme';
+const tabFromHash = (): TabType => {
+  const tab = window.location.hash.slice(1);
+  return ['overview', 'transocean', 'valaris', 'noble', 'seadrill', 'news', 'readme'].includes(tab) ? tab as TabType : 'overview';
+};
 
 export default function App() {
   const [ships, setShips] = useState<Drillship[]>([]);
@@ -23,8 +27,15 @@ export default function App() {
   const [manifest, setManifest] = useState<FleetManifest | null>(null);
   const [officialEvents, setOfficialEvents] = useState<OfficialEvent[]>([]);
   const [syncError, setSyncError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<TabType>('overview');
+  const [activeTab, setActiveTab] = useState<TabType>(tabFromHash);
   const [utilizationMode, setUtilizationMode] = useState<'fleet' | 'market' | 'economic'>('market');
+
+  useEffect(() => {
+    const onHashChange = () => setActiveTab(tabFromHash());
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+  const selectTab = (tab: TabType) => { window.location.hash = tab; setActiveTab(tab); };
 
   useEffect(() => {
     const loadRemoteData = async () => {
@@ -86,7 +97,7 @@ export default function App() {
         setShips(data as Drillship[]);
         setDataSource('custom');
         alert("데이터를 성공적으로 불러왔습니다.");
-        setActiveTab('overview');
+        selectTab('overview');
       } catch (e) {
         alert("유효하지 않은 파일입니다. JSON 형식을 확인해주세요.");
       }
@@ -134,10 +145,6 @@ export default function App() {
     .reduce((sum, ship) => sum + countFirmCoveredDays(ship, yearStart, todayUtc), 0);
 
   const economicUtilization = totalPossibleDays > 0 ? Math.round((totalContractDays / totalPossibleDays) * 100) : 0;
-  const recentEvents = [...officialEvents]
-    .filter(event => Boolean(event.llmReview && event.vessel) || (event.pendingReview !== false && !event.autoApplied))
-    .filter(event => activeTab === 'overview' || event.company.toLowerCase() === activeTab)
-    .sort((a, b) => (Date.parse(b.publishedAt || '') || 0) - (Date.parse(a.publishedAt || '') || 0));
   const reportSources = [...(manifest?.sources ?? [])]
     .sort((a, b) => a.company.localeCompare(b.company));
   const reportDates = reportSources.map(source => source.reportDate).sort();
@@ -151,8 +158,8 @@ export default function App() {
     <>
       <Analytics />
       <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-blue-500/30">
-        <div className="fixed left-0 top-0 bottom-0 w-20 md:w-64 bg-slate-900 border-r border-slate-800 z-50 flex flex-col items-center md:items-stretch py-8 px-4">
-        <div className="flex items-center gap-3 px-2 mb-12">
+        <div className="fixed left-0 top-0 bottom-0 w-14 md:w-52 bg-slate-900 border-r border-slate-800 z-50 flex flex-col items-center md:items-stretch py-5 px-1 md:px-3">
+        <div className="flex items-center gap-3 px-2 mb-7">
           <div className="bg-blue-600 p-2 rounded-xl shadow-lg shadow-blue-900/40">
             <Ship className="text-white w-6 h-6" />
           </div>
@@ -160,28 +167,28 @@ export default function App() {
         </div>
         
         <nav className="flex-1 space-y-2 overflow-y-auto">
-          <button onClick={() => setActiveTab('overview')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeTab === 'overview' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
+          <button aria-label="계약표" aria-current={activeTab === 'overview' ? 'page' : undefined} onClick={() => selectTab('overview')} className={`w-full flex items-center gap-4 px-3 py-3 rounded-xl transition-all ${activeTab === 'overview' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
             <LayoutGrid size={20} />
-            <span className="hidden md:block font-bold">Dashboard</span>
+            <span className="hidden md:block font-bold">계약표</span>
           </button>
 
           <div className="hidden md:block pt-2 pb-1 px-4">
             <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Companies</p>
           </div>
 
-          <button onClick={() => setActiveTab('transocean')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeTab === 'transocean' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
+          <button aria-label="Transocean" onClick={() => selectTab('transocean')} className={`w-full flex items-center gap-4 px-3 py-3 rounded-xl transition-all ${activeTab === 'transocean' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
             <Ship size={18} />
             <span className="hidden md:block font-bold text-sm">Transocean</span>
           </button>
-          <button onClick={() => setActiveTab('valaris')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeTab === 'valaris' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
+          <button aria-label="Valaris" onClick={() => selectTab('valaris')} className={`w-full flex items-center gap-4 px-3 py-3 rounded-xl transition-all ${activeTab === 'valaris' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
             <Ship size={18} />
             <span className="hidden md:block font-bold text-sm">Valaris</span>
           </button>
-          <button onClick={() => setActiveTab('noble')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeTab === 'noble' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
+          <button aria-label="Noble" onClick={() => selectTab('noble')} className={`w-full flex items-center gap-4 px-3 py-3 rounded-xl transition-all ${activeTab === 'noble' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
             <Ship size={18} />
             <span className="hidden md:block font-bold text-sm">Noble</span>
           </button>
-          <button onClick={() => setActiveTab('seadrill')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeTab === 'seadrill' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
+          <button aria-label="Seadrill" onClick={() => selectTab('seadrill')} className={`w-full flex items-center gap-4 px-3 py-3 rounded-xl transition-all ${activeTab === 'seadrill' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
             <Ship size={18} />
             <span className="hidden md:block font-bold text-sm">Seadrill</span>
           </button>
@@ -190,7 +197,12 @@ export default function App() {
             <div className="border-t border-slate-800"></div>
           </div>
 
-          <button onClick={() => setActiveTab('readme')} className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeTab === 'readme' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
+          <button aria-label="뉴스·공시" aria-current={activeTab === 'news' ? 'page' : undefined} onClick={() => selectTab('news')} className={`w-full flex items-center gap-4 px-3 py-3 rounded-xl transition-all ${activeTab === 'news' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
+            <Newspaper size={20} />
+            <span className="hidden md:block font-bold">뉴스·공시</span>
+          </button>
+
+          <button aria-label="README" onClick={() => selectTab('readme')} className={`w-full flex items-center gap-4 px-3 py-3 rounded-xl transition-all ${activeTab === 'readme' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
             <Database size={20} />
             <span className="hidden md:block font-bold">README</span>
           </button>
@@ -199,49 +211,26 @@ export default function App() {
         <div className="pt-8 border-t border-slate-800 opacity-50">
           <div className="hidden md:block p-4 bg-slate-800/30 rounded-2xl">
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Auto Sync</p>
-            <p className="text-[10px] text-slate-400">6시간마다 공식 자료 수집 · 뉴스는 로컬 Codex로 원문 대조 (Mac·앱 실행 필요).</p>
+            <p className="text-[10px] text-slate-400">6시간마다 공식 자료 확인 · 변경 시 자동 반영</p>
           </div>
         </div>
       </div>
 
-      <main className="flex-1 ml-20 md:ml-64 p-6 md:p-10">
-        <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <main className="min-w-0 flex-1 ml-14 md:ml-52 p-3 md:p-6">
+        <header className="mb-5 flex flex-col md:flex-row md:items-start justify-between gap-3">
           <div>
-            <h2 className="text-3xl font-black text-white tracking-tight">
-              {activeTab === 'overview' && 'Market Overview'}
+            <h2 className="text-2xl font-black text-white tracking-tight">
+              {activeTab === 'overview' && 'Fleet Contracts'}
               {activeTab === 'transocean' && 'Transocean Fleet'}
               {activeTab === 'valaris' && 'Valaris Fleet'}
               {activeTab === 'noble' && 'Noble Fleet'}
               {activeTab === 'seadrill' && 'Seadrill Fleet'}
               {activeTab === 'readme' && 'Database Management'}
+              {activeTab === 'news' && '뉴스·공시'}
             </h2>
-            <p className="text-slate-500 mt-1 font-medium">
-              {activeTab === 'readme' ? 'Offshore Drillship Fleet Status & Pricing Intelligence' :
-               activeTab === 'overview' ? 'Offshore Drillship Fleet Status & Pricing Intelligence' :
-               `${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Drillship Fleet Analysis`}
-            </p>
-            <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900/70 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400">
-              Official sync
-              <span className="text-slate-200">{manifest?.sourceCount ?? 0}/4 verified</span>
-              <span className="text-slate-600">·</span>
-              <span className="text-slate-500">
-                {reportDateRange}
-              </span>
-            </p>
-            {reportSources.length > 0 && (
-              <p className="text-[11px] text-slate-500 mt-2">
-                Sources: {reportSources.map(source => `${source.company} ${source.reportDate}`).join(' · ')}
-              </p>
-            )}
-            {manifest?.generatedAt && (
-              <p className="text-[11px] text-slate-600 mt-2">
-                Generated {new Date(manifest.generatedAt).toLocaleString()} · {manifest.contractCount} contract records · 대조 대기·충돌 {manifest.pendingEventCount}건{manifest.newsReview ? ` · Codex 원문 대조 ${manifest.newsReview.reviewedVesselEvents}건` : ''}
-              </p>
-            )}
+            <p className="mt-2 text-[11px] text-slate-500">{dataSource === 'live' ? `공식 출처 ${manifest?.sourceCount ?? 0}/4` : dataSource === 'custom' ? '사용자 데이터' : '기본 데이터'} · {manifest?.generatedAt ? `갱신 ${new Date(manifest.generatedAt).toLocaleString()}` : '불러오는 중'}</p>
+            {(activeTab === 'news' || activeTab === 'readme') && <p className="mt-2 text-xs text-slate-500">{reportDateRange} · {reportSources.map(source => `${source.company} ${source.reportDate}`).join(' · ')}</p>}
             {syncError && <p className="text-[11px] text-amber-500/80 mt-2">Live sync fallback: {syncError}</p>}
-            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.24em] mt-2">
-              Data source: {dataSource}
-            </p>
           </div>
           {(activeTab === 'overview' || activeTab === 'transocean' || activeTab === 'valaris' || activeTab === 'noble' || activeTab === 'seadrill') && (
             <div className="flex gap-3">
@@ -259,51 +248,25 @@ export default function App() {
           )}
         </header>
 
-        {(activeTab === 'overview' || activeTab === 'transocean' || activeTab === 'valaris' || activeTab === 'noble' || activeTab === 'seadrill') ? (
-          <div className="space-y-10 max-w-7xl">
-            {recentEvents.length > 0 && (
-              <section className="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 shadow-xl">
-                <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2 mb-5">
-                  <div>
-                    <h3 className="text-lg font-black text-white">공식 발표 · Codex 계약 대조</h3>
-                    <p className="text-sm leading-relaxed text-slate-400 mt-2">원문을 읽고 기존 계약과 비교합니다. 확인된 변경은 계약표에 반영하고, 날짜·일당이 미공개인 조건은 별도 공지로 보존합니다. 원문 대조 대기와 실제 미공개를 구분합니다.</p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                  {recentEvents.map((event, index) => (
-                    <div key={`${event.company}-${event.url || event.vessel || index}`} className="min-w-0">
-                      <OfficialAnnouncementCard
-                        event={event}
-                        source={reportSources.find(source => source.company === event.company)}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {activeTab === 'news' ? <Announcements events={officialEvents} sources={reportSources} /> : (activeTab === 'overview' || activeTab === 'transocean' || activeTab === 'valaris' || activeTab === 'noble' || activeTab === 'seadrill') ? (
+          <div className="space-y-5">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
               {[
                 { label: 'Total Fleet', value: totalShips, icon: Ship },
                 { label: 'Avg Dayrate', value: `$${Math.round(avgDayrate/1000)}k`, icon: TrendingUp },
                 { label: 'Cold Stacked', value: coldStacked, icon: AlertTriangle },
               ].map((kpi, idx) => (
-                <div key={idx} className="bg-slate-900/50 p-6 rounded-3xl border border-slate-800 shadow-xl group hover:border-slate-700 transition-all">
-                  <div className={`p-3 rounded-2xl bg-blue-500/10 text-blue-500 w-fit mb-4`}>
-                    <kpi.icon size={24} />
-                  </div>
-                  <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">{kpi.label}</p>
-                  <p className="text-3xl font-black text-white mt-1">{kpi.value}</p>
+                <div key={idx} className="bg-slate-900/50 px-4 py-3 rounded-xl border border-slate-800">
+                  <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">{kpi.label}</p>
+                  <p className="text-xl font-black text-white">{kpi.value}</p>
                 </div>
               ))}
 
               {/* Utilization Card with Tabs */}
-              <div className="bg-slate-900/50 p-6 rounded-3xl border border-slate-800 shadow-xl group hover:border-slate-700 transition-all">
-                <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-500 w-fit mb-4">
-                  <BarChart3 size={24} />
-                </div>
+              <div className="bg-slate-900/50 px-4 py-3 rounded-xl border border-slate-800">
 
                 {/* Tab Buttons */}
-                <div className="flex gap-1 mb-3">
+                <div className="flex gap-1 mb-1">
                   {(['fleet', 'market', 'economic'] as const).map(mode => (
                     <button
                       key={mode}
@@ -320,17 +283,17 @@ export default function App() {
                 </div>
 
                 {/* Display Current Utilization */}
-                <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">
+                <p className="sr-only">
                   {utilizationMode === 'fleet' && 'Fleet Utilization'}
                   {utilizationMode === 'market' && 'Market Utilization'}
                   {utilizationMode === 'economic' && 'Economic Utilization'}
                 </p>
-                <p className="text-3xl font-black text-white mt-1">
+                <p className="text-xl font-black text-white">
                   {utilizationMode === 'fleet' && `${fleetUtilization}%`}
                   {utilizationMode === 'market' && `${marketUtilization}%`}
                   {utilizationMode === 'economic' && `${economicUtilization}%`}
                 </p>
-                <p className="text-[10px] text-slate-600 mt-2 font-bold">
+                <p className="sr-only">
                   {utilizationMode === 'fleet' && `${activeShips} active / ${totalShips} total`}
                   {utilizationMode === 'market' && `${activeShips} active / ${marketedFleet} marketed`}
                   {utilizationMode === 'economic' && `${totalContractDays} days / ${totalPossibleDays} possible`}
@@ -340,8 +303,11 @@ export default function App() {
 
             {filteredShips.length > 0 ? (
               <>
-                <MarketChart ships={filteredShips} />
                 <FleetGantt ships={filteredShips} />
+                <details className="rounded-xl border border-slate-800 p-4">
+                  <summary className="cursor-pointer text-sm font-bold text-slate-400">시장 분석 차트</summary>
+                  <div className="mt-4"><MarketChart ships={filteredShips} /></div>
+                </details>
               </>
             ) : (
               <div className="text-center py-24 bg-slate-900/30 rounded-3xl border border-dashed border-slate-800">
@@ -354,7 +320,7 @@ export default function App() {
                    `No ships found for ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} in the current database.`}
                 </p>
                 {ships.length === 0 && (
-                  <button onClick={() => setActiveTab('readme')} className="mt-6 bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-2xl font-bold transition-all">Go to Upload Guide</button>
+                  <button onClick={() => selectTab('readme')} className="mt-6 bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-2xl font-bold transition-all">Go to Upload Guide</button>
                 )}
               </div>
             )}

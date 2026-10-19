@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-19T16:43:32Z",
+  "generatedAt": "2026-10-19T17:05:02Z",
   "updatedAsOf": "2026-08-10",
   "dataHash": "c045fba043000b4056e5",
-  "stateFingerprint": "0d544aae4bea3e99e6d1",
+  "stateFingerprint": "3e731269b2d55530546e",
   "fleetFile": "fleet.c045fba043000b4056e5.json",
   "eventsFile": "events.9544e9a3aa9b4b265cff.json",
   "eventsHash": "9544e9a3aa9b4b265cff",
@@ -113,6 +113,12 @@
   "warningsCount": 12,
   "eventCount": 41,
   "pendingEventCount": 0,
+  "newsQueue": {
+    "schemaVersion": 1,
+    "pendingCount": 0,
+    "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "jobs": []
+  },
   "newsReview": {
     "engine": "Codex CLI / ChatGPT login",
     "model": "gpt-6-luna",

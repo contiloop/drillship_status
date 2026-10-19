@@ -97,12 +97,12 @@ export default function OfficialAnnouncementCard({ event, source }: { event: Off
   const href = sourceHref(event.url || (isReport ? source?.documentUrl : undefined));
   const publishedAt = publicationLabel(event.publishedAt || (isReport ? source?.reportDate : undefined));
   return (
-    <article className="min-w-0 rounded-2xl border border-slate-700 bg-slate-950/60 p-4 sm:p-6">
-      <div className="flex flex-wrap items-center gap-2 text-sm">
-        <span className="font-bold text-blue-300">{event.company}</span>
-        <span className="rounded-md border border-amber-400/30 bg-amber-400/10 px-2 py-1 text-amber-200">{event.reviewStatus === 'conflict' ? '계약 대조 충돌 · 검토 필요' : event.autoApplied ? 'Codex 대조 · 계약표 반영' : event.llmReview ? (event.needsDetails === false ? '원문 확인 · 대조 완료' : '원문 확인 · 상세 조건 미공개') : '원문 대조 대기'}</span>
-      </div>
-      <h4 className="mt-3 break-words text-lg font-bold text-white">{vessel || event.title || `${event.company} 공식 발표`}</h4>
+    <details className="min-w-0 rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+      <summary className="cursor-pointer rounded text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400">
+        <span className="ml-2 font-bold">{vessel || event.title || `${event.company} 공식 발표`}</span>
+        <span className="ml-3 text-xs text-slate-400">{event.company} · {publishedAt}</span>
+        <span className="ml-3 inline-block text-xs text-amber-200">{event.reviewStatus === 'conflict' ? '조건 충돌 · 확인 필요' : event.autoApplied ? '계약표 반영' : event.llmReview ? (event.needsDetails === false ? '확인 완료' : '상세 조건 미공개') : '확인 대기'}</span>
+      </summary>
       {event.title && vessel && <p className="mt-2 break-words text-sm leading-relaxed text-slate-400">{event.title}</p>}
       <dl className="mt-5 space-y-3">
         {announcementDetails(event).map(([label, value]) => (
@@ -120,8 +120,7 @@ export default function OfficialAnnouncementCard({ event, source }: { event: Off
         ) : <p>출처 원문 링크 확인되지 않음 · {publishedAt}</p>}
         {event.reason && <p className="mt-2 text-slate-300">{event.reason}</p>}
         <p className="mt-2 text-slate-400">{event.autoApplied ? '근거가 확인된 기간·계약 상태를 계약표에 반영했습니다. 월 단위 날짜는 월초·월말로 표시하며 정확한 일자는 아닙니다. 미공개 일당은 평균에서 제외합니다.' : '별도 공지로 표시하며 계약표·가동률·평균 dayrate 계산에는 포함하지 않습니다.'} 계약 가치를 일당으로 환산하지 않습니다.</p>
-        {event.llmReview && <p className="mt-2 text-xs text-slate-500">원문·기존 계약 대조: Codex · {event.llmReview.model} · {event.llmReview.reasoningEffort} · Fast {event.llmReview.fast ? 'on' : 'off'} · {new Date(event.llmReview.reviewedAt).toLocaleString('ko-KR')}</p>}
       </div>
-    </article>
+    </details>
   );
 }

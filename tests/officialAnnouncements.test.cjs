@@ -7,13 +7,18 @@ const { renderToStaticMarkup } = require('react-dom/server');
 
 // Compile just this component for Node tests with the already-installed compiler.
 // No browser, extra test runner, or production loader is needed.
-require.extensions['.tsx'] = (module, filename) => {
+const compile = (module, filename) => {
   const { outputText } = ts.transpileModule(fs.readFileSync(filename, 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true },
   });
   module._compile(outputText, filename);
 };
+require.extensions['.tsx'] = compile;
+require.extensions['.ts'] = compile;
 const { default: Card, announcementDetails } = require('../components/OfficialAnnouncementCard.tsx');
+const { default: Announcements, splitAnnouncements } = require('../components/Announcements.tsx');
+const { default: Gantt } = require('../components/FleetGantt.tsx');
+const { contractSpan, contractPeriod } = require('../utils/contractTimeline.ts');
 const kg2 = {
   company: 'Transocean', vessels: ['Dhirubhai Deepwater KG2'],
   classification: 'official-news-signal', autoApplied: false, pendingReview: true,
@@ -85,14 +90,52 @@ test('Codex-reviewed incomplete terms are distinct from unread articles', () => 
     llmReview: { model: 'gpt-6-luna', reasoningEffort: 'medium', fast: false, reviewedAt: '2026-10-20T00:00:00Z' },
     facts: { ...kg2.facts, expectedStart: 'H1 2027', startPrecision: 'half-year', termText: '기본 880일', optionText: '추가 최대 880일', valueText: '약 4.2억 달러 · 이동 포함 · 서비스 제외' } };
   const html = render(reviewed);
-  assert.match(html, /원문 확인 · 상세 조건 미공개/);
+  assert.match(html, /상세 조건 미공개/);
   assert.match(html, /2027년 상반기 예정/);
   assert.match(html, /기본 880일|추가 최대 880일/);
-  assert.match(html, /gpt-6-luna.*medium.*Fast off/);
+  assert.doesNotMatch(html, /Codex|gpt-6-luna|Fast off/);
   assert.match(render({ ...reviewed, facts: { ...reviewed.facts, expectedStart: 'fourth quarter of 2026' } }), /2026년 4분기/);
-  assert.match(render({ ...reviewed, autoApplied: true }), /Codex 대조 · 계약표 반영/);
-  assert.match(render({ ...reviewed, reviewStatus: 'conflict' }), /계약 대조 충돌/);
-  assert.match(render({ ...kg2, llmReview: undefined }), /원문 대조 대기/);
+  assert.match(render({ ...reviewed, autoApplied: true }), /계약표 반영/);
+  assert.match(render({ ...reviewed, reviewStatus: 'conflict' }), /조건 충돌/);
+  assert.match(render({ ...kg2, llmReview: undefined }), /확인 대기/);
+  assert.match(html, /^<details[^>]*><summary/);
+  assert.doesNotMatch(html, /<details[^>]*\sopen(?:\s|=|>)/);
+});
+
+test('applied announcements are archived and every detail stays collapsed', () => {
+  const manifest = JSON.parse(fs.readFileSync('public/data/manifest.json', 'utf8'));
+  const { events } = JSON.parse(fs.readFileSync(`public/data/${manifest.eventsFile}`, 'utf8'));
+  const grouped = splitAnnouncements(events);
+  assert.equal(grouped.applied.length, 2);
+  assert.equal(grouped.unresolved.length, 6);
+  assert(grouped.unresolved.every(e => !e.autoApplied));
+  const html = renderToStaticMarkup(React.createElement(Announcements, {events, sources: manifest.sources}));
+  assert.match(html, /미반영 조건 6건/);
+  assert.match(html, /계약표 반영 이력 2건/);
+  assert.doesNotMatch(html, /<details[^>]*\sopen(?:\s|=|>)|Codex|gpt-6-luna/);
+});
+
+test('contract bars include month ends and exclude completed or out-of-range contracts', () => {
+  const row = {startDate: '2028-02-01', endDate: '2028-02-29'};
+  assert.deepEqual(contractSpan(row, 2028, 2028), {left: 31 / 366 * 100, width: 29 / 366 * 100});
+  assert.equal(contractSpan({startDate:'2025-01-01',endDate:'2025-12-31'}, 2026, 2028), null);
+  assert.equal(contractSpan({startDate:'2030-01-01',endDate:'2030-12-31'}, 2026, 2028), null);
+  assert.equal(contractSpan({startDate:'2026-02-03',endDate:'2026-02-02'}, 2026, 2028), null);
+  assert.equal(contractPeriod(row), '2028-02 ~ 2028-02');
+  assert.equal(contractPeriod({...row,datePrecision:{start:'day',end:'day'}}), '2028-02-01 ~ 2028-02-29');
+});
+
+test('real applied contracts render as accessible selectable bars without a news feed', () => {
+  const manifest = JSON.parse(fs.readFileSync('public/data/manifest.json', 'utf8'));
+  const fleet = JSON.parse(fs.readFileSync(`public/data/${manifest.fleetFile}`, 'utf8'));
+  const html = renderToStaticMarkup(React.createElement(Gantt, {ships:fleet}));
+  assert.match(html, /West Capella · Firm · PTTEP · 2026-03 ~ 2028-02/);
+  assert.match(html, /Sonangol Libongos · Firm · Undisclosed · 2027-03 ~ 2030-01/);
+  assert.match(html, /aria-pressed="false"/);
+  assert.doesNotMatch(html, /Codex|공식 발표|<article/);
+  const app = fs.readFileSync('App.tsx', 'utf8');
+  assert(app.indexOf('<FleetGantt') < app.indexOf('<MarketChart'));
+  assert.doesNotMatch(app, /Codex 계약 대조|Codex 원문 대조|recentEvents/);
 });
 
 test('generated feed renders separately without mutating fleet or announcement data', () => {

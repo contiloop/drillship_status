@@ -19,7 +19,8 @@ from .core import (
     validate_iso_date,
 )
 from .model import ParseResult, SourceDocument
-from .news_review import reconcile_reviews
+from .news_review import read_reviews, reconcile_reviews
+from .news_jobs import plan_news_jobs, queue_from_events
 from .parsers import (
     parse_noble_pdf,
     parse_seadrill_pdf,
@@ -771,9 +772,17 @@ def _build_outputs(
         {company: report_date for company, (_, report_date) in parsed.items()},
     )
     if include_news_reviews:
+        dates = {company: report_date for company, (_, report_date) in parsed.items()}
+        # Compute against the untouched FSR baseline before replaying news.
+        reviews = read_reviews(root)
+        jobs = {job["url"]: job for job in plan_news_jobs(root, fleet, pending_events, dates, reviews)}
+        for event in pending_events:
+            event.pop("readingJob", None)
+            if event.get("url") in jobs:
+                event["readingJob"] = jobs[event["url"]]
         pending_events, review_warnings = reconcile_reviews(
             root, fleet, pending_events,
-            {company: report_date for company, (_, report_date) in parsed.items()},
+            dates, reviews=reviews,
         )
         monitor_warnings.extend(review_warnings)
     live_contract_ids = {c["id"] for ship in fleet for c in ship["contracts"]}
@@ -842,6 +851,7 @@ def run(root: Path, *, write: bool, offline: bool = False) -> dict[str, Any]:
             "eventsHash": events_hash,
             "sourceHealth": source_health,
             "warningsHash": content_hash(warnings, length=20),
+            "newsQueue": queue_from_events(events),
         },
         length=20,
     )
@@ -876,6 +886,7 @@ def run(root: Path, *, write: bool, offline: bool = False) -> dict[str, Any]:
         "warningsCount": len(warnings),
         "eventCount": len(events),
         "pendingEventCount": sum(event.get("pendingReview") is True for event in events),
+        "newsQueue": queue_from_events(events),
         "newsReview": {
             "engine": "Codex CLI / ChatGPT login", "model": "gpt-6-luna",
             "reasoningEffort": "medium", "fast": False,
