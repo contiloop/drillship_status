@@ -89,6 +89,7 @@ test('Codex-reviewed incomplete terms are distinct from unread articles', () => 
   assert.match(html, /2027년 상반기 예정/);
   assert.match(html, /기본 880일|추가 최대 880일/);
   assert.match(html, /gpt-6-luna.*medium.*Fast off/);
+  assert.match(render({ ...reviewed, facts: { ...reviewed.facts, expectedStart: 'fourth quarter of 2026' } }), /2026년 4분기/);
   assert.match(render({ ...reviewed, autoApplied: true }), /Codex 대조 · 계약표 반영/);
   assert.match(render({ ...reviewed, reviewStatus: 'conflict' }), /계약 대조 충돌/);
   assert.match(render({ ...kg2, llmReview: undefined }), /원문 대조 대기/);

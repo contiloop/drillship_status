@@ -63,6 +63,13 @@ def validate_reading(result: dict, text: str, fleet: list[dict]) -> None:
             if value not in (None, [], "undisclosed") and key not in {"dayRateDisclosure", "startPrecision"} and key not in evidence:
                 raise ValueError(f"missing field evidence: {key}")
         facts = item["facts"]
+        party_quote = evidence.get("counterparty", "")
+        if facts.get("counterparty") and re.search(r"joint venture|subsidiary", party_quote, re.I) and re.search(r"has been awarded", party_quote, re.I):
+            raise ValueError("Counterparty means the CUSTOMER/operator purchasing drilling services, not the drilling contractor, its joint venture or owner receiving the award. This quote identifies a contractor-side recipient. Use null/undisclosed unless the article explicitly names the buying customer; keep existing canonical customer unchanged for a continuation.")
+        narratives = [item["comparison"], *(facts.get(k) for k in ("termText", "optionText", "valueText")),
+                      *(change["reason"] for change in item["changes"])]
+        if any(value and not re.search(r"[가-힣]", value) for value in narratives):
+            raise ValueError("Korean UI language required: comparison, termText, optionText, valueText and change reasons must be written in Korean, not Chinese or English. Keep source quotations verbatim in their original language.")
         if facts["dayRateDisclosure"] != "reported" and facts["dayRateUsd"] is not None:
             raise ValueError("inferred dayrate is forbidden")
         if facts["dayRateDisclosure"] == "reported":

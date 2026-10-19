@@ -8,6 +8,8 @@ function periodLabel(value?: string): string {
   if (!value) return UNKNOWN;
   const quarter = /^Q([1-4])\s+(\d{4})$/i.exec(value);
   if (quarter) return `${quarter[2]}년 ${quarter[1]}분기`;
+  const wordQuarter = /^(first|second|third|fourth) quarter(?: of)? (\d{4})$/i.exec(value);
+  if (wordQuarter) return `${wordQuarter[2]}년 ${['first', 'second', 'third', 'fourth'].indexOf(wordQuarter[1].toLowerCase()) + 1}분기`;
   const half = /^H([12])\s+(\d{4})$/i.exec(value);
   if (half) return `${half[2]}년 ${half[1] === '1' ? '상' : '하'}반기`;
   const month = /^([A-Za-z]{3})[- ](\d{2}|\d{4})$/.exec(value);
@@ -80,7 +82,7 @@ export function announcementDetails(event: OfficialEvent): [string, string][] {
   return [
     ['고객·지역', `${disclosedText(facts?.counterparty, event.llmReview ? '원문 미공개' : '고객 확인되지 않음')} · ${facts?.location === 'India' ? '인도' : disclosedText(facts?.location, event.llmReview ? '원문 미공개' : '지역 확인되지 않음')}`],
     ['수주 형태', award],
-    ['작업 시작', start ? `${periodLabel(start)}${approximateStart ? ' 예정 · 정확한 날짜 미공개' : ''}` : UNKNOWN],
+    ['작업 시작', start ? `${periodLabel(start)}${approximateStart ? ' 예정 · 정확한 날짜 미공개' : ''}` : unknown],
     ['기본 기간', term],
     ['옵션', option],
     ['기본 계약 가치', value],

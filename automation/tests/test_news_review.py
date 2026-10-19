@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import copy
+import re
+from pathlib import Path
 
 import pytest
 
 from automation.fleet_sync.core import dump_json
 from automation.fleet_sync.news_review import (
-    REVIEW_PATH, REVIEW_VERSION, apply_changes, reconcile_reviews, validate_reading,
+    REVIEW_PATH, REVIEW_VERSION, apply_changes, read_reviews, reconcile_reviews, validate_reading,
 )
 from automation.fleet_sync.pipeline import _merge_news_events
 
@@ -58,6 +60,22 @@ def test_exact_quotes_and_known_vessel_required():
 
 def test_inline_html_punctuation_spacing_is_not_a_fabricated_quote():
     validate_reading({"vessels": [item()]}, TEXT.replace("Rig A,", "Rig A ,"), [ship()])
+
+
+def test_non_korean_narrative_is_rejected_before_publication():
+    row = item()
+    row["comparison"] = "本次公告称合同已经延长。"
+    with pytest.raises(ValueError, match="Korean UI language required"):
+        validate_reading({"vessels": [row]}, TEXT, [ship()])
+
+
+def test_contractor_joint_venture_is_not_mislabelled_as_customer():
+    row = item()
+    quote = "OwnerCo, the contractor's joint venture, has been awarded a contract extension."
+    row["facts"]["counterparty"] = "OwnerCo"
+    row["evidence"].append({"field": "counterparty", "quote": quote})
+    with pytest.raises(ValueError, match="CUSTOMER/operator"):
+        validate_reading({"vessels": [row]}, TEXT + quote, [ship()])
 
 
 def test_loa_cannot_become_firm():
@@ -175,3 +193,16 @@ def test_unknown_dayrate_does_not_block_explicit_continuous_firm_extension():
     row["evidence"] = [{"field": "awardType", "quote": text}, {"field": "expectedEnd", "quote": text}]
     with pytest.raises(ValueError, match="Unknown tranche rates do not prevent"):
         validate_reading({"vessels": [row]}, text, [s])
+
+
+def test_saved_real_codex_readings_use_pinned_settings_and_korean_narratives():
+    records = read_reviews(Path(__file__).resolve().parents[2])
+    assert records
+    for record in records:
+        assert record["reader"]["model"] == "gpt-6-luna"
+        assert record["reader"]["reasoningEffort"] == "medium"
+        assert record["reader"]["fast"] is False
+        assert len(record["sourceSha256"]) == 64
+        for row in record["result"]["vessels"]:
+            for text in [row["comparison"], *(row["facts"].get(k) for k in ("termText", "optionText", "valueText"))]:
+                assert not text or re.search(r"[가-힣]", text), (row["vessel"], text)
