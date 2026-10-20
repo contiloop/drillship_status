@@ -5,6 +5,7 @@ import { economicsDetails, timelineContracts } from './newsEconomics';
 
 const DAY = 86_400_000;
 export const GENERATIONS: Generation[] = ['6G', '7G', '7G+', '8G'];
+export const DAYRATE_START_YEAR: Partial<Record<Generation, number>> = { '7G+': 2025 };
 
 export interface DayrateObservation {
   id: string;
@@ -54,6 +55,13 @@ export function dayrateObservations(ships: Drillship[], events: OfficialEvent[],
 export interface TrendPoint { time: number; rate: number; band: [number, number] }
 export interface DayrateTrend { points: TrendPoint[]; bandwidth: number; reason?: string }
 
+/** Apply the display window before fitting so hidden history cannot influence the curve. */
+export function dayrateSeries(observations: DayrateObservation[], generation: Generation, includeBacklog = true) {
+  const fromYear = DAYRATE_START_YEAR[generation];
+  const start = fromYear === undefined ? -Infinity : Date.UTC(fromYear, 0, 1);
+  return observations.filter(p => p.generation === generation && p.time >= start && (includeBacklog || p.basis === 'reported'));
+}
+
 /** Robust LOESS via d3-regression. Band = local sample SD of residuals, NOT a confidence interval. */
 export function dayrateTrend(observations: DayrateObservation[]): DayrateTrend {
   const rows = observations.filter(p => Number.isFinite(p.time + p.rate) && p.rate > 0).sort((a, b) => a.time - b.time);
@@ -78,13 +86,13 @@ export function dayrateTrend(observations: DayrateObservation[]): DayrateTrend {
 /** Diamond area, rather than radius, scales with duration; cap at the 4y+ legend mark. */
 export const durationRadius = (days: number) => 4 * Math.sqrt(Math.max(1, Math.min(1460, days)) / 90);
 
-export function dayrateDomain(rows: DayrateObservation[], trend: TrendPoint[]) {
-  if (!rows.length) return { x: [Date.UTC(2021, 0, 1), Date.UTC(2027, 0, 1)] as [number, number], y: [200_000, 550_000] as [number, number], years: [] as number[], ticks: [] as number[] };
-  const first = new Date(Math.min(...rows.map(p => p.time))).getUTCFullYear();
-  const last = new Date(Math.max(...rows.map(p => p.time))).getUTCFullYear();
+export function dayrateDomain(rows: DayrateObservation[], trend: TrendPoint[], fromYear?: number) {
+  if (!rows.length) return { x: [Date.UTC(fromYear ?? 2021, 0, 1), Date.UTC(fromYear === undefined ? 2027 : fromYear + 1, 0, 1)] as [number, number], y: [200_000, 550_000] as [number, number], years: [] as number[], ticks: [] as number[] };
+  const first = fromYear ?? new Date(Math.min(...rows.map(p => p.time))).getUTCFullYear();
+  const last = Math.max(first, new Date(Math.max(...rows.map(p => p.time))).getUTCFullYear());
   const low = Math.max(0, Math.floor((Math.min(...rows.map(p => p.rate), ...trend.map(p => p.band[0])) - 20_000) / 50_000) * 50_000);
   const high = Math.ceil((Math.max(...rows.map(p => p.rate), ...trend.map(p => p.band[1])) + 20_000) / 50_000) * 50_000;
   const years = Array.from({ length: last - first + 1 }, (_, i) => Date.UTC(first + i, 0, 1));
   const ticks = Array.from({ length: Math.round((high - low) / 50_000) + 1 }, (_, i) => low + i * 50_000);
-  return { x: [Date.UTC(first, 0, 1) - 60 * DAY, Date.UTC(last + 1, 0, 1)] as [number, number], y: [low, high] as [number, number], years, ticks };
+  return { x: [Date.UTC(first, 0, 1) - (fromYear === undefined ? 60 * DAY : 0), Date.UTC(last + 1, 0, 1)] as [number, number], y: [low, high] as [number, number], years, ticks };
 }

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Area, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Scatter, XAxis, YAxis } from 'recharts';
 import type { Drillship, FleetSource, Generation, OfficialEvent } from '../types';
-import { dayrateDomain, dayrateObservations, dayrateTrend, durationRadius, GENERATIONS, type DayrateObservation } from '../utils/dayrateTrends';
+import { DAYRATE_START_YEAR, dayrateDomain, dayrateObservations, dayrateSeries, dayrateTrend, durationRadius, GENERATIONS, type DayrateObservation } from '../utils/dayrateTrends';
 import { contractSource } from '../utils/contractTimeline';
 
 interface Props { ships: Drillship[]; events: OfficialEvent[]; sources: FleetSource[] }
@@ -23,9 +23,10 @@ export default function DayrateTrends({ ships, events, sources }: Props) {
   const [chartSize, setChartSize] = useState({ width: 0, height: 510 });
   const narrow = chartSize.width > 0 && chartSize.width < 600;
   const all = useMemo(() => dayrateObservations(ships, events, sources), [ships, events, sources]);
-  const rows = useMemo(() => all.filter(p => p.generation === generation && (includeBacklog || p.basis === 'reported')), [all, generation, includeBacklog]);
+  const rows = useMemo(() => dayrateSeries(all, generation, includeBacklog), [all, generation, includeBacklog]);
   const trend = useMemo(() => dayrateTrend(rows), [rows]);
-  const domain = dayrateDomain(rows, trend.points);
+  const fromYear = DAYRATE_START_YEAR[generation];
+  const domain = dayrateDomain(rows, trend.points, fromYear);
   const selected = rows.find(p => p.id === selectedId);
   const latest = [...rows].reverse().filter((p, index, list) => list.findIndex(other => other.vessel === p.vessel) === index).slice(0, narrow ? 1 : 3);
   const labels: { id: string; y: number; left: number; right: number }[] = [];
@@ -74,7 +75,7 @@ export default function DayrateTrends({ ships, events, sources }: Props) {
       <label className="flex min-h-10 cursor-pointer items-center gap-2 text-xs text-neutral-400"><input type="checkbox" checked={includeBacklog} onChange={event => { setIncludeBacklog(event.target.checked); setSelectedId(null); saveSetting('dayrateBasis', event.target.checked ? 'all' : 'reported'); }} className="h-4 w-4 accent-[#579bd6]" />백로그 환산 포함</label>
     </div>
     <h3 className="text-2xl font-bold tracking-tight text-neutral-100 sm:text-4xl lg:text-[42px]">{generation} Drillship Dayrates</h3>
-    <p className="mt-2 text-xs text-neutral-400 sm:text-base">Contract start dates · Published dayrates{includeBacklog ? ' & backlog-derived values' : ''}</p>
+    <p className="mt-2 text-xs text-neutral-400 sm:text-base">Contract start dates{fromYear ? ` · ${fromYear} onwards` : ''} · Published dayrates{includeBacklog ? ' & backlog-derived values' : ''}</p>
     <figure className="mt-6" aria-label={`${generation} 계약 구간 ${rows.length}건의 요율 산점도`}>
       <p className="mb-2 text-xs font-semibold text-neutral-200">Dayrate (US$ thousands per day)</p>
       {rows.length ? <div className="h-[340px] min-w-0 sm:h-[430px] lg:h-[510px]">

@@ -9,7 +9,7 @@ const compile = (module, filename) => module._compile(ts.transpileModule(fs.read
 }).outputText, filename);
 require.extensions['.tsx'] = compile;
 require.extensions['.ts'] = compile;
-const { dayrateObservations, dayrateTrend, durationRadius, dayrateDomain, GENERATIONS } = require('../utils/dayrateTrends.ts');
+const { DAYRATE_START_YEAR, dayrateObservations, dayrateSeries, dayrateTrend, durationRadius, dayrateDomain, GENERATIONS } = require('../utils/dayrateTrends.ts');
 const { default: Dayrates } = require('../components/DayrateTrends.tsx');
 const manifest = JSON.parse(fs.readFileSync('public/data/manifest.json', 'utf8'));
 const events = JSON.parse(fs.readFileSync(`public/data/${manifest.eventsFile}`, 'utf8')).events;
@@ -68,6 +68,30 @@ test('all real generation curves are finite and stay within the observed time ra
       assert(p.band[0] <= p.rate && p.band[1] >= p.rate);
     }
   }
+});
+
+test('7G+ starts at 2025 and fits only visible contracts, without changing other generations or source data', () => {
+  const before = JSON.stringify(observations);
+  const start = Date.UTC(2025, 0, 1);
+  const rows = dayrateSeries(observations, '7G+');
+  assert.equal(rows.length, 9);
+  assert(rows.every(p => p.generation === '7G+' && p.time >= start));
+  assert(!rows.some(p => ['Deepwater Pontus', 'Deepwater Poseidon'].includes(p.vessel)));
+  assert.equal(dayrateSeries(observations, '7G+', false).length, 6);
+  const trend = dayrateTrend(rows);
+  assert(trend.points.length >= 4);
+  assert(trend.points.every(p => p.time >= start));
+  const domain = dayrateDomain(rows, trend.points, DAYRATE_START_YEAR['7G+']);
+  assert.equal(domain.x[0], start);
+  assert.equal(domain.years[0], start);
+  assert.equal(dayrateDomain([], [], 2025).x[0], start);
+  for (const gen of ['6G', '7G', '8G']) {
+    assert.deepEqual(dayrateSeries(observations, gen), observations.filter(p => p.generation === gen));
+    assert.equal(DAYRATE_START_YEAR[gen], undefined);
+  }
+  const boundary = sample(2).map((p, i) => ({ ...p, generation: '7G+', time: start - (i ? 0 : 1) }));
+  assert.deepEqual(dayrateSeries(boundary, '7G+').map(p => p.id), ['1']);
+  assert.equal(JSON.stringify(observations), before);
 });
 
 test('insufficient or identical-date samples cannot produce an invented trend', () => {
