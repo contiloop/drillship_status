@@ -167,9 +167,9 @@ export default function App() {
         </div>
         
         <nav className="flex-1 space-y-2 overflow-y-auto">
-          <button aria-label="계약표" aria-current={activeTab === 'overview' ? 'page' : undefined} onClick={() => selectTab('overview')} className={`w-full flex items-center gap-4 px-3 py-3 rounded-xl transition-all ${activeTab === 'overview' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
+          <button aria-label="Fleet Status" aria-current={activeTab === 'overview' ? 'page' : undefined} onClick={() => selectTab('overview')} className={`w-full flex items-center gap-4 px-3 py-3 rounded-xl transition-all ${activeTab === 'overview' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
             <LayoutGrid size={20} />
-            <span className="hidden md:block font-bold">계약표</span>
+            <span className="hidden md:block font-bold">Fleet Status</span>
           </button>
 
           <div className="hidden md:block pt-2 pb-1 px-4">
@@ -220,7 +220,7 @@ export default function App() {
         <header className="mb-5 flex flex-col md:flex-row md:items-start justify-between gap-3">
           <div>
             <h2 className="text-2xl font-black text-white tracking-tight">
-              {activeTab === 'overview' && 'Fleet Contracts'}
+              {activeTab === 'overview' && 'Fleet Status'}
               {activeTab === 'transocean' && 'Transocean Fleet'}
               {activeTab === 'valaris' && 'Valaris Fleet'}
               {activeTab === 'noble' && 'Noble Fleet'}
