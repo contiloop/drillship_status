@@ -18,7 +18,7 @@ require.extensions['.ts'] = compile;
 const { default: Card, announcementDetails } = require('../components/OfficialAnnouncementCard.tsx');
 const { default: Announcements, splitAnnouncements } = require('../components/Announcements.tsx');
 const { default: Gantt } = require('../components/FleetGantt.tsx');
-const { contractSpan, contractPeriod } = require('../utils/contractTimeline.ts');
+const { contractSpan, contractPeriod, quarterScrollOffset } = require('../utils/contractTimeline.ts');
 const kg2 = {
   company: 'Transocean', vessels: ['Dhirubhai Deepwater KG2'],
   classification: 'official-news-signal', autoApplied: false, pendingReview: true,
@@ -32,6 +32,20 @@ const kg2 = {
   },
 };
 const render = (event, source) => renderToStaticMarkup(React.createElement(Card, { event, source }));
+
+test('initial viewport follows the current calendar quarter, not the current month', () => {
+  for (let month = 0; month < 12; month++) {
+    assert.equal(quarterScrollOffset(month, 120, 4800), Math.floor(month / 3) * 120);
+  }
+  assert.equal(quarterScrollOffset(9, 120, 4800), 360); // October is Q4.
+  assert.equal(quarterScrollOffset(0, 120, 4800), 0); // January resets to Q1.
+});
+
+test('initial viewport uses measured timeline width on desktop and narrow layouts', () => {
+  assert.equal(quarterScrollOffset(9, 72, 2624), 328);
+  assert.equal(quarterScrollOffset(9, 72, 2720), 340);
+  assert.equal(quarterScrollOffset(9, 36, 1440), 360);
+});
 
 test('KG2 renders all announced terms without inventing exact dates or a dayrate', () => {
   const details = Object.fromEntries(announcementDetails(kg2));

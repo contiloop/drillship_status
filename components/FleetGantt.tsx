@@ -1,8 +1,8 @@
 
-import React, { useMemo, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Drillship, OfficialEvent } from '../types';
 import { getComputedStatus } from '../utils/shipStatus';
-import { contractPeriod, contractSource, contractSpan } from '../utils/contractTimeline';
+import { contractPeriod, contractSource, contractSpan, quarterScrollOffset } from '../utils/contractTimeline';
 import { economicsDetails, backlogRateLabel, timelineContracts, TimelineContract } from '../utils/newsEconomics';
 
 interface FleetGanttProps {
@@ -32,10 +32,14 @@ export function ContractDetails({ selected, shipName, onClose }: { selected: Tim
 
 const FleetGantt: React.FC<FleetGanttProps> = ({ ships, events = [] }) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const axisRef = useRef<HTMLDivElement>(null);
   const timelineShips = useMemo(() => ships.map(s => ({ ...s, contracts: timelineContracts(s, events) })), [ships, events]);
   const selectedShip = timelineShips.find(s => s.contracts.some(c => c.id === selectedId));
   const selected = selectedShip?.contracts.find(c => c.id === selectedId);
   const now = new Date();
+  const currentYear = now.getFullYear();
+  const quarterMonth = Math.floor(now.getMonth() / 3) * 3;
   const yearStart = new Date(now.getFullYear(), 0, 1);
   
   let maxEndDate = new Date(now.getFullYear() + 2, 11, 31);
@@ -48,6 +52,14 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships, events = [] }) => {
 
   const yearEnd = new Date(maxEndDate.getFullYear(), 11, 31);
   const totalMonths = (yearEnd.getFullYear() - yearStart.getFullYear() + 1) * 12;
+  const fleetViewKey = ships.map(ship => ship.id).join('|');
+
+  useLayoutEffect(() => {
+    if (scrollRef.current && axisRef.current) {
+      scrollRef.current.scrollLeft = quarterScrollOffset(quarterMonth, totalMonths, axisRef.current.clientWidth);
+    }
+    // Reposition only for a new fleet/range/quarter, not a selection or data refresh.
+  }, [currentYear, quarterMonth, totalMonths, fleetViewKey]);
 
   const getGenColor = (gen: string) => {
     switch(gen) {
@@ -63,10 +75,12 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships, events = [] }) => {
     const date = new Date(yearStart.getFullYear(), yearStart.getMonth() + i, 1);
     const quarter = Math.floor(date.getMonth() / 3) + 1;
     const isYearStart = quarter === 1;
+    const isCurrentQuarter = i === quarterMonth;
     quarterMarkers.push({
       percent: (i / totalMonths) * 100,
-      label: isYearStart ? `${date.getFullYear()} Q1` : `Q${quarter}`,
-      isYear: isYearStart
+      label: isYearStart || isCurrentQuarter ? `${date.getFullYear()} Q${quarter}` : `Q${quarter}`,
+      isYear: isYearStart,
+      isCurrent: isCurrentQuarter
     });
   }
 
@@ -94,15 +108,15 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships, events = [] }) => {
         <ContractDetails selected={selected} shipName={selectedShip.name} onClose={() => setSelectedId(null)} />
       )}
       
-      <div role="region" aria-label="선박별 계약 타임라인, 좌우 스크롤" tabIndex={0} className="p-3 md:p-4 overflow-x-auto custom-scrollbar relative focus-visible:outline focus-visible:outline-blue-400">
+      <div ref={scrollRef} role="region" aria-label="선박별 계약 타임라인, 좌우 스크롤" tabIndex={0} className="p-3 md:p-4 overflow-x-auto custom-scrollbar relative focus-visible:outline focus-visible:outline-blue-400">
         <div className="relative" style={{ minWidth: `${minWidth}px` }}>
           
           {/* Header Timeline - Sticky Top */}
           <div className="flex mb-6 border-b border-slate-800 pb-2 sticky top-0 bg-slate-900 z-40">
             <div className="w-40 md:w-64 shrink-0 text-[10px] font-black text-slate-500 uppercase tracking-widest sticky left-0 bg-slate-900 z-50 px-2">Vessel / Spec</div>
-            <div className="flex-1 relative h-6">
+            <div ref={axisRef} className="flex-1 relative h-6">
               {quarterMarkers.map((marker, idx) => (
-                <div key={idx} className={`absolute top-0 text-[9px] flex flex-col ${idx === 0 ? 'items-start' : 'items-center -translate-x-1/2'} ${marker.isYear ? 'text-slate-200 font-bold' : 'text-slate-500'}`} style={{ left: `${marker.percent}%` }}>
+                <div key={idx} className={`absolute top-0 text-[9px] flex flex-col ${idx === 0 || marker.isCurrent ? 'items-start' : 'items-center -translate-x-1/2'} ${marker.isYear || marker.isCurrent ? 'text-slate-200 font-bold' : 'text-slate-500'}`} style={{ left: `${marker.percent}%` }}>
                   <span>{marker.label}</span>
                   <div className={`w-px mt-1 ${marker.isYear ? 'h-3 bg-slate-500' : 'h-1.5 bg-slate-700'}`}></div>
                 </div>
