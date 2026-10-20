@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@vercel/analytics": "^1.6.1",
+    "d3-regression": "2.2.0",
     "lucide-react": "^0.562.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",

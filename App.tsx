@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { lazy, Suspense, useState, useEffect } from 'react';
 import {
   LayoutGrid, Ship, Download, FileJson, Database, BarChart3, Newspaper,
   AlertTriangle, TrendingUp, Code
@@ -12,13 +12,15 @@ import Announcements from './components/Announcements';
 import defaultData from './data/data_as_of_26_01_07.json';
 import { countFirmCoveredDays, getComputedStatus } from './utils/shipStatus';
 
+const DayrateTrends = lazy(() => import('./components/DayrateTrends'));
+
 const BASE_URL = import.meta.env.BASE_URL || '/';
 const MANIFEST_URL = `${BASE_URL}data/manifest.json`;
 
-type TabType = 'overview' | 'transocean' | 'valaris' | 'noble' | 'seadrill' | 'news' | 'readme';
+type TabType = 'overview' | 'transocean' | 'valaris' | 'noble' | 'seadrill' | 'dayrates' | 'news' | 'readme';
 const tabFromHash = (): TabType => {
   const tab = window.location.hash.slice(1);
-  return ['overview', 'transocean', 'valaris', 'noble', 'seadrill', 'news', 'readme'].includes(tab) ? tab as TabType : 'overview';
+  return ['overview', 'transocean', 'valaris', 'noble', 'seadrill', 'dayrates', 'news', 'readme'].includes(tab) ? tab as TabType : 'overview';
 };
 
 export default function App() {
@@ -172,6 +174,11 @@ export default function App() {
             <span className="hidden md:block font-bold">Fleet Status</span>
           </button>
 
+          <button aria-label="Dayrates" aria-current={activeTab === 'dayrates' ? 'page' : undefined} onClick={() => selectTab('dayrates')} className={`w-full flex items-center gap-4 px-3 py-3 rounded-xl transition-all ${activeTab === 'dayrates' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:bg-slate-800'}`}>
+            <TrendingUp size={20} />
+            <span className="hidden md:block font-bold">Dayrates</span>
+          </button>
+
           <div className="hidden md:block pt-2 pb-1 px-4">
             <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Companies</p>
           </div>
@@ -221,6 +228,7 @@ export default function App() {
           <div>
             <h2 className="text-2xl font-black text-white tracking-tight">
               {activeTab === 'overview' && 'Fleet Status'}
+              {activeTab === 'dayrates' && 'Dayrates'}
               {activeTab === 'transocean' && 'Transocean Fleet'}
               {activeTab === 'valaris' && 'Valaris Fleet'}
               {activeTab === 'noble' && 'Noble Fleet'}
@@ -248,7 +256,9 @@ export default function App() {
           )}
         </header>
 
-        {activeTab === 'news' ? <Announcements events={officialEvents} sources={reportSources} /> : (activeTab === 'overview' || activeTab === 'transocean' || activeTab === 'valaris' || activeTab === 'noble' || activeTab === 'seadrill') ? (
+        {activeTab === 'news' ? <Announcements events={officialEvents} sources={reportSources} /> : activeTab === 'dayrates' ? (
+          <Suspense fallback={<p role="status" className="py-12 text-sm text-slate-400">Dayrates 불러오는 중…</p>}><DayrateTrends ships={ships} events={officialEvents} sources={reportSources} /></Suspense>
+        ) : (activeTab === 'overview' || activeTab === 'transocean' || activeTab === 'valaris' || activeTab === 'noble' || activeTab === 'seadrill') ? (
           <div className="space-y-5">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
               {[
