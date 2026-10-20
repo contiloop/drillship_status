@@ -18,7 +18,7 @@ export default function Announcements({ events, sources }: { events: OfficialEve
   ));
   return (
     <section aria-label="뉴스·공시 목록" className="max-w-5xl space-y-4">
-      <p className="text-sm text-slate-400">미확정 조건과 계산 근거를 보관합니다. 예상 기간·추정 요율은 계약표에서도 확인할 수 있습니다.</p>
+      <p className="text-sm text-slate-400">계약 조건과 계산 근거를 보관합니다. 기간·요율은 계약표에서도 확인할 수 있습니다.</p>
       <h3 className="text-sm font-bold text-slate-300">미확정 조건 {unresolved.length}건</h3>
       {cards(unresolved)}
       {unresolved.length === 0 && <p className="py-8 text-sm text-slate-500">계약표에 반영하지 못한 발표가 없습니다.</p>}

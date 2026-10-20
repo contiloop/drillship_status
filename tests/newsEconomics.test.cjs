@@ -9,7 +9,7 @@ const compile = (module, filename) => module._compile(ts.transpileModule(fs.read
 }).outputText, filename);
 require.extensions['.tsx'] = compile;
 require.extensions['.ts'] = compile;
-const { awardDuration, newsEconomics, timelineContracts, estimatedRateLabel, economicsDetails } = require('../utils/newsEconomics.ts');
+const { awardDuration, newsEconomics, timelineContracts, backlogRateLabel, economicsDetails } = require('../utils/newsEconomics.ts');
 const { default: Gantt, ContractDetails } = require('../components/FleetGantt.tsx');
 const manifest = JSON.parse(fs.readFileSync('public/data/manifest.json', 'utf8'));
 const events = JSON.parse(fs.readFileSync(`public/data/${manifest.eventsFile}`, 'utf8')).events;
@@ -19,18 +19,18 @@ const shipFor = name => fleet.find(s => s.name === name);
 
 test('real award values divided only by their own firm durations', () => {
   for (const [vessel, url, amount, days, label] of [
-    ['Deepwater Conqueror', '30626', 225e6, 450, '추정 $500k'],
-    ['Deepwater Conqueror', '30551', 80e6, 170, '추정 $471k'],
-    ['Deepwater Proteus', '', 325e6, 700, '추정 $464k'],
-    ['West Carina', '', 420e6, 880, '추정 $477k'],
-    ['Dhirubhai Deepwater KG2', '', 300e6, 730, '추정 $411k'],
+    ['Deepwater Conqueror', '30626', 225e6, 450, '$500k'],
+    ['Deepwater Conqueror', '30551', 80e6, 170, '$471k'],
+    ['Deepwater Proteus', '', 325e6, 700, '$464k'],
+    ['West Carina', '', 420e6, 880, '$477k'],
+    ['Dhirubhai Deepwater KG2', '', 300e6, 730, '$411k'],
   ]) {
     const economics = newsEconomics(eventFor(vessel, url));
     assert.equal(economics.scope, 'award');
     assert.equal(economics.rates.length, 1);
     assert.equal(economics.rates[0].usdPerDay, amount / days);
     assert.equal(economics.rates[0].duration.days, days);
-    assert.equal(estimatedRateLabel(economics, true), label);
+    assert.equal(backlogRateLabel(economics, true), label);
   }
 });
 
@@ -48,7 +48,7 @@ test('Capella extension tranches remain separate and never rate the whole legacy
   const economics = newsEconomics(eventFor('West Capella'));
   assert.equal(economics.scope, 'extension');
   assert.deepEqual(economics.rates.map(r => [r.valueUsd, r.duration.days]), [[41e6, 120], [53e6, 120]]);
-  assert.equal(estimatedRateLabel(economics, true), '연장 추정 $342k / $442k');
+  assert.equal(backlogRateLabel(economics, true), '연장 $342k / $442k');
   assert.match(economicsDetails(economics), /기존 계약 전체 요율 아님/);
   const rows = timelineContracts(shipFor('West Capella'), events);
   assert.equal(rows.length, 1);
@@ -77,7 +77,7 @@ test('forecast envelope preserves source uncertainty, not fabricated exact dates
   assert.equal(row.dayRate, 0);
   assert.equal(row.status, 'Contingent');
   const html = renderToStaticMarkup(React.createElement(ContractDetails, {selected: row, shipName:'KG2', onClose:()=>{}}));
-  assert.match(html, /추정 \$410,959 \/ 일/);
+  assert.match(html, /\$410,959 \/ 일 \(백로그 환산\)/);
   assert.match(html, /전체 폭이 작업 기간은 아닙니다/);
   assert.match(html, /1년=365일 가정/);
   assert.doesNotMatch(html, /2027-01-01|2029-03-30/);
@@ -89,6 +89,8 @@ test('all six reviewed unscheduled awards get separate forecast lanes, no guesse
   assert.equal(rows.filter(c => c.forecast).length, 6);
   const conqueror = timelineContracts(shipFor('Deepwater Conqueror'), events);
   assert.equal(conqueror.filter(c => c.forecast).length, 2);
+  assert(conqueror.filter(c => c.forecast).every(c => c.status === 'Firm' && c.forecast.awardLabel === 'Firm'));
+  assert.equal(timelineContracts(shipFor('West Carina'), events).find(c => c.forecast).status, 'Firm');
   assert.equal(conqueror.find(c => !c.forecast).dayRate, 530000);
   const ds18 = timelineContracts(shipFor('VALARIS DS-18'), events).find(c => c.forecast);
   assert.equal(ds18.forecast.duration.maximum, true);
@@ -98,14 +100,14 @@ test('all six reviewed unscheduled awards get separate forecast lanes, no guesse
   assert.equal(JSON.stringify({fleet, events}), before);
 });
 
-test('forecast rendering exposes estimates without hover and distinguishes exact reported rates', () => {
+test('bars show plain rates and signed Firm status, with provenance available on selection', () => {
   const html = renderToStaticMarkup(React.createElement(Gantt, { ships: fleet, events }));
-  assert.match(html, /LOA · 2027년 1분기 · 2년.*추정 \$411k/);
-  assert.match(html, /수주 · 2027년 상반기 · 880일.*추정 \$477k/);
-  assert.match(html, /연장 추정 \$342k \/ \$442k/);
+  assert.match(html, /LOA · 2027년 1분기 · 2년.*\$411k/);
+  assert.match(html, /Firm · 2027년 상반기 · 880일.*\$477k/);
+  assert.match(html, /연장 \$342k \/ \$442k/);
   assert.match(html, /Deepwater Conqueror · Firm.*\$530,000 \/ 일 \(공시\)/);
-  assert.match(html, /예상 범위·추정 요율은 가동률·평균 dayrate에서 제외/);
-  assert.doesNotMatch(html, /Codex 계약 대조/);
+  assert.match(html, /요율은 공시값 또는 계약 가치÷기본 작업 기간/);
+  assert.doesNotMatch(html, /추정|예상 범위|Codex 계약 대조/);
 });
 
 test('covered/superseded jobs and repeated events cannot duplicate or revive forecasts', () => {

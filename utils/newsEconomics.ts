@@ -16,14 +16,14 @@ export interface AwardDuration {
   assumption?: string;
   maximum: boolean;
 }
-export interface EstimatedRate {
+export interface BacklogRate {
   usdPerDay: number;
   valueUsd: number;
   duration: AwardDuration;
 }
 export interface NewsEconomics {
   scope: 'award' | 'extension';
-  rates: EstimatedRate[];
+  rates: BacklogRate[];
   includes: string[];
   excludes: string[];
 }
@@ -60,7 +60,7 @@ export function newsEconomics(event: OfficialEvent): NewsEconomics | undefined {
   const facts = event.facts!;
   const duration = awardDuration(event);
   const value = facts.announcedValueUsdApprox;
-  let rates: EstimatedRate[] = [];
+  let rates: BacklogRate[] = [];
   const scope = ['extension', 'option-exercised'].includes(facts.awardType || '') ? 'extension' : 'award';
   if (scope === 'award' && value && Number.isFinite(value) && value > 0 && duration && !duration.maximum
       && quotes(event, 'announcedValueUsdApprox').some(q => money(q).includes(value))) {
@@ -131,13 +131,14 @@ export function timelineContracts(ship: Drillship, events: OfficialEvent[]): Tim
     const window = startWindow(event.facts!.expectedStart || '');
     const duration = awardDuration(event);
     if (!window || !duration) continue;
-    const awardLabel = event.facts!.awardType === 'signed-contract' ? '수주' : 'LOA';
+    const signed = event.facts!.awardType === 'signed-contract';
+    const awardLabel = signed ? 'Firm' : 'LOA';
     const end = finish(window.end, duration);
     const endLabel = duration.maximum ? `최대 기간 기준 종료 ~${iso(end).slice(0, 7)}`
       : `종료 예상 ${iso(finish(window.start, duration)).slice(0, 7)}–${iso(end).slice(0, 7)}`;
     rows.push({ id: `forecast-${ship.id}-${event.url}`, vesselId: ship.id,
       startDate: iso(window.start), endDate: iso(end), dayRate: event.facts!.dayRateDisclosure === 'reported' ? event.facts!.dayRateUsd || 0 : 0,
-      client: event.facts!.counterparty || 'Undisclosed', region: event.facts!.location || 'Undisclosed', status: 'Contingent',
+      client: event.facts!.counterparty || 'Undisclosed', region: event.facts!.location || 'Undisclosed', status: signed ? 'Firm' : 'Contingent',
       sourceUrl: event.url, sourcePublishedAt: event.publishedAt, economics,
       forecast: { startLabel: window.label, duration, awardLabel,
         windowLabel: `${window.label} 개시 예정 · ${duration.label} · ${endLabel}` } });
@@ -145,8 +146,8 @@ export function timelineContracts(ship: Drillship, events: OfficialEvent[]): Tim
   return rows;
 }
 
-export function estimatedRateLabel(economics: NewsEconomics, compact = false) {
-  return `${economics.scope === 'extension' ? '연장 ' : ''}추정 ${economics.rates.map(r => compact
+export function backlogRateLabel(economics: NewsEconomics, compact = false) {
+  return `${economics.scope === 'extension' ? '연장 ' : ''}${economics.rates.map(r => compact
     ? `$${Math.round(r.usdPerDay / 1000)}k` : `$${Math.round(r.usdPerDay).toLocaleString('en-US')}`).join(' / ')}${compact ? '' : ' / 일'}`;
 }
 
