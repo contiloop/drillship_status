@@ -25,7 +25,7 @@ export function ContractDetails({ selected, shipName, onClose }: { selected: Tim
       {contractSource(selected.sourceUrl) && <a className="text-blue-300 underline" href={contractSource(selected.sourceUrl)} target="_blank" rel="noopener noreferrer">원문 ↗</a>}
       <button className="ml-auto rounded px-3 py-2 text-slate-400 hover:text-white" onClick={onClose} aria-label="계약 상세 닫기">닫기</button>
       {selected.economics && <p className="w-full text-slate-400">{economicsDetails(selected.economics)}</p>}
-      {selected.forecast && <p className="w-full text-slate-400">점선은 공개된 개시 구간부터 종료까지의 일정 범위이며, 전체 폭이 작업 기간은 아닙니다. Firm은 계약 체결, LOA는 수주 통지를 뜻합니다. 정확한 일자가 없는 일정과 환산 요율은 가동률·평균 공시 dayrate 집계에서 제외합니다.</p>}
+      {selected.forecast && <p className="w-full text-slate-400">일정 배치: {selected.forecast.placementBasis}, {selected.forecast.duration.label}만큼 표시합니다. 원문은 {selected.forecast.startLabel} 개시 예정으로, 정확한 개시·종료일은 공개되지 않았습니다. 정확한 일자가 없는 일정과 환산 요율은 가동률·평균 공시 dayrate 집계에서 제외합니다.</p>}
     </div>
   );
 }
@@ -85,7 +85,6 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships, events = [] }) => {
           <span className="flex items-center gap-2"><div className="w-3 h-3 bg-blue-600 rounded-sm"></div> Firm</span>
           <span className="flex items-center gap-2"><div className="w-3 h-3 bg-sky-400/20 border border-sky-400 rounded-sm"></div> Option</span>
           <span className="flex items-center gap-2"><div className="w-3 h-3 bg-amber-400/20 border border-amber-400 rounded-sm"></div> Contingent</span>
-          <span className="flex items-center gap-2"><div className="w-3 h-3 border border-dashed border-slate-300 rounded-sm"></div> 개시 구간 공개</span>
           <span className="flex items-center gap-2"><div className="w-3 h-3 bg-slate-950 border border-slate-800 rounded-sm"></div> Idle/Gap</span>
           <span className="flex items-center gap-2"><div className="w-3 h-3 bg-slate-800 border border-slate-700 rounded-sm cold-stacked-legend"></div> Cold-Stacked</span>
         </div>
@@ -132,7 +131,6 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships, events = [] }) => {
                 const canonicalShip = ships.find(s => s.id === ship.id)!;
                 const computedStatus = getComputedStatus(canonicalShip, now);
                 const isColdStacked = computedStatus === 'Cold-Stacked';
-                const forecasts = ship.contracts.filter(c => c.forecast);
                 return (
                 <div key={ship.id} className="flex items-center group transition-all relative">
                   {/* Sticky Vessel Information - Opaque Background */}
@@ -147,7 +145,7 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships, events = [] }) => {
                   </div>
 
                   {/* Timeline Row Section */}
-                  <div style={{ height: 40 + forecasts.length * 36 }} className={`flex-1 relative rounded-xl overflow-hidden border z-10 mx-2 ${
+                  <div style={{ height: 40 }} className={`flex-1 relative rounded-xl overflow-hidden border z-10 mx-2 ${
                     isColdStacked
                       ? 'bg-slate-800 border-slate-700'
                       : 'bg-slate-950/60 border-slate-800'
@@ -172,10 +170,10 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships, events = [] }) => {
                       
                       const kind = c.forecast?.awardLabel || c.status;
                       return (
-                        <button type="button" key={c.id} aria-pressed={selectedId === c.id} onClick={() => setSelectedId(c.id)} aria-label={`${ship.name} · ${kind} · ${c.client} · ${periodLabel(c)} · ${rateLabel(c)}`} className={`absolute text-left rounded-md border hover:brightness-125 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${selectedId === c.id ? 'ring-2 ring-white' : ''} ${c.forecast ? (c.status === 'Firm' ? 'bg-blue-600/70 border-dashed border-blue-300' : 'bg-amber-400/10 border-dashed border-amber-300/80') : c.status === 'Firm' ? 'bg-blue-600 border-black/20' : c.status === 'Contingent' ? 'bg-amber-400/20 border-dashed border-amber-400/70' : 'bg-sky-400/20 border-dashed border-sky-400/60'}`} style={{ left: `${span.left}%`, width: `${span.width}%`, height: 30, top: c.forecast ? 42 + forecasts.indexOf(c) * 36 : 4 }} title={`${kind} · ${c.client}: ${periodLabel(c)} · ${rateLabel(c)}`}>
-                          <div className={`h-full w-full flex items-center ${c.forecast ? 'justify-center' : ''} px-3 overflow-hidden whitespace-nowrap`}>
+                        <button type="button" key={c.id} aria-pressed={selectedId === c.id} onClick={() => setSelectedId(c.id)} aria-label={`${ship.name} · ${kind} · ${c.client} · ${periodLabel(c)} · ${rateLabel(c)}`} className={`absolute text-left rounded-md border hover:brightness-125 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${selectedId === c.id ? 'ring-2 ring-white' : ''} ${c.status === 'Firm' ? 'bg-blue-600 border-black/20' : c.status === 'Contingent' ? 'bg-amber-400/20 border-dashed border-amber-400/70' : 'bg-sky-400/20 border-dashed border-sky-400/60'}`} style={{ left: `${span.left}%`, width: `${span.width}%`, height: 30, top: 4 }} title={`${kind} · ${c.client}: ${periodLabel(c)} · ${rateLabel(c)}`}>
+                          <div className="h-full w-full flex items-center px-3 overflow-hidden whitespace-nowrap">
                             <span className="text-[10px] font-black text-white/95 truncate drop-shadow-sm">
-                              {c.forecast ? `${c.forecast.awardLabel} · ${c.forecast.startLabel} · ${c.forecast.duration.label}` : c.client} {(c.dayRate > 0 || c.economics) ? `• ${rateLabel(c, true)}` : ''}
+                              {c.client} {(c.dayRate > 0 || c.economics) ? `• ${rateLabel(c, true)}` : ''}
                             </span>
                           </div>
                         </button>
@@ -189,7 +187,7 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships, events = [] }) => {
         </div>
       </div>
       <div className="px-4 py-3 bg-slate-900 border-t border-slate-800">
-        <p className="text-[10px] text-slate-500">Firm: 체결 계약 · LOA: 수주 통지 · 점선: 공개된 개시 구간 기준 일정 범위 · 요율은 공시값 또는 계약 가치÷기본 작업 기간. 계산 근거는 바를 선택해 확인합니다.</p>
+        <p className="text-[10px] text-slate-500">요율은 공시값 또는 계약 가치÷기본 작업 기간. 계산 근거와 날짜 배치 기준은 바를 선택해 확인합니다.</p>
       </div>
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }

@@ -68,22 +68,25 @@ test('missing backlog, missing term, conflicting evidence, maximum-only duration
   assert.equal(awardDuration({ ...event, evidence: [{field:'termText',quote:'120 days and 180 days'}] }), undefined);
 });
 
-test('forecast envelope preserves source uncertainty, not fabricated exact dates', () => {
+test('bar spans one base term, with the source precision and placement basis only in details', () => {
   const row = timelineContracts(shipFor('Dhirubhai Deepwater KG2'), events).find(c => c.forecast);
   assert.equal(row.forecast.startLabel, '2027년 1분기');
   assert.equal(row.forecast.awardLabel, 'LOA');
   assert.match(row.forecast.windowLabel, /730|2년/);
-  assert.match(row.forecast.windowLabel, /종료 예상 2028-12–2029-03/);
+  assert.equal(row.startDate, '2027-01-01');
+  assert.equal(row.endDate, '2028-12-31');
+  assert.equal(row.forecast.windowLabel, '2027-01-01 – 2028-12-31 · 2년');
   assert.equal(row.dayRate, 0);
   assert.equal(row.status, 'Contingent');
   const html = renderToStaticMarkup(React.createElement(ContractDetails, {selected: row, shipName:'KG2', onClose:()=>{}}));
   assert.match(html, /\$410,959 \/ 일 \(백로그 환산\)/);
-  assert.match(html, /전체 폭이 작업 기간은 아닙니다/);
+  assert.match(html, /공개된 2027년 1분기의 첫날\(2027-01-01\)부터 배치/);
+  assert.match(html, /정확한 개시·종료일은 공개되지 않았습니다/);
   assert.match(html, /1년=365일 가정/);
-  assert.doesNotMatch(html, /2027-01-01|2029-03-30/);
+  assert.doesNotMatch(html, /종료 예상|일정 범위|2029-03-30/);
 });
 
-test('all six reviewed unscheduled awards get separate forecast lanes, no guessed DS18 rate', () => {
+test('all six reviewed unscheduled awards get duration-sized bars, no guessed DS18 rate', () => {
   const before = JSON.stringify({fleet, events});
   const rows = fleet.flatMap(s => timelineContracts(s, events));
   assert.equal(rows.filter(c => c.forecast).length, 6);
@@ -95,19 +98,50 @@ test('all six reviewed unscheduled awards get separate forecast lanes, no guesse
   const ds18 = timelineContracts(shipFor('VALARIS DS-18'), events).find(c => c.forecast);
   assert.equal(ds18.forecast.duration.maximum, true);
   assert.equal(ds18.forecast.duration.label, '최대 7개월');
-  assert.match(ds18.forecast.windowLabel, /최대 기간 기준 종료/);
+  assert.equal(ds18.startDate, '2026-10-01');
+  assert.equal(ds18.endDate, '2027-04-30');
   assert.equal(ds18.economics, undefined);
   assert.equal(JSON.stringify({fleet, events}), before);
 });
 
-test('bars show plain rates and signed Firm status, with provenance available on selection', () => {
+test('new and existing bars use the same client/rate labels, styling, height and row', () => {
   const html = renderToStaticMarkup(React.createElement(Gantt, { ships: fleet, events }));
-  assert.match(html, /LOA · 2027년 1분기 · 2년.*\$411k/);
-  assert.match(html, /Firm · 2027년 상반기 · 880일.*\$477k/);
+  assert.match(html, />ONGC • \$411k<\/span>/);
+  assert.match(html, />Undisclosed operator • \$477k<\/span>/);
   assert.match(html, /연장 \$342k \/ \$442k/);
   assert.match(html, /Deepwater Conqueror · Firm.*\$530,000 \/ 일 \(공시\)/);
   assert.match(html, /요율은 공시값 또는 계약 가치÷기본 작업 기간/);
-  assert.doesNotMatch(html, /추정|예상 범위|Codex 계약 대조/);
+  assert.doesNotMatch(html, /추정|예상 범위|종료 예상|개시 구간 공개|Codex 계약 대조/);
+  const bars = [...html.matchAll(/<button\b[^>]*aria-pressed[^>]*>[\s\S]*?<\/button>/g)].map(m => m[0]);
+  for (const bar of bars) {
+    assert.match(bar, /height:30px;top:4px/);
+    assert.doesNotMatch(bar, /justify-center|bg-blue-600\/70/);
+    assert.doesNotMatch(bar.split('<span')[1], />Firm ·|>LOA ·|개시 예정/);
+    if (bar.includes('· Firm ·')) assert.match(bar, /bg-blue-600 border-black\/20/);
+  }
+  assert.doesNotMatch(html, /height:(76|112)px/);
+});
+
+test('explicit consecutive campaigns join after the prior firm end regardless of feed order', () => {
+  const ship = shipFor('Deepwater Conqueror');
+  const rows = timelineContracts(ship, events).filter(c => c.forecast);
+  const first = rows.find(c => c.sourceUrl.includes('30551'));
+  const second = rows.find(c => c.sourceUrl.includes('30626'));
+  assert.equal(first.startDate, '2027-02-01');
+  assert.equal(Date.parse(first.endDate) - Date.parse(first.startDate), 169 * 86400000);
+  assert.equal(Date.parse(second.startDate), Date.parse(first.endDate) + 86400000);
+  assert.equal(Date.parse(second.endDate) - Date.parse(second.startDate), 449 * 86400000);
+  assert.match(first.forecast.placementBasis, /앞선 계약 종료 다음 날/);
+  assert.deepEqual(timelineContracts(ship, [...events].reverse()), timelineContracts(ship, events));
+  const carina = timelineContracts(shipFor('West Carina'), events).find(c => c.forecast);
+  assert.equal(Date.parse(carina.endDate) - Date.parse(carina.startDate), 879 * 86400000);
+});
+
+test('continuation outside its source window is not silently shifted to an invented schedule', () => {
+  const event = eventFor('Deepwater Conqueror', '30551');
+  const ship = shipFor('Deepwater Conqueror');
+  const conflict = {...ship, contracts: ship.contracts.map(c => ({...c, endDate: '2028-01-31'}))};
+  assert.equal(timelineContracts(conflict, [event]).filter(c => c.forecast).length, 0);
 });
 
 test('covered/superseded jobs and repeated events cannot duplicate or revive forecasts', () => {

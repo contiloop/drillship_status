@@ -29,7 +29,7 @@ export interface NewsEconomics {
 }
 export interface TimelineContract extends Contract {
   economics?: NewsEconomics;
-  forecast?: { startLabel: string; duration: AwardDuration; awardLabel: string; windowLabel: string };
+  forecast?: { startLabel: string; duration: AwardDuration; awardLabel: string; windowLabel: string; placementBasis: string };
 }
 
 function durations(text: string): AwardDuration[] {
@@ -116,7 +116,13 @@ function finish(start: number, duration: AwardDuration) {
 export function timelineContracts(ship: Drillship, events: OfficialEvent[]): TimelineContract[] {
   const rows: TimelineContract[] = ship.contracts.map(c => ({ ...c }));
   const seen = new Set<string>();
-  for (const event of events) {
+  // Place earlier campaigns first so explicitly consecutive awards can join up,
+  // independent of the newest-first ordering of the news feed.
+  const ordered = [...events].sort((a, b) =>
+    (startWindow(a.facts?.expectedStart || '')?.start ?? Infinity) - (startWindow(b.facts?.expectedStart || '')?.start ?? Infinity)
+    || (Date.parse(a.publishedAt || '') || 0) - (Date.parse(b.publishedAt || '') || 0)
+    || (a.url || '').localeCompare(b.url || ''));
+  for (const event of ordered) {
     if (!usableNews(event) || event.company !== ship.company || event.vessel !== ship.name || seen.has(event.url!)) continue;
     seen.add(event.url!);
     const economics = newsEconomics(event);
@@ -133,15 +139,25 @@ export function timelineContracts(ship: Drillship, events: OfficialEvent[]): Tim
     if (!window || !duration) continue;
     const signed = event.facts!.awardType === 'signed-contract';
     const awardLabel = signed ? 'Firm' : 'LOA';
-    const end = finish(window.end, duration);
-    const endLabel = duration.maximum ? `최대 기간 기준 종료 ~${iso(end).slice(0, 7)}`
-      : `종료 예상 ${iso(finish(window.start, duration)).slice(0, 7)}–${iso(end).slice(0, 7)}`;
+    let start = window.start;
+    const continuation = quotes(event, 'termText').some(q => /\bdirect continuation\b/i.test(q));
+    if (continuation) {
+      const predecessors = rows.filter(c => c.status === 'Firm' && Date.parse(c.startDate) <= window.end);
+      start = Math.max(start, ...predecessors.map(c => Date.parse(c.endDate) + DAY));
+      // A source window conflicting with an existing firm commitment must not
+      // silently be shifted outside the disclosed window.
+      if (!Number.isFinite(start) || start > window.end) continue;
+    }
+    const end = finish(start, duration);
+    const placementBasis = start > window.start
+      ? `원문의 직접 연속 작업 조건에 따라 앞선 계약 종료 다음 날(${iso(start)})부터 배치`
+      : `공개된 ${window.label}의 첫날(${iso(start)})부터 배치`;
     rows.push({ id: `forecast-${ship.id}-${event.url}`, vesselId: ship.id,
-      startDate: iso(window.start), endDate: iso(end), dayRate: event.facts!.dayRateDisclosure === 'reported' ? event.facts!.dayRateUsd || 0 : 0,
+      startDate: iso(start), endDate: iso(end), dayRate: event.facts!.dayRateDisclosure === 'reported' ? event.facts!.dayRateUsd || 0 : 0,
       client: event.facts!.counterparty || 'Undisclosed', region: event.facts!.location || 'Undisclosed', status: signed ? 'Firm' : 'Contingent',
       sourceUrl: event.url, sourcePublishedAt: event.publishedAt, economics,
-      forecast: { startLabel: window.label, duration, awardLabel,
-        windowLabel: `${window.label} 개시 예정 · ${duration.label} · ${endLabel}` } });
+      forecast: { startLabel: window.label, duration, awardLabel, placementBasis,
+        windowLabel: `${iso(start)} – ${iso(end)} · ${duration.label}` } });
   }
   return rows;
 }
