@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-28T14:20:03Z",
+  "generatedAt": "2026-10-28T14:35:55Z",
   "events": [
     {
       "company": "Noble",
@@ -1648,627 +1648,6 @@
       "newsCategory": "실적"
     },
     {
-      "id": "reading-a02ba14cf1ec084306ae",
-      "company": "Noble",
-      "vessel": "Noble Faye Kozack",
-      "vessels": [
-        "Noble Faye Kozack"
-      ],
-      "vesselId": "noble-faye-kozack",
-      "classification": "official-report-reading",
-      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
-      "publishedAt": null,
-      "title": "Noble Fleet Status Report",
-      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
-      "autoApplied": true,
-      "pendingReview": false,
-      "reviewStatus": "applied",
-      "readingDecision": {
-        "action": "upsert",
-        "contractId": "noble-faye-kozack-r67895ee2180c",
-        "row": {
-          "startDate": "2027-06-01",
-          "endDate": "2028-01-31",
-          "dayRate": 0,
-          "client": "Tullow",
-          "region": "Ghana",
-          "status": "Firm",
-          "interpretation": {
-            "sourceStartText": "Mid 2027",
-            "sourceEndText": "Q1 2028",
-            "placementBasis": "mid는 6월, Q1은 분기 말로 배치",
-            "termText": "Five-well contract (estimated 250 days)",
-            "optionText": "plus five priced option wells",
-            "valueText": null,
-            "awardType": "unreported",
-            "valueUsd": null,
-            "baseDurationDays": 250,
-            "includes": [],
-            "excludes": [],
-            "derivedUsdPerDay": null
-          }
-        },
-        "reasonKo": "신규 Tullow 계약과 옵션 다섯 건이 보고됨",
-        "quote": "Five-well contract (estimated 250 days), plus five priced option wells",
-        "locator": "page:3"
-      },
-      "newsCategory": "Fleet Status"
-    },
-    {
-      "id": "reading-3773f29a7a2dc936c974",
-      "company": "Noble",
-      "vessel": "Noble Faye Kozack",
-      "vessels": [
-        "Noble Faye Kozack"
-      ],
-      "vesselId": "noble-faye-kozack",
-      "classification": "official-report-reading",
-      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
-      "publishedAt": null,
-      "title": "Noble Fleet Status Report",
-      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
-      "autoApplied": true,
-      "pendingReview": false,
-      "reviewStatus": "applied",
-      "readingDecision": {
-        "action": "upsert",
-        "contractId": "noble-faye-kozack-rf90f56964ab2",
-        "row": {
-          "startDate": "2028-02-01",
-          "endDate": "2028-12-31",
-          "dayRate": 0,
-          "client": "Tullow",
-          "region": "Ghana",
-          "status": "Option",
-          "interpretation": {
-            "sourceStartText": null,
-            "sourceEndText": null,
-            "placementBasis": "옵션 기간은 타임라인의 밝은 구간으로 배치",
-            "termText": null,
-            "optionText": "five priced option wells",
-            "valueText": null,
-            "awardType": null,
-            "valueUsd": null,
-            "baseDurationDays": null,
-            "includes": [],
-            "excludes": [],
-            "derivedUsdPerDay": null
-          }
-        },
-        "reasonKo": "미행사 가격 옵션 다섯 건",
-        "quote": "plus five priced option wells",
-        "locator": "page:3"
-      },
-      "newsCategory": "Fleet Status"
-    },
-    {
-      "id": "reading-f3a39a3faff08ed5f72f",
-      "company": "Noble",
-      "vessel": "Noble Valiant",
-      "vessels": [
-        "Noble Valiant"
-      ],
-      "vesselId": "noble-valiant",
-      "classification": "official-report-reading",
-      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
-      "publishedAt": null,
-      "title": "Noble Fleet Status Report",
-      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
-      "autoApplied": true,
-      "pendingReview": false,
-      "reviewStatus": "applied",
-      "readingDecision": {
-        "action": "upsert",
-        "contractId": "noble-valiant-72ce40eb06",
-        "row": {
-          "startDate": "2026-12-01",
-          "endDate": "2029-12-31",
-          "dayRate": 0,
-          "client": "TotalEnergies",
-          "region": "Suriname",
-          "status": "Firm",
-          "interpretation": {
-            "sourceStartText": "Dec-26",
-            "sourceEndText": "Q4-29",
-            "placementBasis": "월 표기는 해당 월 시작, Q4는 분기 말",
-            "termText": "16-well contract (estimated 1,060 days)",
-            "optionText": "plus four one-well options across both TotalEnergies Suriname contracts",
-            "valueText": null,
-            "awardType": "unreported",
-            "valueUsd": null,
-            "baseDurationDays": 1060,
-            "includes": [],
-            "excludes": [],
-            "derivedUsdPerDay": null
-          }
-        },
-        "reasonKo": "기존 계약이 보고된 16웰 계약 기간과 일치하며 옵션 정보 보강",
-        "quote": "Dec-26 Q4-29",
-        "locator": "page:3"
-      },
-      "newsCategory": "Fleet Status"
-    },
-    {
-      "id": "reading-894d6b43547b07d4a5ec",
-      "company": "Noble",
-      "vessel": "Noble Valiant",
-      "vessels": [
-        "Noble Valiant"
-      ],
-      "vesselId": "noble-valiant",
-      "classification": "official-report-reading",
-      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
-      "publishedAt": null,
-      "title": "Noble Fleet Status Report",
-      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
-      "autoApplied": true,
-      "pendingReview": false,
-      "reviewStatus": "applied",
-      "readingDecision": {
-        "action": "upsert",
-        "contractId": "noble-valiant-rc14cbcb18204",
-        "row": {
-          "startDate": "2030-01-01",
-          "endDate": "2030-12-31",
-          "dayRate": 0,
-          "client": "TotalEnergies",
-          "region": "Suriname",
-          "status": "Option",
-          "interpretation": {
-            "sourceStartText": null,
-            "sourceEndText": null,
-            "placementBasis": "타임라인상 기존 계약 종료 후 옵션 구간",
-            "termText": null,
-            "optionText": "four one-well options across both TotalEnergies Suriname contracts",
-            "valueText": null,
-            "awardType": null,
-            "valueUsd": null,
-            "baseDurationDays": null,
-            "includes": [],
-            "excludes": [],
-            "derivedUsdPerDay": null
-          }
-        },
-        "reasonKo": "Suriname 계약 두 건 전체에 포함된 옵션",
-        "quote": "Plus four one-well options",
-        "locator": "page:3"
-      },
-      "newsCategory": "Fleet Status"
-    },
-    {
-      "id": "reading-d09318978c7e2a5002c1",
-      "company": "Noble",
-      "vessel": "Noble Venturer",
-      "vessels": [
-        "Noble Venturer"
-      ],
-      "vesselId": "noble-venturer",
-      "classification": "official-report-reading",
-      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
-      "publishedAt": null,
-      "title": "Noble Fleet Status Report",
-      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
-      "autoApplied": true,
-      "pendingReview": false,
-      "reviewStatus": "applied",
-      "readingDecision": {
-        "action": "upsert",
-        "contractId": "noble-venturer-26bd126dca",
-        "row": {
-          "startDate": "2027-10-01",
-          "endDate": "2031-06-30",
-          "dayRate": 0,
-          "client": "Shell",
-          "region": "US Gulf",
-          "status": "Firm",
-          "interpretation": {
-            "sourceStartText": "Q4-27",
-            "sourceEndText": "Q3-31",
-            "placementBasis": "Q4 시작은 분기 초로 배치하고 기존 계약 종료일을 유지",
-            "termText": "Four-year contract",
-            "optionText": "plus four 1-year options at mutually agreed rates",
-            "valueText": "base dayrate value of $606 million (including upgrades and services, excluding mob/demob)",
-            "awardType": "unreported",
-            "valueUsd": 606000000,
-            "baseDurationDays": 1460,
-            "includes": [
-              "upgrades and services"
-            ],
-            "excludes": [
-              "mobilization and demobilization"
-            ],
-            "derivedUsdPerDay": 415068.4931506849
-          }
-        },
-        "reasonKo": "기존 Shell 계약과 같은 수상 건으로 중복 기간을 정리하고 금액 정보를 보강",
-        "quote": "Four-year contract, base dayrate value of $606 million",
-        "locator": "page:3"
-      },
-      "newsCategory": "Fleet Status"
-    },
-    {
-      "id": "reading-e23913fbbdc1fbf075a5",
-      "company": "Noble",
-      "vessel": "Noble Venturer",
-      "vessels": [
-        "Noble Venturer"
-      ],
-      "vesselId": "noble-venturer",
-      "classification": "official-report-reading",
-      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
-      "publishedAt": null,
-      "title": "Noble Fleet Status Report",
-      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
-      "autoApplied": true,
-      "pendingReview": false,
-      "reviewStatus": "applied",
-      "readingDecision": {
-        "action": "upsert",
-        "contractId": "noble-venturer-300040a979",
-        "row": {
-          "startDate": "2031-07-01",
-          "endDate": "2035-06-30",
-          "dayRate": 0,
-          "client": "Shell",
-          "region": "US Gulf",
-          "status": "Option",
-          "interpretation": {
-            "sourceStartText": null,
-            "sourceEndText": null,
-            "placementBasis": "기존 기본 계약 종료 다음 날부터 네 차례 1년 옵션을 연속 배치",
-            "termText": "four 1-year options",
-            "optionText": "at mutually agreed rates",
-            "valueText": null,
-            "awardType": null,
-            "valueUsd": null,
-            "baseDurationDays": null,
-            "includes": [],
-            "excludes": [],
-            "derivedUsdPerDay": null
-          }
-        },
-        "reasonKo": "기존 옵션을 보고서의 4개 연간 옵션으로 보강",
-        "quote": "Plus four 1-year options at mutually agreed rates",
-        "locator": "page:3"
-      },
-      "newsCategory": "Fleet Status"
-    },
-    {
-      "id": "reading-0f504614543833c291e6",
-      "company": "Noble",
-      "vessel": "Noble Viking",
-      "vessels": [
-        "Noble Viking"
-      ],
-      "vesselId": "noble-viking",
-      "classification": "official-report-reading",
-      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
-      "publishedAt": null,
-      "title": "Noble Fleet Status Report",
-      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
-      "autoApplied": true,
-      "pendingReview": false,
-      "reviewStatus": "applied",
-      "readingDecision": {
-        "action": "upsert",
-        "contractId": "noble-viking-008ba8cd5a",
-        "row": {
-          "startDate": "2028-01-01",
-          "endDate": "2028-12-31",
-          "dayRate": 0,
-          "client": "Undisclosed",
-          "region": "Asia Pac",
-          "status": "Firm",
-          "interpretation": {
-            "sourceStartText": "Q1-28",
-            "sourceEndText": "Q4-28",
-            "placementBasis": "Q1 시작은 분기 초, Q4 종료는 분기 말로 배치",
-            "termText": null,
-            "optionText": "Plus options to Q1 2029.",
-            "valueText": null,
-            "awardType": "unreported",
-            "valueUsd": null,
-            "baseDurationDays": null,
-            "includes": [],
-            "excludes": [],
-            "derivedUsdPerDay": null
-          }
-        },
-        "reasonKo": "기존 계약의 종료일이 보고서 기간과 맞지 않아 수정",
-        "quote": "Q1-28 Q4-28",
-        "locator": "page:3"
-      },
-      "newsCategory": "Fleet Status"
-    },
-    {
-      "id": "reading-a49b232fd7f61fb18876",
-      "company": "Noble",
-      "vessel": "Noble Viking",
-      "vessels": [
-        "Noble Viking"
-      ],
-      "vesselId": "noble-viking",
-      "classification": "official-report-reading",
-      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
-      "publishedAt": null,
-      "title": "Noble Fleet Status Report",
-      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
-      "autoApplied": true,
-      "pendingReview": false,
-      "reviewStatus": "applied",
-      "readingDecision": {
-        "action": "upsert",
-        "contractId": "noble-viking-3713509662",
-        "row": {
-          "startDate": "2029-01-01",
-          "endDate": "2029-03-31",
-          "dayRate": 0,
-          "client": "Undisclosed",
-          "region": "Asia Pac",
-          "status": "Option",
-          "interpretation": {
-            "sourceStartText": null,
-            "sourceEndText": "Q1 2029",
-            "placementBasis": "보고서의 Q1 2029까지 옵션을 1분기로 배치",
-            "termText": null,
-            "optionText": "options to Q1 2029",
-            "valueText": null,
-            "awardType": null,
-            "valueUsd": null,
-            "baseDurationDays": null,
-            "includes": [],
-            "excludes": [],
-            "derivedUsdPerDay": null
-          }
-        },
-        "reasonKo": "옵션 종료가 2029년 1분기로 명시됨",
-        "quote": "Plus options to Q1 2029",
-        "locator": "page:3"
-      },
-      "newsCategory": "Fleet Status"
-    },
-    {
-      "id": "reading-7adb6eb3e7b8966ba7cd",
-      "company": "Noble",
-      "vessel": "Noble BlackHawk",
-      "vessels": [
-        "Noble BlackHawk"
-      ],
-      "vesselId": "noble-blackhawk",
-      "classification": "official-report-reading",
-      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
-      "publishedAt": null,
-      "title": "Noble Fleet Status Report",
-      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
-      "autoApplied": true,
-      "pendingReview": false,
-      "reviewStatus": "applied",
-      "readingDecision": {
-        "action": "upsert",
-        "contractId": "noble-blackhawk-reb2fb1f96477",
-        "row": {
-          "startDate": "2027-10-01",
-          "endDate": "2027-12-31",
-          "dayRate": 0,
-          "client": "Apache",
-          "region": "Uruguay",
-          "status": "Firm",
-          "interpretation": {
-            "sourceStartText": "Q4 2027",
-            "sourceEndText": "Q4 2027",
-            "placementBasis": "Q4 시작은 분기 초, 종료는 분기 말",
-            "termText": "One-well contract (estimated 50 days)",
-            "optionText": null,
-            "valueText": "valued at $25 million, excluding additional fees for mobilization",
-            "awardType": "unreported",
-            "valueUsd": 25000000,
-            "baseDurationDays": 50,
-            "includes": [],
-            "excludes": [
-              "mobilization"
-            ],
-            "derivedUsdPerDay": 500000.0
-          }
-        },
-        "reasonKo": "Apache 신규 계약이며 추정 기간 50일 및 기본 계약 금액이 공개됨",
-        "quote": "One-well contract (estimated 50 days) valued at $25 million",
-        "locator": "page:4"
-      },
-      "newsCategory": "Fleet Status"
-    },
-    {
-      "id": "reading-e60e4c0f0e22f67a336f",
-      "company": "Noble",
-      "vessel": "Noble BlackRhino",
-      "vessels": [
-        "Noble BlackRhino"
-      ],
-      "vesselId": "noble-blackrhino",
-      "classification": "official-report-reading",
-      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
-      "publishedAt": null,
-      "title": "Noble Fleet Status Report",
-      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
-      "autoApplied": true,
-      "pendingReview": false,
-      "reviewStatus": "applied",
-      "readingDecision": {
-        "action": "upsert",
-        "contractId": "noble-blackrhino-r30df4b5a2c4d",
-        "row": {
-          "startDate": "2026-11-01",
-          "endDate": "2027-04-30",
-          "dayRate": 0,
-          "client": "TotalEnergies",
-          "region": "Nigeria",
-          "status": "Firm",
-          "interpretation": {
-            "sourceStartText": "Nov-26",
-            "sourceEndText": "Apr-27",
-            "placementBasis": "월 표기는 해당 월의 시작과 말로 배치",
-            "termText": "Four-well contract (estimated 150 days)",
-            "optionText": "plus six priced option wells",
-            "valueText": null,
-            "awardType": "unreported",
-            "valueUsd": null,
-            "baseDurationDays": 150,
-            "includes": [],
-            "excludes": [],
-            "derivedUsdPerDay": null
-          }
-        },
-        "reasonKo": "신규 TotalEnergies 계약",
-        "quote": "Four-well contract (estimated 150 days) plus six priced option wells",
-        "locator": "page:4"
-      },
-      "newsCategory": "Fleet Status"
-    },
-    {
-      "id": "reading-91cc6068590e46a508a7",
-      "company": "Noble",
-      "vessel": "Noble BlackRhino",
-      "vessels": [
-        "Noble BlackRhino"
-      ],
-      "vesselId": "noble-blackrhino",
-      "classification": "official-report-reading",
-      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
-      "publishedAt": null,
-      "title": "Noble Fleet Status Report",
-      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
-      "autoApplied": true,
-      "pendingReview": false,
-      "reviewStatus": "applied",
-      "readingDecision": {
-        "action": "upsert",
-        "contractId": "noble-blackrhino-rf2314adf9287",
-        "row": {
-          "startDate": "2027-05-01",
-          "endDate": "2027-12-31",
-          "dayRate": 0,
-          "client": "TotalEnergies",
-          "region": "Nigeria",
-          "status": "Option",
-          "interpretation": {
-            "sourceStartText": null,
-            "sourceEndText": null,
-            "placementBasis": "미행사 옵션은 기본 계약 뒤의 타임라인 옵션 구간으로 배치",
-            "termText": null,
-            "optionText": "six priced option wells",
-            "valueText": null,
-            "awardType": null,
-            "valueUsd": null,
-            "baseDurationDays": null,
-            "includes": [],
-            "excludes": [],
-            "derivedUsdPerDay": null
-          }
-        },
-        "reasonKo": "미행사 가격 옵션 여섯 건",
-        "quote": "six priced option wells",
-        "locator": "page:4"
-      },
-      "newsCategory": "Fleet Status"
-    },
-    {
-      "id": "reading-34e4fa4fb3b7cf8d29c1",
-      "company": "Noble",
-      "vessel": "Noble Globetrotter I",
-      "vessels": [
-        "Noble Globetrotter I"
-      ],
-      "vesselId": "noble-globetrotter-i",
-      "classification": "official-report-reading",
-      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
-      "publishedAt": null,
-      "title": "Noble Fleet Status Report",
-      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
-      "autoApplied": true,
-      "pendingReview": false,
-      "reviewStatus": "applied",
-      "readingDecision": {
-        "action": "upsert",
-        "contractId": "noble-globetrotter-i-r6400580dd14f",
-        "row": {
-          "startDate": "2027-04-01",
-          "endDate": "2027-06-30",
-          "dayRate": 0,
-          "client": "Occidental",
-          "region": "Peru",
-          "status": "Firm",
-          "interpretation": {
-            "sourceStartText": "Q2-27",
-            "sourceEndText": "Q2-27",
-            "placementBasis": "Q2 계약기간을 해당 분기에 배치",
-            "termText": "Two-well contract",
-            "optionText": null,
-            "valueText": null,
-            "awardType": "unreported",
-            "valueUsd": null,
-            "baseDurationDays": null,
-            "includes": [
-              "additional fees for mobilization and demobilization"
-            ],
-            "excludes": [],
-            "derivedUsdPerDay": null
-          }
-        },
-        "reasonKo": "Occidental 2웰 계약 신규 공시",
-        "quote": "Two-well contract with Occidental expected to commence in Q2 2027",
-        "locator": "page:4"
-      },
-      "newsCategory": "Fleet Status"
-    },
-    {
-      "id": "reading-e7d3c6ee444bd35a01d9",
-      "company": "Noble",
-      "vessel": "Noble Globetrotter I",
-      "vessels": [
-        "Noble Globetrotter I"
-      ],
-      "vesselId": "noble-globetrotter-i",
-      "classification": "official-report-reading",
-      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
-      "publishedAt": null,
-      "title": "Noble Fleet Status Report",
-      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
-      "autoApplied": true,
-      "pendingReview": false,
-      "reviewStatus": "applied",
-      "readingDecision": {
-        "action": "upsert",
-        "contractId": "noble-globetrotter-i-rc99d5d9f86c6",
-        "row": {
-          "startDate": "2027-07-01",
-          "endDate": "2030-06-30",
-          "dayRate": 0,
-          "client": "TotalEnergies",
-          "region": "West Africa",
-          "status": "Firm",
-          "interpretation": {
-            "sourceStartText": "Q3/Q4-27",
-            "sourceEndText": "2030",
-            "placementBasis": "첫 콜오프 Q3/Q4 시점을 포함해 3년 기간을 2027년 4분기부터 배치",
-            "termText": "Three-year capacity reservation agreement (CRA)",
-            "optionText": null,
-            "valueText": null,
-            "awardType": "unreported",
-            "valueUsd": null,
-            "baseDurationDays": 1095,
-            "includes": [
-              "minimum 150 days per year for Light Well Intervention services"
-            ],
-            "excludes": [],
-            "derivedUsdPerDay": null
-          }
-        },
-        "reasonKo": "CRA 3년 예약 계약 및 첫 콜오프의 추정 기간 반영",
-        "quote": "Three-year capacity reservation agreement (CRA) for light well intervention services",
-        "locator": "page:4"
-      },
-      "newsCategory": "Fleet Status"
-    },
-    {
       "id": "reading-21500a3d95d4eeb645fa",
       "company": "Valaris",
       "vessel": "VALARIS DS-12",
@@ -3266,6 +2645,1121 @@
       "storedReading": {
         "reviewedAt": "2026-10-19T16:34:40Z"
       }
+    },
+    {
+      "id": "reading-a02ba14cf1ec084306ae",
+      "company": "Noble",
+      "vessel": "Noble Faye Kozack",
+      "vessels": [
+        "Noble Faye Kozack"
+      ],
+      "vesselId": "noble-faye-kozack",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "noble-faye-kozack-f35970f156",
+        "row": null,
+        "reasonKo": "기존 Petrobras 계약과 보고서가 일치합니다.",
+        "quote": "Brazil Petrobras Jul-24 Jan-27",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-3773f29a7a2dc936c974",
+      "company": "Noble",
+      "vessel": "Noble Faye Kozack",
+      "vessels": [
+        "Noble Faye Kozack"
+      ],
+      "vesselId": "noble-faye-kozack",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "noble-faye-kozack-r67895ee2180c",
+        "row": null,
+        "reasonKo": "Tullow 기본 계약의 기간과 유정 수가 이미 반영되어 있습니다.",
+        "quote": "Mid 2027 Q1 2028",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-f3a39a3faff08ed5f72f",
+      "company": "Noble",
+      "vessel": "Noble Faye Kozack",
+      "vessels": [
+        "Noble Faye Kozack"
+      ],
+      "vesselId": "noble-faye-kozack",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "noble-faye-kozack-rf90f56964ab2",
+        "row": null,
+        "reasonKo": "Tullow 옵션이 이미 반영되어 있습니다.",
+        "quote": "plus five priced option wells",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-894d6b43547b07d4a5ec",
+      "company": "Noble",
+      "vessel": "Noble Stanley Lafosse",
+      "vessels": [
+        "Noble Stanley Lafosse"
+      ],
+      "vesselId": "noble-stanley-lafosse",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "noble-stanley-lafosse-a635b013db",
+        "row": null,
+        "reasonKo": "Murphy 계약 기간이 보고서와 일치합니다.",
+        "quote": "US Gulf Murphy Feb-25 Jan-27",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-d09318978c7e2a5002c1",
+      "company": "Noble",
+      "vessel": "Noble Valiant",
+      "vessels": [
+        "Noble Valiant"
+      ],
+      "vesselId": "noble-valiant",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "noble-valiant-72ce40eb06",
+        "row": null,
+        "reasonKo": "TotalEnergies 기본 계약 기간과 조건이 이미 반영되어 있습니다.",
+        "quote": "Dec-26 Q4-29",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-e23913fbbdc1fbf075a5",
+      "company": "Noble",
+      "vessel": "Noble Valiant",
+      "vessels": [
+        "Noble Valiant"
+      ],
+      "vesselId": "noble-valiant",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "noble-valiant-rc14cbcb18204",
+        "row": null,
+        "reasonKo": "TotalEnergies 미행사 옵션이 이미 반영되어 있습니다.",
+        "quote": "four one-well options",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-0f504614543833c291e6",
+      "company": "Noble",
+      "vessel": "Noble Venturer",
+      "vessels": [
+        "Noble Venturer"
+      ],
+      "vesselId": "noble-venturer",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "noble-venturer-57cee55354",
+        "row": null,
+        "reasonKo": "Planet One 계약 기간과 공개 일일 요율이 일치합니다.",
+        "quote": "Oct-26 Nov-26 $430,000",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-a49b232fd7f61fb18876",
+      "company": "Noble",
+      "vessel": "Noble Venturer",
+      "vessels": [
+        "Noble Venturer"
+      ],
+      "vesselId": "noble-venturer",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "noble-venturer-26bd126dca",
+        "row": {
+          "startDate": "2027-10-01",
+          "endDate": "2031-09-30",
+          "dayRate": 0,
+          "client": "Shell",
+          "region": "US Gulf",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Q4-27",
+            "sourceEndText": "Q3-31",
+            "placementBasis": "Q4 시작은 분기 초, Q3 종료는 분기 말로 배치",
+            "termText": "Four-year contract",
+            "optionText": "Plus four 1-year options at mutually agreed rates.",
+            "valueText": "base dayrate value of $606 million (including upgrades and services, excluding mob/demob)",
+            "awardType": "unreported",
+            "valueUsd": 606000000,
+            "baseDurationDays": 1460,
+            "includes": [
+              "upgrades and services"
+            ],
+            "excludes": [
+              "mobilization and demobilization"
+            ],
+            "derivedUsdPerDay": 415068.4931506849
+          }
+        },
+        "reasonKo": "종료 표기를 Q3-31의 분기 말로 정정했습니다.",
+        "quote": "Q4-27 Q3-31",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-7adb6eb3e7b8966ba7cd",
+      "company": "Noble",
+      "vessel": "Noble Venturer",
+      "vessels": [
+        "Noble Venturer"
+      ],
+      "vesselId": "noble-venturer",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "noble-venturer-300040a979",
+        "row": {
+          "startDate": "2031-10-01",
+          "endDate": "2035-09-30",
+          "dayRate": 0,
+          "client": "Shell",
+          "region": "US Gulf",
+          "status": "Option",
+          "interpretation": {
+            "sourceStartText": null,
+            "sourceEndText": null,
+            "placementBasis": "기본 계약 Q3-31 종료 다음 날부터 네 차례 1년 옵션을 연속 배치",
+            "termText": "four 1-year options",
+            "optionText": "at mutually agreed rates",
+            "valueText": null,
+            "awardType": null,
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "기본 계약이 Q3-31에 끝나므로 옵션을 다음 날부터 연속 배치해 겹침을 없앱니다.",
+        "quote": "Plus four 1-year options",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-e60e4c0f0e22f67a336f",
+      "company": "Noble",
+      "vessel": "Noble Viking",
+      "vessels": [
+        "Noble Viking"
+      ],
+      "vesselId": "noble-viking",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "noble-viking-008ba8cd5a",
+        "row": null,
+        "reasonKo": "Asia Pac 계약의 분기 기간과 지역이 일치합니다.",
+        "quote": "Asia Pac Undisclosed Q1-28 Q4-28",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-91cc6068590e46a508a7",
+      "company": "Noble",
+      "vessel": "Noble Viking",
+      "vessels": [
+        "Noble Viking"
+      ],
+      "vesselId": "noble-viking",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "noble-viking-3713509662",
+        "row": null,
+        "reasonKo": "Q1 2029까지 옵션이 이미 반영되어 있습니다.",
+        "quote": "Plus options to Q1 2029.",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-34e4fa4fb3b7cf8d29c1",
+      "company": "Noble",
+      "vessel": "Noble Voyager",
+      "vessels": [
+        "Noble Voyager"
+      ],
+      "vesselId": "noble-voyager",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "noble-voyager-2e1f880e11",
+        "row": {
+          "startDate": "2026-09-01",
+          "endDate": "2030-09-30",
+          "dayRate": 0,
+          "client": "Shell",
+          "region": "US Gulf",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Sep-26",
+            "sourceEndText": "Sep-30",
+            "placementBasis": "월 표기는 해당 월의 시작일과 말일로 배치",
+            "termText": "Four-year contract",
+            "optionText": "Plus four 1-year options at mutually agreed rates.",
+            "valueText": "base dayrate value of $606 million (including upgrades and services, excluding mob/demob)",
+            "awardType": "unreported",
+            "valueUsd": 606000000,
+            "baseDurationDays": 1460,
+            "includes": [
+              "upgrades and services"
+            ],
+            "excludes": [
+              "mobilization and demobilization"
+            ],
+            "derivedUsdPerDay": 415068.4931506849
+          }
+        },
+        "reasonKo": "보고서의 Sep-26 시작일과 Sep-30 종료일로 갱신합니다.",
+        "quote": "Sep-26 Sep-30",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-e7d3c6ee444bd35a01d9",
+      "company": "Noble",
+      "vessel": "Noble Voyager",
+      "vessels": [
+        "Noble Voyager"
+      ],
+      "vesselId": "noble-voyager",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "noble-voyager-0d0344b4f0",
+        "row": {
+          "startDate": "2030-10-01",
+          "endDate": "2034-09-30",
+          "dayRate": 0,
+          "client": "Shell",
+          "region": "US Gulf",
+          "status": "Option",
+          "interpretation": {
+            "sourceStartText": null,
+            "sourceEndText": null,
+            "placementBasis": "기본 계약 종료 다음 날부터 4년 옵션을 연속 배치",
+            "termText": "four 1-year options",
+            "optionText": "at mutually agreed rates",
+            "valueText": null,
+            "awardType": null,
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "기본 계약 종료일이 갱신되어 옵션도 그 다음 날부터 연속 배치합니다.",
+        "quote": "Plus four 1-year options",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-3d67b90b630ad34f5625",
+      "company": "Noble",
+      "vessel": "Noble Tom Madden",
+      "vessels": [
+        "Noble Tom Madden"
+      ],
+      "vesselId": "noble-tom-madden",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "noble-tom-madden-77476a732f",
+        "row": {
+          "startDate": "2019-12-01",
+          "endDate": "2029-02-28",
+          "dayRate": 0,
+          "client": "ExxonMobil",
+          "region": "Guyana",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Dec-19",
+            "sourceEndText": "Feb-29",
+            "placementBasis": "월 표기는 해당 월의 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": null,
+            "valueText": null,
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "보고서 종료 월인 Feb-29로 갱신합니다.",
+        "quote": "Guyana ExxonMobil Dec-19 Feb-29",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-416e50a4e191cd3305a9",
+      "company": "Noble",
+      "vessel": "Noble Sam Croft",
+      "vessels": [
+        "Noble Sam Croft"
+      ],
+      "vesselId": "noble-sam-croft",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "noble-sam-croft-2047ad4413",
+        "row": {
+          "startDate": "2019-04-01",
+          "endDate": "2029-02-28",
+          "dayRate": 0,
+          "client": "ExxonMobil",
+          "region": "Guyana",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Apr-19",
+            "sourceEndText": "Feb-29",
+            "placementBasis": "월 표기는 해당 월의 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": null,
+            "valueText": null,
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "보고서 종료 월인 Feb-29로 갱신합니다.",
+        "quote": "Guyana ExxonMobil Apr-19 Feb-29",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-026f6d6900e75923ece3",
+      "company": "Noble",
+      "vessel": "Noble Don Taylor",
+      "vessels": [
+        "Noble Don Taylor"
+      ],
+      "vesselId": "noble-don-taylor",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "noble-don-taylor-7f08c6b6e4",
+        "row": {
+          "startDate": "2019-11-01",
+          "endDate": "2029-02-28",
+          "dayRate": 0,
+          "client": "ExxonMobil",
+          "region": "Guyana",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Nov-19",
+            "sourceEndText": "Feb-29",
+            "placementBasis": "월 표기는 해당 월의 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": null,
+            "valueText": null,
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "보고서 종료 월인 Feb-29로 갱신합니다.",
+        "quote": "Guyana ExxonMobil Nov-19 Feb-29",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-29c2a5ef12994d3ff3be",
+      "company": "Noble",
+      "vessel": "Noble Bob Douglas",
+      "vessels": [
+        "Noble Bob Douglas"
+      ],
+      "vesselId": "noble-bob-douglas",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "noble-bob-douglas-d3495f8ec3",
+        "row": {
+          "startDate": "2018-04-01",
+          "endDate": "2029-02-28",
+          "dayRate": 0,
+          "client": "ExxonMobil",
+          "region": "Guyana",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Apr-18",
+            "sourceEndText": "Feb-29",
+            "placementBasis": "월 표기는 해당 월의 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": null,
+            "valueText": null,
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "보고서 종료 월인 Feb-29로 갱신합니다.",
+        "quote": "Guyana ExxonMobil Apr-18 Feb-29",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-e11897dab4b04c67fe53",
+      "company": "Noble",
+      "vessel": "Noble BlackHawk",
+      "vessels": [
+        "Noble BlackHawk"
+      ],
+      "vesselId": "noble-blackhawk",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "noble-blackhawk-0adc4f5264",
+        "row": {
+          "startDate": "2024-11-01",
+          "endDate": "2026-11-30",
+          "dayRate": 0,
+          "client": "Occidental",
+          "region": "US Gulf",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Nov-24",
+            "sourceEndText": "Nov-26",
+            "placementBasis": "월 표기는 해당 월의 시작일과 말일로 배치",
+            "termText": "Two-year contract valued at $350 million",
+            "optionText": null,
+            "valueText": "valued at $350 million, excluding potential additional fees for MPD services.",
+            "awardType": "unreported",
+            "valueUsd": 350000000,
+            "baseDurationDays": 730,
+            "includes": [],
+            "excludes": [
+              "potential additional fees for MPD services"
+            ],
+            "derivedUsdPerDay": 479452.05479452055
+          }
+        },
+        "reasonKo": "보고서가 Occidental 계약 종료를 Nov-26으로 표시합니다.",
+        "quote": "Occidental Nov-24 Nov-26",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-e21fd52e7076bed00738",
+      "company": "Noble",
+      "vessel": "Noble BlackHawk",
+      "vessels": [
+        "Noble BlackHawk"
+      ],
+      "vesselId": "noble-blackhawk",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "noble-blackhawk-2882232a6e",
+        "row": null,
+        "reasonKo": "보고서에 기재되지 않았지만 기존 옵션의 취소나 대체가 명시되지 않았습니다."
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-af3f88e530e8a8c49210",
+      "company": "Noble",
+      "vessel": "Noble BlackHawk",
+      "vessels": [
+        "Noble BlackHawk"
+      ],
+      "vesselId": "noble-blackhawk",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "noble-blackhawk-reb2fb1f96477",
+        "row": null,
+        "reasonKo": "Apache 수주 기간과 금액이 이미 반영되어 있습니다.",
+        "quote": "Q4 2027 Q4 2027",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-20bfdad107b44a0467e7",
+      "company": "Noble",
+      "vessel": "Noble BlackHornet",
+      "vessels": [
+        "Noble BlackHornet"
+      ],
+      "vesselId": "noble-blackhornet",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "noble-blackhornet-da57fd4e74",
+        "row": {
+          "startDate": "2025-02-01",
+          "endDate": "2027-02-28",
+          "dayRate": 0,
+          "client": "bp",
+          "region": "US Gulf",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Feb-25",
+            "sourceEndText": "Feb-27",
+            "placementBasis": "월 표기는 해당 월의 시작일과 말일로 배치",
+            "termText": "Two-year contract valued at $350 million",
+            "optionText": null,
+            "valueText": "Two-year contract valued at $350 million.",
+            "awardType": "unreported",
+            "valueUsd": 350000000,
+            "baseDurationDays": 730,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": 479452.05479452055
+          }
+        },
+        "reasonKo": "보고서 종료 월 Feb-27에 맞춰 갱신합니다.",
+        "quote": "bp Feb-25 Feb-27",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-4dcb090979afe8af9831",
+      "company": "Noble",
+      "vessel": "Noble BlackHornet",
+      "vessels": [
+        "Noble BlackHornet"
+      ],
+      "vesselId": "noble-blackhornet",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "noble-blackhornet-4adea1d559",
+        "row": null,
+        "reasonKo": "bp의 두 번째 firm 계약 기간과 금액이 일치합니다.",
+        "quote": "Feb-27 Feb-29",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-a99aa6f7ff53c0d947a3",
+      "company": "Noble",
+      "vessel": "Noble BlackHornet",
+      "vessels": [
+        "Noble BlackHornet"
+      ],
+      "vesselId": "noble-blackhornet",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "noble-blackhornet-834f095b0a",
+        "row": null,
+        "reasonKo": "가격이 정해진 1년 옵션이 이미 반영되어 있습니다.",
+        "quote": "one-year priced option",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-7e08bc0f5db560897901",
+      "company": "Noble",
+      "vessel": "Noble BlackLion",
+      "vessels": [
+        "Noble BlackLion"
+      ],
+      "vesselId": "noble-blacklion",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "noble-blacklion-3dddbdde8f",
+        "row": null,
+        "reasonKo": "기존 bp 계약이 보고서와 일치합니다.",
+        "quote": "bp Sep-26 Sep-28",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-b4f00fe9068c20b09b6f",
+      "company": "Noble",
+      "vessel": "Noble BlackLion",
+      "vessels": [
+        "Noble BlackLion"
+      ],
+      "vesselId": "noble-blacklion",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "noble-blacklion-e00f033cdf",
+        "row": {
+          "startDate": "2026-09-01",
+          "endDate": "2028-09-30",
+          "dayRate": 0,
+          "client": "bp",
+          "region": "US Gulf",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Sep-26",
+            "sourceEndText": "Sep-28",
+            "placementBasis": "월 표기는 해당 월의 시작일과 말일로 배치",
+            "termText": "Two-year contract valued at $310 million",
+            "optionText": "plus a one-year priced option",
+            "valueText": "Two-year contract valued at $310 million",
+            "awardType": "unreported",
+            "valueUsd": 310000000,
+            "baseDurationDays": 730,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": 424657.5342465753
+          }
+        },
+        "reasonKo": "보고서의 Sep-28 종료 월로 갱신합니다.",
+        "quote": "Sep-26 Sep-28",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-e52557a552f588b22087",
+      "company": "Noble",
+      "vessel": "Noble BlackLion",
+      "vessels": [
+        "Noble BlackLion"
+      ],
+      "vesselId": "noble-blacklion",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "noble-blacklion-ec6ec15e81",
+        "row": {
+          "startDate": "2028-10-01",
+          "endDate": "2029-09-30",
+          "dayRate": 0,
+          "client": "bp",
+          "region": "US Gulf",
+          "status": "Option",
+          "interpretation": {
+            "sourceStartText": null,
+            "sourceEndText": null,
+            "placementBasis": "갱신된 기본 계약 종료 다음 날부터 1년 옵션 배치",
+            "termText": "one-year priced option",
+            "optionText": "one-year priced option",
+            "valueText": null,
+            "awardType": null,
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "기본 계약 종료 월 변경에 맞춰 옵션을 다음 달부터 배치합니다.",
+        "quote": "plus a one-year priced option",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-32534dad4acd5c6b7ead",
+      "company": "Noble",
+      "vessel": "Noble BlackRhino",
+      "vessels": [
+        "Noble BlackRhino"
+      ],
+      "vesselId": "noble-blackrhino",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "noble-blackrhino-r30df4b5a2c4d",
+        "row": null,
+        "reasonKo": "TotalEnergies 기본 계약의 기간과 추정 작업일이 일치합니다.",
+        "quote": "Nov-26 Apr-27",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-a290b075cf81a808b07d",
+      "company": "Noble",
+      "vessel": "Noble BlackRhino",
+      "vessels": [
+        "Noble BlackRhino"
+      ],
+      "vesselId": "noble-blackrhino",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "noble-blackrhino-rf2314adf9287",
+        "row": null,
+        "reasonKo": "6개 가격 확정 옵션 유정이 이미 반영되어 있습니다.",
+        "quote": "six priced option wells",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-3ee26cc2b6b9c841e896",
+      "company": "Noble",
+      "vessel": "Noble Globetrotter I",
+      "vessels": [
+        "Noble Globetrotter I"
+      ],
+      "vesselId": "noble-globetrotter-i",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "noble-globetrotter-i-r6400580dd14f",
+        "row": null,
+        "reasonKo": "Occidental 2개 유정 계약의 분기 기간과 추가 비용 조건이 반영되어 있습니다.",
+        "quote": "Q2-27 Q2-27",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-90d83bb6d3a74b2642bf",
+      "company": "Noble",
+      "vessel": "Noble Globetrotter I",
+      "vessels": [
+        "Noble Globetrotter I"
+      ],
+      "vesselId": "noble-globetrotter-i",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "noble-globetrotter-i-rc99d5d9f86c6",
+        "row": {
+          "startDate": "2027-10-01",
+          "endDate": "2030-09-30",
+          "dayRate": 0,
+          "client": "TotalEnergies",
+          "region": "West Africa",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Q3/Q4-27",
+            "sourceEndText": "2030",
+            "placementBasis": "첫 콜오프가 Q3/Q4-27이므로 시작을 Q4 초로 배치하고 3년 기간 적용",
+            "termText": "3-year Capacity Reservation Agreement (CRA)",
+            "optionText": null,
+            "valueText": null,
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": 1095,
+            "includes": [
+              "minimum 150 days per year for Light Well Intervention services"
+            ],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "CRA 시작을 명시된 첫 콜오프 Q3/Q4-27에 맞춰 배치합니다.",
+        "quote": "Q3/Q4-27 2030",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-8b1fa1385aa567ace0f1",
+      "company": "Noble",
+      "vessel": "Noble Gerry de Souza",
+      "vessels": [
+        "Noble Gerry de Souza"
+      ],
+      "vesselId": "noble-gerry-de-souza",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "noble-gerry-de-souza-7aa86809f4",
+        "row": null,
+        "reasonKo": "ExxonMobil 기본 계약과 공개 금액이 이미 반영되어 있습니다.",
+        "quote": "Aug-26 Aug-28",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-a03103952bdd50e6a03f",
+      "company": "Noble",
+      "vessel": "Noble Gerry de Souza",
+      "vessels": [
+        "Noble Gerry de Souza"
+      ],
+      "vesselId": "noble-gerry-de-souza",
+      "classification": "official-report-reading",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "publishedAt": null,
+      "title": "Noble Fleet Status Report",
+      "sourceId": "source-5c38990246916c2dc39555f86a4405fdaeac9407c33882b7130dbb7a590942c2",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "noble-gerry-de-souza-8f405eb5f9",
+        "row": null,
+        "reasonKo": "세 개의 미가격 1년 옵션이 이미 반영되어 있습니다.",
+        "quote": "three unpriced one-year options",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
     }
   ]
 }

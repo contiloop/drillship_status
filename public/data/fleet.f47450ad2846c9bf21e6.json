@@ -194,7 +194,7 @@
       {
         "vesselId": "noble-venturer",
         "startDate": "2027-10-01",
-        "endDate": "2031-06-30",
+        "endDate": "2031-09-30",
         "dayRate": 0,
         "client": "Shell",
         "region": "US Gulf",
@@ -203,9 +203,9 @@
         "interpretation": {
           "sourceStartText": "Q4-27",
           "sourceEndText": "Q3-31",
-          "placementBasis": "Q4 시작은 분기 초로 배치하고 기존 계약 종료일을 유지",
+          "placementBasis": "Q4 시작은 분기 초, Q3 종료는 분기 말로 배치",
           "termText": "Four-year contract",
-          "optionText": "plus four 1-year options at mutually agreed rates",
+          "optionText": "Plus four 1-year options at mutually agreed rates.",
           "valueText": "base dayrate value of $606 million (including upgrades and services, excluding mob/demob)",
           "awardType": "unreported",
           "valueUsd": 606000000,
@@ -222,8 +222,8 @@
       },
       {
         "vesselId": "noble-venturer",
-        "startDate": "2031-07-01",
-        "endDate": "2035-06-30",
+        "startDate": "2031-10-01",
+        "endDate": "2035-09-30",
         "dayRate": 0,
         "client": "Shell",
         "region": "US Gulf",
@@ -232,7 +232,7 @@
         "interpretation": {
           "sourceStartText": null,
           "sourceEndText": null,
-          "placementBasis": "기존 기본 계약 종료 다음 날부터 네 차례 1년 옵션을 연속 배치",
+          "placementBasis": "기본 계약 Q3-31 종료 다음 날부터 네 차례 1년 옵션을 연속 배치",
           "termText": "four 1-year options",
           "optionText": "at mutually agreed rates",
           "valueText": null,
@@ -359,23 +359,57 @@
     "contracts": [
       {
         "vesselId": "noble-voyager",
-        "startDate": "2026-07-01",
-        "endDate": "2030-06-30",
+        "startDate": "2026-09-01",
+        "endDate": "2030-09-30",
         "dayRate": 0,
         "client": "Shell",
         "region": "US Gulf",
         "status": "Firm",
-        "id": "noble-voyager-2e1f880e11"
+        "id": "noble-voyager-2e1f880e11",
+        "interpretation": {
+          "sourceStartText": "Sep-26",
+          "sourceEndText": "Sep-30",
+          "placementBasis": "월 표기는 해당 월의 시작일과 말일로 배치",
+          "termText": "Four-year contract",
+          "optionText": "Plus four 1-year options at mutually agreed rates.",
+          "valueText": "base dayrate value of $606 million (including upgrades and services, excluding mob/demob)",
+          "awardType": "unreported",
+          "valueUsd": 606000000,
+          "baseDurationDays": 1460,
+          "includes": [
+            "upgrades and services"
+          ],
+          "excludes": [
+            "mobilization and demobilization"
+          ],
+          "derivedUsdPerDay": 415068.4931506849
+        },
+        "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
       },
       {
         "vesselId": "noble-voyager",
-        "startDate": "2030-07-01",
-        "endDate": "2034-06-30",
+        "startDate": "2030-10-01",
+        "endDate": "2034-09-30",
         "dayRate": 0,
         "client": "Shell",
         "region": "US Gulf",
         "status": "Option",
-        "id": "noble-voyager-0d0344b4f0"
+        "id": "noble-voyager-0d0344b4f0",
+        "interpretation": {
+          "sourceStartText": null,
+          "sourceEndText": null,
+          "placementBasis": "기본 계약 종료 다음 날부터 4년 옵션을 연속 배치",
+          "termText": "four 1-year options",
+          "optionText": "at mutually agreed rates",
+          "valueText": null,
+          "awardType": null,
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
       }
     ]
   },
@@ -391,12 +425,27 @@
       {
         "vesselId": "noble-tom-madden",
         "startDate": "2019-12-01",
-        "endDate": "2029-01-31",
+        "endDate": "2029-02-28",
         "dayRate": 0,
         "client": "ExxonMobil",
         "region": "Guyana",
         "status": "Firm",
-        "id": "noble-tom-madden-77476a732f"
+        "id": "noble-tom-madden-77476a732f",
+        "interpretation": {
+          "sourceStartText": "Dec-19",
+          "sourceEndText": "Feb-29",
+          "placementBasis": "월 표기는 해당 월의 시작일과 말일로 배치",
+          "termText": null,
+          "optionText": null,
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
       }
     ]
   },
@@ -412,12 +461,27 @@
       {
         "vesselId": "noble-sam-croft",
         "startDate": "2019-04-01",
-        "endDate": "2029-01-31",
+        "endDate": "2029-02-28",
         "dayRate": 0,
         "client": "ExxonMobil",
         "region": "Guyana",
         "status": "Firm",
-        "id": "noble-sam-croft-2047ad4413"
+        "id": "noble-sam-croft-2047ad4413",
+        "interpretation": {
+          "sourceStartText": "Apr-19",
+          "sourceEndText": "Feb-29",
+          "placementBasis": "월 표기는 해당 월의 시작일과 말일로 배치",
+          "termText": null,
+          "optionText": null,
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
       }
     ]
   },
@@ -433,12 +497,27 @@
       {
         "vesselId": "noble-don-taylor",
         "startDate": "2019-11-01",
-        "endDate": "2029-01-31",
+        "endDate": "2029-02-28",
         "dayRate": 0,
         "client": "ExxonMobil",
         "region": "Guyana",
         "status": "Firm",
-        "id": "noble-don-taylor-7f08c6b6e4"
+        "id": "noble-don-taylor-7f08c6b6e4",
+        "interpretation": {
+          "sourceStartText": "Nov-19",
+          "sourceEndText": "Feb-29",
+          "placementBasis": "월 표기는 해당 월의 시작일과 말일로 배치",
+          "termText": null,
+          "optionText": null,
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
       }
     ]
   },
@@ -454,12 +533,27 @@
       {
         "vesselId": "noble-bob-douglas",
         "startDate": "2018-04-01",
-        "endDate": "2029-01-31",
+        "endDate": "2029-02-28",
         "dayRate": 0,
         "client": "ExxonMobil",
         "region": "Guyana",
         "status": "Firm",
-        "id": "noble-bob-douglas-d3495f8ec3"
+        "id": "noble-bob-douglas-d3495f8ec3",
+        "interpretation": {
+          "sourceStartText": "Apr-18",
+          "sourceEndText": "Feb-29",
+          "placementBasis": "월 표기는 해당 월의 시작일과 말일로 배치",
+          "termText": null,
+          "optionText": null,
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
       }
     ]
   },
@@ -475,12 +569,29 @@
       {
         "vesselId": "noble-blackhawk",
         "startDate": "2024-11-01",
-        "endDate": "2026-10-31",
+        "endDate": "2026-11-30",
         "dayRate": 0,
         "client": "Occidental",
         "region": "US Gulf",
         "status": "Firm",
-        "id": "noble-blackhawk-0adc4f5264"
+        "id": "noble-blackhawk-0adc4f5264",
+        "interpretation": {
+          "sourceStartText": "Nov-24",
+          "sourceEndText": "Nov-26",
+          "placementBasis": "월 표기는 해당 월의 시작일과 말일로 배치",
+          "termText": "Two-year contract valued at $350 million",
+          "optionText": null,
+          "valueText": "valued at $350 million, excluding potential additional fees for MPD services.",
+          "awardType": "unreported",
+          "valueUsd": 350000000,
+          "baseDurationDays": 730,
+          "includes": [],
+          "excludes": [
+            "potential additional fees for MPD services"
+          ],
+          "derivedUsdPerDay": 479452.05479452055
+        },
+        "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
       },
       {
         "vesselId": "noble-blackhawk",
@@ -533,12 +644,27 @@
       {
         "vesselId": "noble-blackhornet",
         "startDate": "2025-02-01",
-        "endDate": "2027-01-31",
+        "endDate": "2027-02-28",
         "dayRate": 0,
         "client": "bp",
         "region": "US Gulf",
         "status": "Firm",
-        "id": "noble-blackhornet-da57fd4e74"
+        "id": "noble-blackhornet-da57fd4e74",
+        "interpretation": {
+          "sourceStartText": "Feb-25",
+          "sourceEndText": "Feb-27",
+          "placementBasis": "월 표기는 해당 월의 시작일과 말일로 배치",
+          "termText": "Two-year contract valued at $350 million",
+          "optionText": null,
+          "valueText": "Two-year contract valued at $350 million.",
+          "awardType": "unreported",
+          "valueUsd": 350000000,
+          "baseDurationDays": 730,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": 479452.05479452055
+        },
+        "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
       },
       {
         "vesselId": "noble-blackhornet",
@@ -584,22 +710,52 @@
       {
         "vesselId": "noble-blacklion",
         "startDate": "2026-09-01",
-        "endDate": "2028-08-31",
+        "endDate": "2028-09-30",
         "dayRate": 0,
         "client": "bp",
         "region": "US Gulf",
         "status": "Firm",
-        "id": "noble-blacklion-e00f033cdf"
+        "id": "noble-blacklion-e00f033cdf",
+        "interpretation": {
+          "sourceStartText": "Sep-26",
+          "sourceEndText": "Sep-28",
+          "placementBasis": "월 표기는 해당 월의 시작일과 말일로 배치",
+          "termText": "Two-year contract valued at $310 million",
+          "optionText": "plus a one-year priced option",
+          "valueText": "Two-year contract valued at $310 million",
+          "awardType": "unreported",
+          "valueUsd": 310000000,
+          "baseDurationDays": 730,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": 424657.5342465753
+        },
+        "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
       },
       {
         "vesselId": "noble-blacklion",
-        "startDate": "2028-09-01",
-        "endDate": "2029-08-31",
+        "startDate": "2028-10-01",
+        "endDate": "2029-09-30",
         "dayRate": 0,
         "client": "bp",
         "region": "US Gulf",
         "status": "Option",
-        "id": "noble-blacklion-ec6ec15e81"
+        "id": "noble-blacklion-ec6ec15e81",
+        "interpretation": {
+          "sourceStartText": null,
+          "sourceEndText": null,
+          "placementBasis": "갱신된 기본 계약 종료 다음 날부터 1년 옵션 배치",
+          "termText": "one-year priced option",
+          "optionText": "one-year priced option",
+          "valueText": null,
+          "awardType": null,
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
       }
     ]
   },
@@ -711,8 +867,8 @@
         "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
       },
       {
-        "startDate": "2027-07-01",
-        "endDate": "2030-06-30",
+        "startDate": "2027-10-01",
+        "endDate": "2030-09-30",
         "dayRate": 0,
         "client": "TotalEnergies",
         "region": "West Africa",
@@ -720,8 +876,8 @@
         "interpretation": {
           "sourceStartText": "Q3/Q4-27",
           "sourceEndText": "2030",
-          "placementBasis": "첫 콜오프 Q3/Q4 시점을 포함해 3년 기간을 2027년 4분기부터 배치",
-          "termText": "Three-year capacity reservation agreement (CRA)",
+          "placementBasis": "첫 콜오프가 Q3/Q4-27이므로 시작을 Q4 초로 배치하고 3년 기간 적용",
+          "termText": "3-year Capacity Reservation Agreement (CRA)",
           "optionText": null,
           "valueText": null,
           "awardType": "unreported",
