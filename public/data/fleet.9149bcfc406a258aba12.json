@@ -67,6 +67,56 @@
         "id": "noble-faye-kozack-rf90f56964ab2",
         "vesselId": "noble-faye-kozack",
         "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
+      },
+      {
+        "startDate": "2027-06-01",
+        "endDate": "2028-01-31",
+        "dayRate": 0,
+        "client": "Tullow",
+        "region": "Ghana",
+        "status": "Firm",
+        "interpretation": {
+          "sourceStartText": "Mid 2027",
+          "sourceEndText": "Q1 2028",
+          "placementBasis": "mid는 6월, Q1은 분기 말로 배치",
+          "termText": "Five-well contract (estimated 250 days)",
+          "optionText": "plus five priced option wells",
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": 250,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "id": "noble-faye-kozack-r6e85fb0de015",
+        "vesselId": "noble-faye-kozack",
+        "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
+      },
+      {
+        "startDate": "2028-02-01",
+        "endDate": "2028-12-31",
+        "dayRate": 0,
+        "client": "Tullow",
+        "region": "Ghana",
+        "status": "Option",
+        "interpretation": {
+          "sourceStartText": null,
+          "sourceEndText": null,
+          "placementBasis": "옵션 기간은 타임라인의 밝은 구간으로 배치",
+          "termText": null,
+          "optionText": "five priced option wells",
+          "valueText": null,
+          "awardType": null,
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "id": "noble-faye-kozack-r10805540f133",
+        "vesselId": "noble-faye-kozack",
+        "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
       }
     ]
   },
@@ -147,6 +197,31 @@
           "derivedUsdPerDay": null
         },
         "id": "noble-valiant-rc14cbcb18204",
+        "vesselId": "noble-valiant",
+        "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
+      },
+      {
+        "startDate": "2030-01-01",
+        "endDate": "2030-12-31",
+        "dayRate": 0,
+        "client": "TotalEnergies",
+        "region": "Suriname",
+        "status": "Option",
+        "interpretation": {
+          "sourceStartText": null,
+          "sourceEndText": null,
+          "placementBasis": "타임라인상 기존 계약 종료 후 옵션 구간",
+          "termText": null,
+          "optionText": "four one-well options across both TotalEnergies Suriname contracts",
+          "valueText": null,
+          "awardType": null,
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "id": "noble-valiant-r80a19bc03413",
         "vesselId": "noble-valiant",
         "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
       }
@@ -518,6 +593,33 @@
         "id": "noble-blackhawk-reb2fb1f96477",
         "vesselId": "noble-blackhawk",
         "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
+      },
+      {
+        "startDate": "2027-10-01",
+        "endDate": "2027-12-31",
+        "dayRate": 0,
+        "client": "Apache",
+        "region": "Uruguay",
+        "status": "Firm",
+        "interpretation": {
+          "sourceStartText": "Q4 2027",
+          "sourceEndText": "Q4 2027",
+          "placementBasis": "Q4 시작은 분기 초, 종료는 분기 말",
+          "termText": "One-well contract (estimated 50 days)",
+          "optionText": null,
+          "valueText": "valued at $25 million, excluding additional fees for mobilization",
+          "awardType": "unreported",
+          "valueUsd": 25000000,
+          "baseDurationDays": 50,
+          "includes": [],
+          "excludes": [
+            "mobilization"
+          ],
+          "derivedUsdPerDay": 500000.0
+        },
+        "id": "noble-blackhawk-re680709ee0ce",
+        "vesselId": "noble-blackhawk",
+        "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
       }
     ]
   },
@@ -661,6 +763,56 @@
         "id": "noble-blackrhino-rf2314adf9287",
         "vesselId": "noble-blackrhino",
         "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
+      },
+      {
+        "startDate": "2026-11-01",
+        "endDate": "2027-04-30",
+        "dayRate": 0,
+        "client": "TotalEnergies",
+        "region": "Nigeria",
+        "status": "Firm",
+        "interpretation": {
+          "sourceStartText": "Nov-26",
+          "sourceEndText": "Apr-27",
+          "placementBasis": "월 표기는 해당 월의 시작과 말로 배치",
+          "termText": "Four-well contract (estimated 150 days)",
+          "optionText": "plus six priced option wells",
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": 150,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "id": "noble-blackrhino-rb1e0d348c0ff",
+        "vesselId": "noble-blackrhino",
+        "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
+      },
+      {
+        "startDate": "2027-05-01",
+        "endDate": "2027-12-31",
+        "dayRate": 0,
+        "client": "TotalEnergies",
+        "region": "Nigeria",
+        "status": "Option",
+        "interpretation": {
+          "sourceStartText": null,
+          "sourceEndText": null,
+          "placementBasis": "미행사 옵션은 기본 계약 뒤의 타임라인 옵션 구간으로 배치",
+          "termText": null,
+          "optionText": "six priced option wells",
+          "valueText": null,
+          "awardType": null,
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "id": "noble-blackrhino-r05443cea4f85",
+        "vesselId": "noble-blackrhino",
+        "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
       }
     ]
   },
@@ -734,6 +886,60 @@
           "derivedUsdPerDay": null
         },
         "id": "noble-globetrotter-i-rc99d5d9f86c6",
+        "vesselId": "noble-globetrotter-i",
+        "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
+      },
+      {
+        "startDate": "2027-04-01",
+        "endDate": "2027-06-30",
+        "dayRate": 0,
+        "client": "Occidental",
+        "region": "Peru",
+        "status": "Firm",
+        "interpretation": {
+          "sourceStartText": "Q2-27",
+          "sourceEndText": "Q2-27",
+          "placementBasis": "Q2 계약기간을 해당 분기에 배치",
+          "termText": "Two-well contract",
+          "optionText": null,
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [
+            "additional fees for mobilization and demobilization"
+          ],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "id": "noble-globetrotter-i-r5097563e9a5a",
+        "vesselId": "noble-globetrotter-i",
+        "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
+      },
+      {
+        "startDate": "2027-07-01",
+        "endDate": "2030-06-30",
+        "dayRate": 0,
+        "client": "TotalEnergies",
+        "region": "West Africa",
+        "status": "Firm",
+        "interpretation": {
+          "sourceStartText": "Q3/Q4-27",
+          "sourceEndText": "2030",
+          "placementBasis": "첫 콜오프 Q3/Q4 시점을 포함해 3년 기간을 2027년 4분기부터 배치",
+          "termText": "Three-year capacity reservation agreement (CRA)",
+          "optionText": null,
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": 1095,
+          "includes": [
+            "minimum 150 days per year for Light Well Intervention services"
+          ],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "id": "noble-globetrotter-i-r68798b6b492f",
         "vesselId": "noble-globetrotter-i",
         "sourceUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015"
       }

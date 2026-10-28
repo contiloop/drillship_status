@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-10-28T14:20:03Z",
+  "generatedAt": "2026-10-28T14:26:02Z",
   "fromDataHash": "740f584011f227fa23f4",
-  "toDataHash": "740f584011f227fa23f4",
+  "toDataHash": "9149bcfc406a258aba12",
   "companies": {
     "Transocean": {
       "statusChanges": 0,
@@ -17,7 +17,7 @@
     },
     "Noble": {
       "statusChanges": 0,
-      "contractsAdded": 0,
+      "contractsAdded": 8,
       "contractsRemoved": 0,
       "contractsChanged": 0
     },
