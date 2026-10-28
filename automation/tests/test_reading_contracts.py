@@ -529,3 +529,186 @@ def test_png_end_integrity_is_required_even_after_all_hashes_are_recomputed(dama
     # PNG integrity, not a stale transport/content digest.
     with pytest.raises(DocumentValidationError, match="PNG"):
         validate_reading_input(image_request(image=image))
+
+
+def stored_record():
+    return {"version": "legacy-v1", "company": "Seadrill", "url": "https://example.com/report",
+            "publishedAt": "2026-10-01", "sourceSha256": "a" * 64,
+            "reader": {"engine": "codex-cli", "model": "old-model", "reviewedAt": "2026-10-02T12:00:00Z"},
+            "result": {"vessels": [{"vessel": "Rig A", "facts": {"expectedStart": "Mid 2027",
+                "expectedEnd": "2028", "counterparty": "New client", "location": "Angola",
+                "announcedValueUsdApprox": 182500000, "termText": "1 year"}}]},
+            "unrecognizedLegacyField": {"keep": ["every", "original", "value"]}}
+
+
+def stored_request(record=None):
+    import hashlib
+    import json
+    record = stored_record() if record is None else record
+    text = json.dumps(record, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False)
+    record_hash = hashlib.sha256(text.encode("utf-8")).hexdigest()
+    req = request("official-news")
+    req.update(sourceId="stored-reading-" + record_hash, inputMode="stored-result",
+               pages=[{"locator": "stored-review:" + record_hash, "text": text}],
+               storedReading={"legacyLedger": "data/news/reviews.json", "recordSha256": record_hash,
+                              "originalSourceSha256": record.get("sourceSha256"),
+                              "reviewedAt": record.get("reader", {}).get("reviewedAt")})
+    req["sourceSha256"] = source_sha256(req["pages"])
+    return req
+
+
+def stored_response(req):
+    out = response(req)
+    out["readLocators"] = [req["pages"][0]["locator"]]
+    out["decisions"][0]["evidence"] = [{"fields": ["client", "region", "interpretation"],
+        "sourceId": req["sourceId"], "locator": req["pages"][0]["locator"], "quote": req["pages"][0]["text"]}]
+    return out
+
+
+def test_stored_result_is_a_separate_valid_input_without_an_original_body():
+    req = stored_request()
+    validate_reading_input(req, reader_policy="policy")
+    result = validate_reading_response(stored_response(req), req)
+    assert result.issues == []
+    assert len(result.decisions) == 1
+    assert req["sourceSha256"] != req["storedReading"]["originalSourceSha256"]
+
+
+def test_stored_record_helpers_preserve_every_unknown_legacy_field():
+    from automation.fleet_sync.reading_contracts import stored_record_sha256, stored_review_page
+    record = stored_record()
+    before = deepcopy(record)
+    req = stored_request(record)
+    assert stored_review_page(record) == req["pages"][0]
+    assert stored_record_sha256(record) == req["storedReading"]["recordSha256"]
+    del record["unrecognizedLegacyField"]
+    assert stored_record_sha256(record) != stored_record_sha256(before)
+    assert before == stored_record()
+
+
+def test_explicit_document_mode_keeps_existing_document_contract():
+    req = request()
+    req["inputMode"] = "document"
+    validate_reading_input(req)
+    assert validate_reading_response(response(req), req).issues == []
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda req: req.pop("storedReading"),
+    lambda req: req["storedReading"].update(recordSha256="0" * 64),
+    lambda req: req["storedReading"].update(originalSourceSha256="0" * 64),
+    lambda req: req["storedReading"].update(originalSourceSha256=None),
+    lambda req: req["storedReading"].update(reviewedAt="2026-10-03T12:00:00Z"),
+    lambda req: req["storedReading"].update(reviewedAt=None),
+    lambda req: req["storedReading"].update(legacyLedger=""),
+    lambda req: req["pages"][0].update(locator="page:1"),
+    lambda req: req["pages"][0].update(image=png_image()),
+    lambda req: req["pages"].append({"locator": "page:2", "text": "Original body must not be appended"}),
+    lambda req: req.update(company="Noble"),
+    lambda req: req.update(url="https://example.com/another-original"),
+    lambda req: req.update(publishedAt="2025-01-01"),
+])
+def test_stored_result_requires_consistent_provenance_and_only_its_record_page(mutate):
+    req = stored_request()
+    mutate(req)
+    req["sourceSha256"] = source_sha256(req["pages"])
+    with pytest.raises(DocumentValidationError):
+        validate_reading_input(req)
+
+
+@pytest.mark.parametrize("mode", [None, "document"])
+def test_document_mode_cannot_masquerade_stored_pages_or_provenance_as_original_reading(mode):
+    req = stored_request()
+    if mode is None:
+        req.pop("inputMode")
+    else:
+        req["inputMode"] = mode
+    with pytest.raises(DocumentValidationError):
+        validate_reading_input(req)
+    req.pop("storedReading")
+    with pytest.raises(DocumentValidationError):
+        validate_reading_input(req)
+
+
+@pytest.mark.parametrize("text", ["not JSON", "[]", '{"result":{}}', '{"same":1,"same":2}'])
+def test_stored_pages_cannot_substitute_summaries_or_non_record_json(text):
+    req = stored_request()
+    req["pages"][0]["text"] = text
+    req["sourceSha256"] = source_sha256(req["pages"])
+    with pytest.raises(DocumentValidationError):
+        validate_reading_input(req)
+
+
+def test_original_hash_and_review_date_nullability_follows_the_record():
+    record = stored_record()
+    record.pop("sourceSha256")
+    record["reader"].pop("reviewedAt")
+    req = stored_request(record)
+    validate_reading_input(req)
+    assert req["storedReading"]["originalSourceSha256"] is None
+    assert req["storedReading"]["reviewedAt"] is None
+
+
+def test_stored_result_does_not_allow_fake_original_evidence_or_bypass_calculation():
+    req = stored_request()
+    out = stored_response(req)
+    out["decisions"][0]["evidence"][0].update(locator="page:1")
+    assert len(validate_reading_response(out, req).issues) == 1
+    out = stored_response(req)
+    out["decisions"][0]["evidence"][0].update(sourceId="original-document-id")
+    assert len(validate_reading_response(out, req).issues) == 1
+    out = stored_response(req)
+    out["decisions"][0]["evidence"][0].update(quote="Original words absent from this saved JSON")
+    assert len(validate_reading_response(out, req).issues) == 1
+    out = stored_response(req)
+    out["decisions"][0]["row"]["interpretation"]["derivedUsdPerDay"] = 600000
+    assert len(validate_reading_response(out, req).issues) == 1
+
+
+def test_stored_fleet_report_still_requires_registry_coverage_and_input_locator():
+    req = stored_request()
+    req["kind"] = "fleet-report"
+    out = stored_response(req)
+    out["coverage"] = []
+    with pytest.raises(DocumentValidationError, match="coverage"):
+        validate_reading_response(out, req)
+    out = stored_response(req)
+    out["readLocators"] = ["page:1"]
+    with pytest.raises(DocumentValidationError, match="readLocators"):
+        validate_reading_response(out, req)
+
+
+def test_stored_v2_output_wrapper_is_opaque_and_preserves_optional_audit_fields():
+    record = stored_record()
+    record["result"] = {"readingResponse": {"schemaVersion": 2, "futureField": [1, {"keep": True}]}}
+    record["originalDocumentSha256"] = "b" * 64
+    validate_reading_input(stored_request(record))
+
+
+def test_stored_page_is_exact_canonical_json_and_record_hash_covers_unknown_fields():
+    import json
+    req = stored_request()
+    req["pages"][0]["text"] = json.dumps(stored_record(), indent=2)
+    req["sourceSha256"] = source_sha256(req["pages"])
+    with pytest.raises(DocumentValidationError, match="canonical"):
+        validate_reading_input(req)
+    record = stored_record()
+    record.pop("unrecognizedLegacyField")
+    req["pages"][0]["text"] = json.dumps(record, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    req["sourceSha256"] = source_sha256(req["pages"])
+    with pytest.raises(DocumentValidationError, match="recordSha256"):
+        validate_reading_input(req)
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda decision: decision.update(contractId="unknown-contract"),
+    lambda decision: decision["row"].update(endDate="2020-01-01"),
+    lambda decision: decision["row"].update(dayRate=math.inf),
+])
+def test_stored_results_preserve_existing_reference_date_and_finite_number_checks(mutate):
+    req = stored_request()
+    out = stored_response(req)
+    mutate(out["decisions"][0])
+    result = validate_reading_response(out, req)
+    assert len(result.issues) == 1
+    assert not result.decisions
