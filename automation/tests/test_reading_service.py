@@ -1,12 +1,14 @@
 """Controlled reader outputs test the boundary; these never invoke a model."""
 from copy import deepcopy
+import base64
+import hashlib
 import json
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
-from automation.fleet_sync.codex_reader import CodexReader
+from automation.fleet_sync.codex_reader import CodexReader, _prepare_page_images
 from automation.fleet_sync.reading_contracts import context_sha256, policy_sha256, source_sha256
 from automation.fleet_sync.reading_service import (
     POLICY_SHA256, READER_POLICY, READER_PROMPT, ReadingService,
@@ -309,3 +311,126 @@ def test_codex_rejects_non_chatgpt_or_failed_auth_without_exec(monkeypatch, auth
 def test_invalid_retry_configuration(max_attempts):
     with pytest.raises(ValueError):
         ReadingService(Reader(), max_attempts=max_attempts)
+
+
+# A real PNG fixture encoded inline keeps tests reproducible without retained
+# generated files. The adapter transports pixels; it does not interpret them.
+PNG = base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=")
+
+
+def image(data=PNG):
+    return dict(mimeType="image/png", sha256=hashlib.sha256(data).hexdigest(),
+                dataBase64=base64.b64encode(data).decode("ascii"))
+
+
+@pytest.mark.parametrize("retry", [False, True])
+def test_pdf_images_are_all_attached_in_page_order_without_inline_base64(monkeypatch, retry):
+    req = request()
+    req["pages"].insert(1, {"locator": "page:decoration", "text": "", "image": image()})
+    req["pages"][0]["image"] = image()
+    req["pages"][-1]["image"] = image()
+    req["sourceSha256"] = source_sha256(req["pages"])
+    original = deepcopy(req)
+    expected = response(req)
+    observed_paths = []
+    monkeypatch.setattr("automation.fleet_sync.codex_reader.shutil.which", lambda _: "/bin/codex")
+
+    def run(command, **kwargs):
+        if command[1:3] == ["login", "status"]:
+            return SimpleNamespace(returncode=0, stdout="Logged in using ChatGPT", stderr="")
+        image_paths = [Path(command[index + 1]) for index, value in enumerate(command) if value == "--image"]
+        observed_paths.extend(image_paths)
+        assert [path.name for path in image_paths] == ["page-000001.png", "page-000002.png", "page-000003.png"]
+        assert all(path.read_bytes() == PNG for path in image_paths)
+        assert len({path.parent for path in image_paths}) == 1
+        manifest = json.loads(kwargs["input"].split("\nPAGE_IMAGE_ATTACHMENTS_JSON:\n", 1)[1].split("\nINPUT_JSON:\n", 1)[0])
+        assert [item["locator"] for item in manifest] == [p["locator"] for p in req["pages"]]
+        assert [item["attachmentIndex"] for item in manifest] == [1, 2, 3]
+        assert all(item["sourceId"] == "s1" for item in manifest)
+        supplied = json.loads(kwargs["input"].split("\nINPUT_JSON:\n", 1)[1])
+        assert supplied["pages"] == [{**page, "image": {k: v for k, v in page["image"].items() if k != "dataBase64"}} for page in req["pages"]]
+        assert supplied["sourceSha256"] == req["sourceSha256"]
+        assert "dataBase64" not in kwargs["input"]
+        output = deepcopy(expected)
+        if retry and len(observed_paths) == 3:
+            output["readLocators"] = ["page:1"]
+        Path(command[command.index("--output-last-message") + 1]).write_text(json.dumps(output))
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr("automation.fleet_sync.codex_reader.subprocess.run", run)
+    outcome = ReadingService(CodexReader()).read(req)
+    assert outcome.response == expected
+    assert outcome.attempts == (2 if retry else 1)
+    assert len(observed_paths) == (6 if retry else 3)
+    assert req == original
+    assert all(not path.exists() for path in observed_paths)
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda img: img.update(dataBase64="not base64!"),
+    lambda img: img.update(dataBase64=img["dataBase64"] + "\n"),
+    lambda img: img.update(sha256="0" * 64),
+    lambda img: img.update(mimeType="image/jpeg"),
+    lambda img: img.update(image(b"not a PNG")),
+])
+def test_invalid_page_image_fails_before_cli_invocation(monkeypatch, mutate):
+    req = request()
+    req["pages"][0]["image"] = image()
+    mutate(req["pages"][0]["image"])
+    req["sourceSha256"] = source_sha256(req["pages"])
+    calls = []
+    monkeypatch.setattr("automation.fleet_sync.codex_reader.subprocess.run", lambda *args, **kwargs: calls.append(args))
+    with pytest.raises(ValueError):
+        CodexReader().read(req)
+    assert calls == []
+
+
+def test_original_image_input_hash_is_verified_before_metadata_only_transport(monkeypatch):
+    req = request()
+    req["pages"][0]["image"] = image()
+    # Keep the previous text-only hash: stripping image data must never make
+    # this stale identity appear to match the actual original input.
+    calls = []
+    monkeypatch.setattr("automation.fleet_sync.codex_reader.subprocess.run", lambda *args, **kwargs: calls.append(args))
+    with pytest.raises(ValueError, match="sourceSha256"):
+        CodexReader().read(req)
+    assert calls == []
+
+
+def test_policy_identifies_multimodal_delivery():
+    policy = json.loads(READER_POLICY)
+    assert policy["imageDelivery"]["version"] == "png-page-attachments-v1"
+    assert policy["imageDelivery"]["order"] == "input-page-order"
+    assert policy["imageDelivery"]["inlineImageData"] == "omitted-after-validation"
+
+
+def test_image_attachment_indices_preserve_text_only_page_gaps_and_untrusted_locators(tmp_path):
+    req = request()
+    req["pages"][0]["locator"] = "../../outside.png"
+    req["pages"].append({"locator": "page:3", "text": "", "image": image()})
+    req["pages"][0]["image"] = image()
+    supplied, attachments = _prepare_page_images(req, tmp_path)
+    assert [a["filename"] for a in attachments] == ["page-000001.png", "page-000003.png"]
+    assert [a["attachmentIndex"] for a in attachments] == [1, 2]
+    assert [a["pageIndex"] for a in attachments] == [1, 3]
+    assert attachments[0]["locator"] == "../../outside.png"
+    assert set(p.name for p in tmp_path.iterdir()) == {"page-000001.png", "page-000003.png"}
+    assert supplied["pages"][1] == req["pages"][1]
+    assert "dataBase64" not in supplied["pages"][0]["image"]
+    assert "dataBase64" in req["pages"][0]["image"]
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda img: img.update(dataBase64="invalid"),
+    lambda img: img.update(dataBase64=img["dataBase64"] + "\n"),
+    lambda img: img.update(sha256="0" * 64),
+    lambda img: img.update(mimeType="image/jpeg"),
+    lambda img: img.update(image(b"not a PNG")),
+])
+def test_image_file_boundary_rechecks_strict_decode_and_raw_identity(tmp_path, mutate):
+    req = request()
+    req["pages"][0]["image"] = image()
+    mutate(req["pages"][0]["image"])
+    with pytest.raises(ValueError):
+        _prepare_page_images(req, tmp_path)
+    assert list(tmp_path.iterdir()) == []
