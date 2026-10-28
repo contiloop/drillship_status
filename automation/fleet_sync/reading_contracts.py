@@ -32,6 +32,13 @@ class ReadingPage(TypedDict):
 
 
 class ReadingEvidence(TypedDict):
+    """Claim paths, e.g. facts.client or row.interpretation.valueUsd.
+
+    A complete interpretation path may cite the object. A leaf path supports
+    only that leaf. Bare aliases require equal facts/row values. Source metadata
+    is checked against input/baseline rather than requiring body quotations.
+    """
+
     fields: list[str]
     sourceId: str
     locator: str
@@ -413,7 +420,48 @@ def _check_interpretation(value: ContractInterpretation, *, public: bool = False
             raise ValueError("derivedUsdPerDay does not equal valueUsd / baseDurationDays")
 
 
-def _check_evidence(items: list[ReadingEvidence], request: ReadingInput, required: set[str]) -> None:
+_MISSING = object()
+
+
+def _value_at_path(target: dict, path: str) -> Any:
+    value: Any = target
+    for key in path.split("."):
+        if not key or not isinstance(value, dict) or key not in value:
+            return _MISSING
+        value = value[key]
+    return value
+
+
+def _evidence_paths(name: str, target: dict) -> set[str]:
+    """Resolve a real claim path; aliases never merge different claim values."""
+    if name in {"row", "facts"} or name.split(".")[0] in {"evidence", "reasonKo"}:
+        raise ValueError(f"evidence field must identify a claim: {name}")
+    direct = _value_at_path(target, name)
+    if direct is not _MISSING:
+        return {name}
+    if name.split(".")[0] in {"row", "facts"}:
+        raise ValueError(f"evidence field does not exist: {name}")
+    candidates = [(f"{scope}.{name}", _value_at_path(target, f"{scope}.{name}"))
+                  for scope in ("facts", "row")]
+    candidates = [(path, value) for path, value in candidates if value is not _MISSING]
+    if not candidates:
+        raise ValueError(f"evidence field does not exist: {name}")
+    # A null fact makes no affirmative claim. It need not make an otherwise
+    # unambiguous row field alias ambiguous, or acquire an invented quotation.
+    present = [(path, value) for path, value in candidates if value is not None]
+    candidates = present or candidates
+    if any(value != candidates[0][1] for _, value in candidates[1:]):
+        raise ValueError(f"ambiguous evidence field; use facts./row. path: {name}")
+    return {path for path, _ in candidates}
+
+
+def _check_evidence(items: list[ReadingEvidence], request: ReadingInput, required: set[str], target: dict) -> None:
+    """Check exact source text and coverage of actual, scoped claim paths.
+
+    A citation naming an entire interpretation object supports its descendants.
+    A citation naming one leaf supports only that leaf, never its siblings or
+    parent. Bare aliases are accepted only for equal facts/row claim values.
+    """
     pages = {page["locator"]: page["text"] for page in request["pages"]}
     covered: set[str] = set()
     for item in items:
@@ -422,26 +470,46 @@ def _check_evidence(items: list[ReadingEvidence], request: ReadingInput, require
         if item["quote"] not in pages[item["locator"]]:
             raise ValueError("evidence quote must be a verbatim substring at its locator")
         for name in item["fields"]:
-            # Both bare row field names and explicit facts./row. paths are
-            # accepted. A parent interpretation citation covers that object.
-            name = name.removeprefix("row.").removeprefix("facts.")
-            covered.add(name)
+            covered.update(_evidence_paths(name, target))
     missing = {name for name in required if not any(
-        name == key or name.startswith(key + ".") or key.startswith(name + ".") for key in covered)}
+        name == key or name.startswith(key + ".") for key in covered)}
     if missing:
         raise ValueError(f"changed fields lack evidence: {sorted(missing)}")
 
 
+def _interpretation_evidence_fields(value: ContractInterpretation) -> set[str]:
+    # These explicit absence/default values are established by reading the whole
+    # input. They do not require a quotation claiming that a source said nothing.
+    absence = {"startPrecision": "unknown", "endPrecision": "unknown", "dateBasis": "unresolved",
+               "awardType": "unreported", "rateBasis": "undisclosed", "maximumTerm": False}
+    return {key for key, item in value.items() if item is not None and item != [] and
+            not (key in absence and item == absence[key])}
+
+
 def _facts_evidence_fields(facts: ReadingFacts) -> set[str]:
-    fields = {key for key in ("client", "region") if facts[key] is not None}
-    interpretation = facts["interpretation"]
-    content = ("sourceStartText", "sourceEndText", "placementBasis", "termText", "optionText", "valueText", "reportedUsdPerDay", "derivedUsdPerDay", "valueUsd", "baseDurationDays", "durationAssumption")
-    disclosed = (interpretation["awardType"] != "unreported" or interpretation["dateBasis"] != "unresolved" or
-                 interpretation["startPrecision"] != "unknown" or interpretation["endPrecision"] != "unknown" or
-                 interpretation["maximumTerm"] or interpretation["includes"] or interpretation["excludes"])
-    if any(interpretation[key] is not None for key in content) or disclosed:
-        fields.add("interpretation")
+    fields = {f"facts.{key}" for key in ("client", "region") if facts[key] is not None}
+    fields |= {f"facts.interpretation.{key}" for key in _interpretation_evidence_fields(facts["interpretation"])}
     return fields
+
+
+def _check_row_metadata(row: ReadingRow, baseline: dict | None, request: ReadingInput) -> None:
+    """Model provenance must preserve baseline or match verified input values.
+
+    Null/missing values are unsupplied, never instructions to clear provenance.
+    These system links need no artificial quote from a document's body.
+    """
+    verified = {"sourceUrl": request["url"], "sourcePublishedAt": request["publishedAt"],
+                "newsReviewed": request["kind"] == "official-news",
+                "datePrecision": {"start": row["interpretation"]["startPrecision"],
+                                  "end": row["interpretation"]["endPrecision"]}}
+    for name, expected in verified.items():
+        supplied = row.get(name)
+        if supplied is None:
+            continue
+        if baseline is not None and supplied == baseline.get(name, _MISSING):
+            continue
+        if supplied != expected:
+            raise ValueError(f"{name} must preserve baseline or match verified reading input/interpretation")
 
 
 def _check_decision(item: ReadingDecision, request: ReadingInput, vessels: dict, contracts: dict) -> None:
@@ -474,9 +542,17 @@ def _check_decision(item: ReadingDecision, request: ReadingInput, vessels: dict,
         expected_day_rate = reported if row["interpretation"]["rateBasis"] == "reported" else 0
         if row["dayRate"] != expected_day_rate:
             raise ValueError("dayRate must preserve the disclosed reported rate, otherwise zero")
-        fields = {"startDate", "endDate", "dayRate", "client", "region", "status", "interpretation"}
-        required |= {key for key in fields if baseline is None or row[key] != baseline.get(key)}
-    _check_evidence(item["evidence"], request, required)
+        _check_row_metadata(row, baseline, request)
+        fields = {"startDate", "endDate", "dayRate", "client", "region", "status"}
+        # Zero is the public representation of a non-reported rate, not a new
+        # source claim. A source-absence quote must never be invented for it.
+        if row["interpretation"]["rateBasis"] != "reported":
+            fields.remove("dayRate")
+        required |= {f"row.{key}" for key in fields if baseline is None or row[key] != baseline.get(key)}
+        old_interpretation = (baseline or {}).get("interpretation") or {}
+        required |= {f"row.interpretation.{key}" for key in _interpretation_evidence_fields(row["interpretation"])
+                     if row["interpretation"][key] != old_interpretation.get(key, _MISSING)}
+    _check_evidence(item["evidence"], request, required, item)
 
 
 def validate_reading_response(response: ReadingResponse, request: ReadingInput) -> ReadingValidationResult:
@@ -530,7 +606,7 @@ def validate_reading_response(response: ReadingResponse, request: ReadingInput) 
             _check_vessel(item["vesselId"], request, vessels)
             if update_ids[item["vesselId"]] > 1:
                 raise ValueError("duplicate vesselUpdates vesselId")
-            _check_evidence(item["evidence"], request, {"status", "statusAsOf"})
+            _check_evidence(item["evidence"], request, {"status", "statusAsOf"}, item)
             result.vessel_updates.append(item)
         except (ValueError, TypeError, KeyError, OverflowError) as error:
             result.issues.append(ValidationIssue("vesselUpdates", index, str(error)))

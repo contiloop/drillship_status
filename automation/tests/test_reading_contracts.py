@@ -111,6 +111,7 @@ def test_envelope_failures_fail_document(mutate):
     lambda d: d["row"]["interpretation"].update(maximumTerm=True),
     lambda d: d["row"]["interpretation"].update(dateBasis="unresolved"),
     lambda d: d["row"].update(id="other"),
+    lambda d: d["row"].update(sourceUrl="https://fabricated.example/report"),
     lambda d: d.update(action="withdraw", contractId=None, row=None),
 ])
 def test_individual_invalid_decisions_do_not_block_independent_ones(mutate):
@@ -203,7 +204,7 @@ def test_incomplete_or_nonfinite_rate_metadata_is_isolated(field, value):
 
 def test_existing_source_metadata_is_retained_without_new_required_fields():
     from automation.fleet_sync.model import SourceDocument
-    req = request()
+    req = request("official-news")
     out = response(req)
     row = out["decisions"][0]["row"]
     row.update(sourceUrl=req["url"], sourcePublishedAt="2026-10-01", newsReviewed=True,
@@ -284,3 +285,111 @@ def test_input_published_at_requires_real_iso_date_or_timestamp(timestamp, valid
     else:
         with pytest.raises(DocumentValidationError):
             validate_reading_input(req)
+
+
+@pytest.mark.parametrize("metadata", [
+    {"sourceUrl": "https://untrusted.example/fabricated"},
+    {"sourcePublishedAt": "2000-01-01"},
+    {"datePrecision": {"start": "day", "end": "day"}},
+    {"newsReviewed": True},
+])
+def test_model_cannot_invent_source_metadata_even_with_an_existing_quote(metadata):
+    req = request()
+    out = response(req)
+    out["decisions"][0]["row"].update(metadata)
+    result = validate_reading_response(out, req)
+    assert result.decisions == []
+    assert len(result.issues) == 1
+
+
+@pytest.mark.parametrize("fields", [
+    ["client.nonexistent", "region.nonexistent", "interpretation.sourceStartText"],
+    ["client", "region", "interpretation.sourceStartText"],
+    ["client", "region", "interpretation.nonexistent"],
+    ["client", "region", "row"],
+])
+def test_evidence_does_not_expand_partial_or_nonexistent_paths(fields):
+    req = request()
+    out = response(req)
+    out["decisions"][0]["evidence"] = evidence(fields)
+    result = validate_reading_response(out, req)
+    assert result.decisions == []
+    assert len(result.issues) == 1
+
+
+def test_all_exact_interpretation_leaf_paths_can_support_their_own_changes():
+    req = request()
+    out = response(req)
+    interp = out["decisions"][0]["facts"]["interpretation"]
+    fields = ["client", "region"] + ["interpretation." + key for key, value in interp.items()
+                                    if value is not None and value is not False and value != []]
+    out["decisions"][0]["evidence"] = evidence(fields)
+    assert validate_reading_response(out, req).issues == []
+
+
+def test_fact_citation_cannot_support_a_different_row_claim():
+    req = request()
+    out = response(req)
+    d = out["decisions"][0]
+    d["row"]["client"] = "Different row client"
+    d["evidence"] = evidence(["facts.client", "region", "interpretation"])
+    assert len(validate_reading_response(out, req).issues) == 1
+    d["evidence"][0]["fields"].append("row.client")
+    assert validate_reading_response(out, req).issues == []
+
+
+def test_nullable_and_verified_metadata_need_no_fabricated_metadata_quotes():
+    req = request("official-news")
+    out = response(req)
+    row = out["decisions"][0]["row"]
+    row.update(sourceUrl=req["url"], sourcePublishedAt=req["publishedAt"], newsReviewed=True,
+               datePrecision={"start": row["interpretation"]["startPrecision"], "end": row["interpretation"]["endPrecision"]})
+    assert validate_reading_response(out, req).issues == []
+    row.update(sourceUrl=None, sourcePublishedAt=None, newsReviewed=None, datePrecision=None)
+    assert validate_reading_response(out, req).issues == []
+
+
+def test_original_source_metadata_can_be_preserved_from_the_baseline():
+    req = request()
+    metadata = dict(sourceUrl="https://example.com/prior-report", sourcePublishedAt="2025-01-01",
+                    newsReviewed=True, datePrecision={"start": "month", "end": "month"})
+    req["baseline"][0]["contracts"][0].update(metadata)
+    req["contextSha256"] = context_sha256(req["baseline"], req["priorEvidence"])
+    out = response(req)
+    out["decisions"][0]["row"].update(metadata)
+    assert validate_reading_response(out, req).issues == []
+
+
+def test_missing_interpretation_leaf_citation_does_not_borrow_its_sibling_quote():
+    req = request()
+    out = response(req)
+    interp = out["decisions"][0]["facts"]["interpretation"]
+    fields = ["client", "region"] + ["interpretation." + key for key, value in interp.items()
+                                    if value is not None and value is not False and value != []]
+    fields.remove("interpretation.valueUsd")
+    out["decisions"][0]["evidence"] = evidence(fields)
+    result = validate_reading_response(out, req)
+    assert len(result.issues) == 1
+    assert "interpretation.valueUsd" in result.issues[0].message
+
+
+def test_bare_field_alias_is_rejected_when_facts_and_row_values_differ():
+    req = request()
+    out = response(req)
+    out["decisions"][0]["row"]["client"] = "Different row client"
+    result = validate_reading_response(out, req)
+    assert len(result.issues) == 1
+    assert "ambiguous evidence field" in result.issues[0].message
+
+
+def test_undisclosed_public_zero_needs_no_absence_quote():
+    req = request()
+    req["baseline"][0]["contracts"][0]["dayRate"] = 500000
+    req["contextSha256"] = context_sha256(req["baseline"], req["priorEvidence"])
+    out = response(req)
+    d = out["decisions"][0]
+    for interp in (d["facts"]["interpretation"], d["row"]["interpretation"]):
+        interp.update(rateBasis="undisclosed", reportedUsdPerDay=None, derivedUsdPerDay=None,
+                      valueUsd=None, baseDurationDays=None, durationAssumption=None)
+    assert "dayRate" not in d["evidence"][0]["fields"]
+    assert validate_reading_response(out, req).issues == []
