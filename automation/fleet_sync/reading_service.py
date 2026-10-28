@@ -20,7 +20,7 @@ from .reading_contracts import (
 MODEL = "gpt-6-luna"
 REASONING_EFFORT = "medium"
 SERVICE_TIER = "default"
-POLICY_VERSION = "fleet-reading-v2.5"
+POLICY_VERSION = "fleet-reading-v2.6"
 INPUT_MODE_SELECTION = {
     "version": "document-or-stored-result-v1", "default": "document",
     "document": "prompt", "stored-result": "storedResultPrompt",
@@ -76,6 +76,16 @@ hold that contract and explain the evidence limitation; do not invent a quote.
 INPUT_JSON image metadata deliberately omits binary image data after validation;
 each image sha256 identifies the attached PNG. sourceSha256 remains the hash of
 the original complete request pages, including image data; copy it unchanged.
+
+For fleet-report, account for every contract period the report lists for each
+target vessel, including firm, option, LOA and future periods; do not report only
+the periods you consider new. Return one decision per listed period: upsert for a
+new award, a changed term, or an existing contract whose baseline row lacks the
+source date wording, precision, placement or economic normalization this report
+supports (keep its existing contractId; adding interpretation is not a duplicate);
+no-change only when the existing contract already fully represents the period;
+hold when it cannot be resolved. Existing contracts the report no longer lists
+need no decision unless the report explicitly cancels or replaces them.
 
 """
 
@@ -153,6 +163,10 @@ supports withdrawal. """
 
 _DOCUMENT_QUOTE_RULES = """Copy a nonempty contiguous VERBATIM quote from the cited
 sourceId/locator, preserving original source language, punctuation and spacing.
+Quote the supplied page text exactly as given, not a sentence reassembled from
+the visual layout: table cells and side-by-side columns are often interleaved in
+the text layer, so prefer short fragments (a cell, a phrase or a clause) that
+occur contiguously in that page text, and cite several fragments when needed.
 Use the current input sourceId and page locators for citations; priorEvidence
 provides comparison context rather than permission to invent source citations.
 """
