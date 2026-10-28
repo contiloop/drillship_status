@@ -577,3 +577,19 @@ def test_forced_re_read_of_the_same_revision_adds_new_contracts_without_overwrit
     run(root, reader, collector(material('award')), now=NOW + 60)
     second = [c for c in contracts(published(root)[1]) if '-r' in c['id']]
     assert len(second) == 2 and first[0] in second
+
+
+def test_published_responses_are_forgotten_so_a_forced_re_read_asks_again(root):
+    cache = root / '.cache/reading-responses.json'
+    reader = FakeReader(lambda request: [decision()])
+    run(root, reader, collector(material('award')))
+    record = next(iter(documents(root).values()))
+    dump_json(cache, {'responses': {record['jobId']: {'decisions': []}, 'other': {}}, 'triage': {}, 'categories': {}})
+    reading_pipeline.forget_responses(cache, [record['jobId']])
+    assert load_json(cache)['responses'] == {'other': {}}
+    records = load_json(root / 'data/provenance/readings.json')
+    records['documents'] = {}
+    dump_json(root / 'data/provenance/readings.json', records)
+    reads = len(reader.reads)
+    run(root, reader, collector(material('award')), now=NOW + 60)
+    assert len(reader.reads) == reads + 1

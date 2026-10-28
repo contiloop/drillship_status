@@ -256,6 +256,24 @@ def execute(root: Path, *, mode: str, write: bool, service: ReadingService | Non
         return run.execute(write=write, stored_results=stored_results)
 
 
+def forget_responses(cache_path: Path, job_ids: list[str]) -> None:
+    """Drop cached responses once their results are published.
+
+    The cache exists so a publication retry in a fresh clone does not ask the
+    model again; after publication it must not outlive the job, or a forced
+    re-read of the same revision would replay the old answer.
+    """
+    try:
+        cache = _read(cache_path, {})
+    except (OSError, ValueError):
+        return
+    responses = cache.get("responses") if isinstance(cache, dict) else None
+    if isinstance(responses, dict) and any(job in responses for job in job_ids):
+        for job in job_ids:
+            responses.pop(job, None)
+        atomic_json(cache_path, cache)
+
+
 class _Run:
     def __init__(self, root: Path, *, mode, service, clock, collector, recheck, cache_path):
         self.root, self.mode, self.service, self.clock = root, mode, service, clock

@@ -18,6 +18,7 @@ import time
 from urllib.request import urlopen
 
 from .fleet_sync.core import content_hash
+from .fleet_sync.reading_pipeline import forget_responses
 
 PRODUCTION = 'https://offshore-drillship-fleet-analyst.vercel.app'
 PUBLISH_PATHS = ('public/data', 'data/provenance', 'data/news')
@@ -116,6 +117,7 @@ def _publish_checkout(root: Path, remote: str, cache: Path, *, deploy_timeout: i
         while time.monotonic() < deadline:
             try:
                 if verify_deployment(checkout, expected):
+                    forget_responses(cache, review.get('completedJobIds') or [])
                     return {'ok': True, 'changed': bool(changed), 'deploymentVerified': True,
                             'stateFingerprint': expected['stateFingerprint'], 'production': PRODUCTION,
                             'queueFingerprint': expected['newsQueue']['fingerprint'], **receipts}

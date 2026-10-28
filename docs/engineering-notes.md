@@ -18,6 +18,7 @@
 - **대응**: 개선은 다음 새 판(다음 분기 보고서, 새 기사)부터 적용된다. 특정 문서를 꼭 다시 읽어야 하면 로컬 checkout에서 `data/provenance/readings.json`의 그 문서 기록(같은 `sourceId`의 기록 전부)을 지우고 게시기를 돌린다. 이때 두 가지에 주의한다.
   - 그 URL이 `data/news/reviews.json`에 있거나, `sourceId` 없는 예전 이벤트에 있으면, 처음 보는 문서로 취급되어 다시 읽지 않고 `migrated`로 완료된다.
   - `.cache/reading-responses.json`에 그 작업의 응답이 남아 있으면 Codex를 부르지 않고 그 응답을 다시 쓴다. 새 답이 필요하면 그 키도 지운다.
+  - 실행기 checkout의 `.cache/reading-responses.json`에 그 작업(`jobId`)의 답이 남아 있으면 Codex를 부르지 않고 예전 답을 다시 적용한다. 게시가 확인되면 그 실행에서 완료된 작업의 답은 지워지지만, 로컬에서 `review_news`로 직접 돌린 답은 남는다. 다시 읽히기 전에 그 `jobId` 항목이 없는지 확인하고 있으면 지운다. (2026-10-28 실제 사례: 남은 답이 다시 적용되며 Noble 계약이 두 번씩 들어가 되돌렸다.)
   - 같은 판을 다시 읽으면 첫 읽기가 만든 계약이 기존 계약(baseline)으로 보이고, Codex가 그 ID로 고치거나 새 계약을 추가한다. 새 계약 ID(`new_contract_id`: 선박 ID, `sourceId`, 문서 지문, `decisions` 순번)가 이미 있는 row와 같아지면 순번에 덧붙임 값을 더해 다른 ID를 만든다. 그래서 새 계약이 기존 row를 덮어쓰지는 않지만, Codex가 첫 읽기 row를 고치지 않고 따로 추가하면 겹침 재확인을 거쳐도 중복이 남을 수 있다. 다시 읽은 뒤 그 문서의 `changes`와 해당 선박의 `<선박 ID>-r…` 계약을 확인한다.
   - 확인: 실행 결과의 `modelCalls`가 1 이상이고 그 문서 기록이 `completed`로 바뀌었는지 본다.
 
