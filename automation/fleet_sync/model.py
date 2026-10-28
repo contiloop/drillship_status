@@ -64,6 +64,11 @@ class SourceDocument:
     discovery: str
     content_type: str
 
+    @property
+    def document_sha256(self) -> str:
+        """Original downloaded bytes; distinct from a reader input digest."""
+        return self.sha256
+
 
 @dataclass
 class ParseResult:
@@ -71,3 +76,13 @@ class ParseResult:
     vessels: dict[str, VesselSnapshot]
     warnings: list[str] = field(default_factory=list)
     pending_events: list[dict] = field(default_factory=list)
+
+
+# Version 2 reading contracts are additive: existing parser observations and
+# published rows can continue to omit this metadata while adapters migrate.
+DatePrecision = Literal["day", "month", "quarter", "half-year", "year", "approximate", "unknown"]
+DateBasis = Literal["source", "placement", "unresolved"]
+RateBasis = Literal["reported", "backlog-derived", "undisclosed"]
+AwardType = Literal["signed-contract", "binding-letter-of-award", "letter-of-award", "option-exercised", "extension", "unreported"]
+ReadingKind = Literal["fleet-report", "official-news"]
+ReadingAction = Literal["upsert", "withdraw", "no-change", "hold"]
