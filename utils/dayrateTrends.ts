@@ -1,6 +1,6 @@
 import { regressionLoess } from 'd3-regression';
 import type { Company, Drillship, FleetSource, Generation, OfficialEvent } from '../types';
-import { contractSource } from './contractTimeline';
+import { contractSource, isIsoDate, interpretationDetails, reportedRate } from './contractTimeline';
 import { economicsDetails, timelineContracts } from './newsEconomics';
 
 const DAY = 86_400_000;
@@ -28,14 +28,13 @@ export function dayrateObservations(ships: Drillship[], events: OfficialEvent[],
   const observations: DayrateObservation[] = [];
   for (const ship of ships) {
     for (const row of timelineContracts(ship, events)) {
-      if (row.status !== 'Firm') continue;
+      if (row.status !== 'Firm' || row.interpretation?.dateBasis === 'unresolved' || !isIsoDate(row.startDate) || !isIsoDate(row.endDate)) continue;
       const time = Date.parse(`${row.startDate}T00:00:00Z`);
       const end = Date.parse(`${row.endDate}T00:00:00Z`);
       if (!Number.isFinite(time + end) || end < time) continue;
-      const reported = Number.isFinite(row.dayRate) && row.dayRate > 0;
-      // Extension tranches without individual dates cannot be placed on the
-      // whole legacy contract, even if their individual rates are known.
-      const conversion = row.economics?.scope === 'award' && row.economics.rates.length === 1 ? row.economics.rates[0] : undefined;
+      const reported = reportedRate(row) > 0;
+      // Each canonical model row represents its own value/term tranche.
+      const conversion = row.economics?.rates.length === 1 ? row.economics.rates[0] : undefined;
       if (!reported && !conversion) continue;
       const rate = reported ? row.dayRate : conversion!.usdPerDay;
       if (!Number.isFinite(rate) || rate <= 0) continue;
@@ -45,7 +44,7 @@ export function dayrateObservations(ships: Drillship[], events: OfficialEvent[],
         basis: reported ? 'reported' : 'backlog',
         sourceUrl: contractSource(row.sourceUrl) || contractSource(sources.find(s => s.company === ship.company)?.documentUrl),
         detail: [reported ? '공식 Fleet Status Report에 공개된 일당' : economicsDetails(row.economics!),
-          row.forecast ? `날짜 배치: ${row.forecast.placementBasis}. 원문 개시: ${row.forecast.startLabel}; 정확한 일자 미공개` : '월 단위 계약 구간은 월초·월말로 배치'].join(' · '),
+          row.interpretation ? interpretationDetails(row) : '월 단위 계약 구간은 월초·월말로 배치'].join(' · '),
       });
     }
   }

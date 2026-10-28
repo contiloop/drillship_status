@@ -1,20 +1,9 @@
-import type { Contract, Drillship, OfficialEvent } from '../types';
-import { contractSource } from './contractTimeline';
-
-const DAY = 86_400_000;
-const numbers: Record<string, number> = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10 };
-const numberToken = '(?:[0-9][0-9,]*(?:\\.[0-9]+)?|one|two|three|four|five|six|seven|eight|nine|ten)';
-const numeric = (value: string) => numbers[value.toLowerCase()] ?? Number(value.replaceAll(',', ''));
-const iso = (value: number) => new Date(value).toISOString().slice(0, 10);
-const quotes = (event: OfficialEvent, field: string) => [...new Set((event.evidence || []).filter(e => e.field === field).map(e => e.quote))];
+import type { Contract, ContractInterpretation, Drillship, OfficialEvent } from '../types';
 
 export interface AwardDuration {
-  amount: number;
-  unit: 'day' | 'month' | 'year';
   days: number;
   label: string;
   assumption?: string;
-  maximum: boolean;
 }
 export interface BacklogRate {
   usdPerDay: number;
@@ -29,137 +18,32 @@ export interface NewsEconomics {
 }
 export interface TimelineContract extends Contract {
   economics?: NewsEconomics;
-  forecast?: { startLabel: string; duration: AwardDuration; awardLabel: string; windowLabel: string; placementBasis: string };
 }
 
-function durations(text: string): AwardDuration[] {
-  return [...text.matchAll(new RegExp(`\\b(${numberToken})[-\\s]+(day|month|year)s?\\b`, 'gi'))].map(match => {
-    const amount = numeric(match[1]);
-    const unit = match[2].toLowerCase() as AwardDuration['unit'];
-    const maximum = /up to|maximum|at most/i.test(text.slice(Math.max(0, match.index! - 20), match.index));
-    return { amount, unit, days: amount * (unit === 'year' ? 365 : unit === 'month' ? 365 / 12 : 1), maximum,
-      label: `${maximum ? '최대 ' : ''}${amount.toLocaleString('en-US')}${{ day: '일', month: '개월', year: '년' }[unit]}`,
-      assumption: unit === 'year' ? '1년=365일 가정' : unit === 'month' ? '1개월=365/12일 가정' : undefined };
-  }).filter(d => d.amount > 0 && d.days < 36_500 && (d.unit === 'day' || Number.isInteger(d.amount)));
-}
+const positive = (value: number | null | undefined): value is number => typeof value === 'number' && Number.isFinite(value) && value > 0;
 
-export function awardDuration(event: OfficialEvent): AwardDuration | undefined {
-  const found = durations(quotes(event, 'termText').join(' '));
-  // Ambiguous tranches/options must not silently become a single base term.
-  const distinct = [...new Map(found.map(d => [`${d.amount}-${d.unit}-${d.maximum}`, d])).values()];
-  return distinct.length === 1 ? distinct[0] : undefined;
-}
-
-function money(text: string) {
-  return [...text.matchAll(/\$\s*([\d,]+(?:\.\d+)?)\s*(million|billion)?/gi)]
-    .map(m => Number(m[1].replaceAll(',', '')) * (m[2]?.toLowerCase() === 'billion' ? 1e9 : m[2] ? 1e6 : 1));
+/** Validate the model's numeric pairing; never select amounts or terms from prose. */
+export function interpretationEconomics(value?: ContractInterpretation): NewsEconomics | undefined {
+  if (!value || value.rateBasis !== 'backlog-derived' || value.maximumTerm
+    || !positive(value.valueUsd) || !positive(value.baseDurationDays) || !positive(value.derivedUsdPerDay)) return undefined;
+  const expected = value.valueUsd / value.baseDurationDays;
+  if (Math.abs(expected - value.derivedUsdPerDay) > Math.max(1, expected * 0.00001)) return undefined;
+  return {
+    scope: ['extension', 'option-exercised'].includes(value.awardType) ? 'extension' : 'award',
+    rates: [{ valueUsd: value.valueUsd, usdPerDay: value.derivedUsdPerDay,
+      duration: { days: value.baseDurationDays, label: value.termText || `${value.baseDurationDays.toLocaleString('en-US')}일`, assumption: value.durationAssumption || undefined } }],
+    includes: value.includes, excludes: value.excludes,
+  };
 }
 
 export function newsEconomics(event: OfficialEvent): NewsEconomics | undefined {
-  if (!usableNews(event)) return undefined;
-  const facts = event.facts!;
-  const duration = awardDuration(event);
-  const value = facts.announcedValueUsdApprox;
-  let rates: BacklogRate[] = [];
-  const scope = ['extension', 'option-exercised'].includes(facts.awardType || '') ? 'extension' : 'award';
-  if (scope === 'award' && value && Number.isFinite(value) && value > 0 && duration && !duration.maximum
-      && quotes(event, 'announcedValueUsdApprox').some(q => money(q).includes(value))) {
-    rates = [{ valueUsd: value, duration, usdPerDay: value / duration.days }];
-  } else if (scope === 'extension') {
-    // Pair value and days only within the same quoted sentence, never divide
-    // extension backlog by the whole legacy contract or average separate rates.
-    const sentences = [...new Set(quotes(event, 'termText').flatMap(q => q.split(/(?<=[.!?])\s+(?=[A-Z])/)))];
-    for (const sentence of sentences) {
-      const terms = durations(sentence);
-      const values = money(sentence);
-      if (terms.length === 1 && !terms[0].maximum && values.length === 1 && values[0] > 0) {
-        rates.push({ valueUsd: values[0], duration: terms[0], usdPerDay: values[0] / terms[0].days });
-      }
-    }
-  }
-  rates = [...new Map(rates.map(r => [`${r.valueUsd}-${r.duration.days}`, r])).values()];
-  return rates.length ? { scope, rates, includes: facts.valueIncludes || [], excludes: facts.valueExcludes || [] } : undefined;
+  return interpretationEconomics(event.readingDecision?.facts.interpretation);
 }
 
-function usableNews(event: OfficialEvent) {
-  return Boolean(event.llmReview && event.vessel && event.facts && contractSource(event.url)
-    && ['applied', 'details-incomplete', 'reviewed'].includes(event.reviewStatus || ''));
-}
-
-function startWindow(value: string): { start: number; end: number; label: string } | undefined {
-  const quarter = /^(?:Q([1-4])\s+(\d{4})|(first|second|third|fourth) quarter(?: of)? (\d{4}))$/i.exec(value);
-  const half = /^H([12])\s+(\d{4})$/i.exec(value);
-  const yearOnly = /^(\d{4})$/.exec(value);
-  let year: number, month: number, months: number, label: string;
-  if (quarter) {
-    const q = Number(quarter[1]) || ['first', 'second', 'third', 'fourth'].indexOf(quarter[3].toLowerCase()) + 1;
-    year = Number(quarter[2] || quarter[4]); month = (q - 1) * 3; months = 3; label = `${year}년 ${q}분기`;
-  } else if (half) {
-    year = Number(half[2]); month = (Number(half[1]) - 1) * 6; months = 6; label = `${year}년 ${half[1] === '1' ? '상' : '하'}반기`;
-  } else if (yearOnly) {
-    year = Number(yearOnly[1]); month = 0; months = 12; label = `${year}년`;
-  } else return undefined;
-  return year >= 2000 && year <= 2100 ? { start: Date.UTC(year, month, 1), end: Date.UTC(year, month + months, 1) - DAY, label } : undefined;
-}
-
-function finish(start: number, duration: AwardDuration) {
-  if (duration.unit === 'day') return start + (duration.amount - 1) * DAY;
-  const date = new Date(start);
-  // Calendar months/years for placement; rate conversion assumptions stay explicit.
-  const months = duration.amount * (duration.unit === 'year' ? 12 : 1);
-  const boundary = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + months, 1));
-  const lastDay = new Date(Date.UTC(boundary.getUTCFullYear(), boundary.getUTCMonth() + 1, 0)).getUTCDate();
-  return Date.UTC(boundary.getUTCFullYear(), boundary.getUTCMonth(), Math.min(date.getUTCDate(), lastDay)) - DAY;
-}
-
-/** View-only projection. Canonical contracts and all fleet metrics are untouched. */
-export function timelineContracts(ship: Drillship, events: OfficialEvent[]): TimelineContract[] {
-  const rows: TimelineContract[] = ship.contracts.map(c => ({ ...c }));
-  const seen = new Set<string>();
-  // Place earlier campaigns first so explicitly consecutive awards can join up,
-  // independent of the newest-first ordering of the news feed.
-  const ordered = [...events].sort((a, b) =>
-    (startWindow(a.facts?.expectedStart || '')?.start ?? Infinity) - (startWindow(b.facts?.expectedStart || '')?.start ?? Infinity)
-    || (Date.parse(a.publishedAt || '') || 0) - (Date.parse(b.publishedAt || '') || 0)
-    || (a.url || '').localeCompare(b.url || ''));
-  for (const event of ordered) {
-    if (!usableNews(event) || event.company !== ship.company || event.vessel !== ship.name || seen.has(event.url!)) continue;
-    seen.add(event.url!);
-    const economics = newsEconomics(event);
-    const existing = rows.filter(c => c.sourceUrl === event.url);
-    if (existing.length) {
-      // No guessed matching by vessel/client alone, or distributing one award to
-      // several rows. Extension rates are explicitly scoped to those tranches.
-      if (existing.length === 1 && economics) existing[0].economics = economics;
-      continue;
-    }
-    if (event.autoApplied || !['signed-contract', 'binding-letter-of-award', 'letter-of-award'].includes(event.facts!.awardType || '')) continue;
-    const window = startWindow(event.facts!.expectedStart || '');
-    const duration = awardDuration(event);
-    if (!window || !duration) continue;
-    const signed = event.facts!.awardType === 'signed-contract';
-    const awardLabel = signed ? 'Firm' : 'LOA';
-    let start = window.start;
-    const continuation = quotes(event, 'termText').some(q => /\bdirect continuation\b/i.test(q));
-    if (continuation) {
-      const predecessors = rows.filter(c => c.status === 'Firm' && Date.parse(c.startDate) <= window.end);
-      start = Math.max(start, ...predecessors.map(c => Date.parse(c.endDate) + DAY));
-      // A source window conflicting with an existing firm commitment must not
-      // silently be shifted outside the disclosed window.
-      if (!Number.isFinite(start) || start > window.end) continue;
-    }
-    const end = finish(start, duration);
-    const placementBasis = start > window.start
-      ? `원문의 직접 연속 작업 조건에 따라 앞선 계약 종료 다음 날(${iso(start)})부터 배치`
-      : `공개된 ${window.label}의 첫날(${iso(start)})부터 배치`;
-    rows.push({ id: `forecast-${ship.id}-${event.url}`, vesselId: ship.id,
-      startDate: iso(start), endDate: iso(end), dayRate: event.facts!.dayRateDisclosure === 'reported' ? event.facts!.dayRateUsd || 0 : 0,
-      client: event.facts!.counterparty || 'Undisclosed', region: event.facts!.location || 'Undisclosed', status: signed ? 'Firm' : 'Contingent',
-      sourceUrl: event.url, sourcePublishedAt: event.publishedAt, economics,
-      forecast: { startLabel: window.label, duration, awardLabel, placementBasis,
-        windowLabel: `${iso(start)} – ${iso(end)} · ${duration.label}` } });
-  }
-  return rows;
+/** Canonical rows already contain model-resolved identity, dates and status.
+ * News is detail/provenance only: it must never synthesize a second schedule. */
+export function timelineContracts(ship: Drillship, _events: OfficialEvent[] = []): TimelineContract[] {
+  return ship.contracts.map(row => ({ ...row, economics: interpretationEconomics(row.interpretation) }));
 }
 
 export function backlogRateLabel(economics: NewsEconomics, compact = false) {
@@ -169,7 +53,7 @@ export function backlogRateLabel(economics: NewsEconomics, compact = false) {
 
 export function economicsDetails(economics: NewsEconomics) {
   const calculations = economics.rates.map(r => `$${r.valueUsd.toLocaleString('en-US')} ÷ ${r.duration.days.toLocaleString('en-US', { maximumFractionDigits: 2 })}일${r.duration.assumption ? ` (${r.duration.assumption})` : ''}`);
-  return [...calculations, economics.scope === 'extension' ? '표시 요율은 연장분 각각에만 해당 · 기존 계약 전체 요율 아님' : '계약 가치의 일평균 환산액 · 공시 dayrate 아님',
+  return [...calculations, '계약 가치의 일평균 환산액 · 공시 dayrate 아님',
     economics.includes.length ? `포함: ${economics.includes.join('·')}` : '추가 비용 포함 여부는 원문 기준',
     economics.excludes.length ? `제외: ${economics.excludes.join('·')}` : ''].filter(Boolean).join(' · ');
 }

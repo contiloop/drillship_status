@@ -11,9 +11,7 @@ require.extensions['.tsx'] = compile;
 require.extensions['.ts'] = compile;
 const { DAYRATE_START_YEAR, dayrateObservations, dayrateSeries, dayrateTrend, durationRadius, dayrateDomain, GENERATIONS } = require('../utils/dayrateTrends.ts');
 const { default: Dayrates } = require('../components/DayrateTrends.tsx');
-const manifest = JSON.parse(fs.readFileSync('public/data/manifest.json', 'utf8'));
-const events = JSON.parse(fs.readFileSync(`public/data/${manifest.eventsFile}`, 'utf8')).events;
-const fleet = JSON.parse(fs.readFileSync(`public/data/${manifest.fleetFile}`, 'utf8'));
+const { manifest, events, fleet } = require('./fixtures/legacy-fleet/load.cjs');
 const observations = dayrateObservations(fleet, events, manifest.sources);
 const DAY = 86400000;
 const sample = (n, rate = i => 250000 + i * 10000) => Array.from({ length: n }, (_, i) => ({
@@ -24,22 +22,17 @@ const sample = (n, rate = i => 250000 + i * 10000) => Array.from({ length: n }, 
 
 test('real data contains only supported firm rate-periods by exact generation', () => {
   assert.deepEqual(GENERATIONS.map(gen => observations.filter(p => p.generation === gen && p.basis === 'reported').length), [13, 4, 8, 6]);
-  assert.deepEqual(GENERATIONS.map(gen => observations.filter(p => p.generation === gen && p.basis === 'backlog').length), [0, 1, 3, 0]);
-  assert.equal(observations.length, 35);
+  assert.deepEqual(GENERATIONS.map(gen => observations.filter(p => p.generation === gen && p.basis === 'backlog').length), [0, 0, 0, 0]);
+  assert.equal(observations.length, 31);
   assert(observations.every(p => p.rate > 0 && p.days > 0 && p.sourceUrl.startsWith('https://')));
   assert(!observations.some(p => p.vessel === 'Dhirubhai Deepwater KG2' && p.basis === 'backlog'));
   assert(!observations.some(p => p.vessel === 'West Capella' && p.basis === 'backlog'));
   assert(!observations.some(p => p.vessel === 'VALARIS DS-18' && p.basis === 'backlog'));
 });
 
-test('backlog rates retain amount/term/date provenance and do not overwrite public dayrates', () => {
+test('legacy rows retain reported values without inferring backlog from old news prose', () => {
   const before = JSON.stringify({ fleet, events });
-  const carina = observations.find(p => p.vessel === 'West Carina' && p.basis === 'backlog');
-  assert.equal(carina.rate, 420e6 / 880);
-  assert.equal(carina.days, 880);
-  assert.equal(carina.start, '2027-01-01');
-  assert.match(carina.detail, /420,000,000.*880일/);
-  assert.match(carina.detail, /정확한 일자 미공개/);
+  assert.equal(observations.filter(p => p.basis === 'backlog').length, 0);
   assert.equal(observations.find(p => p.vessel === 'Deepwater Conqueror' && p.basis === 'reported').rate, 530000);
   assert.deepEqual(dayrateObservations(fleet, [...events].reverse(), manifest.sources), observations);
   assert.equal(JSON.stringify({ fleet, events }), before);
@@ -60,6 +53,7 @@ test('all real generation curves are finite and stay within the observed time ra
   for (const gen of GENERATIONS) {
     const rows = observations.filter(p => p.generation === gen);
     const trend = dayrateTrend(rows);
+    if (rows.length < 5) { assert.deepEqual(trend.points, []); continue; }
     assert(trend.points.length >= 4, gen);
     assert(trend.bandwidth >= 0.3 && trend.bandwidth <= 1);
     for (const p of trend.points) {
@@ -74,7 +68,7 @@ test('7G+ starts at 2025 and fits only visible contracts, without changing other
   const before = JSON.stringify(observations);
   const start = Date.UTC(2025, 0, 1);
   const rows = dayrateSeries(observations, '7G+');
-  assert.equal(rows.length, 9);
+  assert.equal(rows.length, 6);
   assert(rows.every(p => p.generation === '7G+' && p.time >= start));
   assert(!rows.some(p => ['Deepwater Pontus', 'Deepwater Poseidon'].includes(p.vessel)));
   assert.equal(dayrateSeries(observations, '7G+', false).length, 6);
@@ -149,11 +143,14 @@ test('axis domains contain all real marks and band values with valid one-point a
 test('chart exposes generation controls, sample count, duration legend, and source limitations', () => {
   const html = renderToStaticMarkup(React.createElement(Dayrates, { ships: fleet, events, sources: manifest.sources }));
   assert.match(html, /7G Drillship Dayrates/);
-  assert.match(html, /n = 5 contract-rate periods/);
+  assert.match(html, /n = 4 contract-rate periods/);
   assert.match(html, /Contract term/);
-  assert.match(html, /LOESS trend/);
-  assert.match(html, /±1 SD dispersion band/);
-  assert.match(html, /not a confidence interval/);
+  assert.match(html, /표본이 부족/);
+  const extra = { ...fleet.find(s => s.generation === '7G'), id: 'controlled-extra', name: 'Controlled', contracts: [{ id: 'controlled-extra', startDate: '2026-01-01', endDate: '2027-01-01', dayRate: 450000, status: 'Firm', client: 'Client' }] };
+  const withTrend = renderToStaticMarkup(React.createElement(Dayrates, { ships: [...fleet, extra], events, sources: manifest.sources }));
+  assert.match(withTrend, /LOESS trend/);
+  assert.match(withTrend, /±1 SD dispersion band/);
+  assert.match(withTrend, /not a confidence interval/);
   assert.match(html, /수주 발표일 아님/);
   assert.match(html, /모든 수주를 수집한 시장 시계열은 아닙니다/);
   assert.match(html, /7G\+<\/button>/);

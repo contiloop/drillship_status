@@ -2,7 +2,7 @@
 import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Drillship, OfficialEvent } from '../types';
 import { getComputedStatus } from '../utils/shipStatus';
-import { contractPeriod, contractSource, contractSpan, quarterScrollOffset } from '../utils/contractTimeline';
+import { contractPeriod, contractSource, contractSpan, interpretationDetails, reportedRate, quarterScrollOffset } from '../utils/contractTimeline';
 import { economicsDetails, backlogRateLabel, timelineContracts, TimelineContract } from '../utils/newsEconomics';
 
 interface FleetGanttProps {
@@ -10,8 +10,8 @@ interface FleetGanttProps {
   events?: OfficialEvent[];
 }
 
-const periodLabel = (row: TimelineContract) => row.forecast?.windowLabel || contractPeriod(row);
-const rateLabel = (row: TimelineContract, compact = false) => row.dayRate > 0
+const periodLabel = (row: TimelineContract) => contractPeriod(row);
+const rateLabel = (row: TimelineContract, compact = false) => reportedRate(row) > 0
   ? (compact ? `$${Math.round(row.dayRate / 1000)}k` : `$${row.dayRate.toLocaleString()} / 일 (공시)`)
   : row.economics ? `${backlogRateLabel(row.economics, compact)}${compact ? '' : ' (백로그 환산)'}` : '일당 미공개';
 
@@ -19,13 +19,13 @@ export function ContractDetails({ selected, shipName, onClose }: { selected: Tim
   return (
     <div role="status" className="fixed bottom-3 left-[4.25rem] right-3 md:left-[14.5rem] md:right-6 z-[60] flex max-h-[45vh] overflow-y-auto flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-xs text-slate-300 shadow-2xl">
       <strong className="text-white">{shipName}</strong>
-      <span>{selected.forecast?.awardLabel || selected.status} · {selected.client} · {selected.region}</span>
-      <span>{periodLabel(selected)}{!selected.forecast && (selected.datePrecision?.start !== 'day' || selected.datePrecision?.end !== 'day') ? ' (월 단위)' : ''}</span>
+      <span>{selected.status} · {selected.client} · {selected.region}</span>
+      <span>{periodLabel(selected)}{!selected.interpretation && (selected.datePrecision?.start !== 'day' || selected.datePrecision?.end !== 'day') ? ' (월 단위)' : ''}</span>
       <span>{rateLabel(selected)}</span>
       {contractSource(selected.sourceUrl) && <a className="text-blue-300 underline" href={contractSource(selected.sourceUrl)} target="_blank" rel="noopener noreferrer">원문 ↗</a>}
       <button className="ml-auto rounded px-3 py-2 text-slate-400 hover:text-white" onClick={onClose} aria-label="계약 상세 닫기">닫기</button>
       {selected.economics && <p className="w-full text-slate-400">{economicsDetails(selected.economics)}</p>}
-      {selected.forecast && <p className="w-full text-slate-400">일정 배치: {selected.forecast.placementBasis}, {selected.forecast.duration.label}만큼 표시합니다. 원문은 {selected.forecast.startLabel} 개시 예정으로, 정확한 개시·종료일은 공개되지 않았습니다. 정확한 일자가 없는 일정과 환산 요율은 가동률·평균 공시 dayrate 집계에서 제외합니다.</p>}
+      {selected.interpretation && <p className="w-full text-slate-400">{interpretationDetails(selected)}</p>}
     </div>
   );
 }
@@ -141,7 +141,7 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships, events = [] }) => {
                 return a.company.localeCompare(b.company);
               })
               .map((ship) => {
-                // View-only forecasts must never change the vessel's active status.
+                // Status uses statistical contracts, not model placement dates.
                 const canonicalShip = ships.find(s => s.id === ship.id)!;
                 const computedStatus = getComputedStatus(canonicalShip, now);
                 const isColdStacked = computedStatus === 'Cold-Stacked';
@@ -182,12 +182,12 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships, events = [] }) => {
                       const span = contractSpan(c, yearStart.getFullYear(), yearEnd.getFullYear());
                       if (!span) return null;
                       
-                      const kind = c.forecast?.awardLabel || c.status;
+                      const kind = c.status;
                       return (
                         <button type="button" key={c.id} aria-pressed={selectedId === c.id} onClick={() => setSelectedId(c.id)} aria-label={`${ship.name} · ${kind} · ${c.client} · ${periodLabel(c)} · ${rateLabel(c)}`} className={`absolute text-left rounded-md border hover:brightness-125 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${selectedId === c.id ? 'ring-2 ring-white' : ''} ${c.status === 'Firm' ? 'bg-blue-600 border-black/20' : c.status === 'Contingent' ? 'bg-amber-400/20 border-dashed border-amber-400/70' : 'bg-sky-400/20 border-dashed border-sky-400/60'}`} style={{ left: `${span.left}%`, width: `${span.width}%`, height: 30, top: 4 }} title={`${kind} · ${c.client}: ${periodLabel(c)} · ${rateLabel(c)}`}>
                           <div className="h-full w-full flex items-center px-3 overflow-hidden whitespace-nowrap">
                             <span className="text-[10px] font-black text-white/95 truncate drop-shadow-sm">
-                              {c.client} {(c.dayRate > 0 || c.economics) ? `• ${rateLabel(c, true)}` : ''}
+                              {c.client} {(reportedRate(c) > 0 || c.economics) ? `• ${rateLabel(c, true)}` : ''}
                             </span>
                           </div>
                         </button>
