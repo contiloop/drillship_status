@@ -535,3 +535,57 @@ def test_dom_flow_extraction_changes_the_reader_policy_identity():
     old_version = 'official-materials-v3-pdf-image144-ocr-tsv'
     assert materials.EXTRACTION_VERSION != old_version
     assert policy_sha256(build_reader_policy(extraction_version=materials.EXTRACTION_VERSION)) != policy_sha256(build_reader_policy(extraction_version=old_version))
+
+
+def test_legacy_article_hash_matches_old_reader_from_the_same_single_get():
+    from automation.fleet_sync.sources import fetch_article
+    url = 'https://www.deepwater.com/news/detail?ID=30626'
+    body = ('<html><head><script>discard script</script></head><body><nav>discard nav</nav>'
+            '<main><article class="news"><header>discard legacy header</header>'
+            '<p>The <em>Deepwater Proteus</em> works in the <span>U.S</span>. Gulf. '
+            + 'Full original release body including amounts and disclosures. ' * 8
+            + '</p><footer>discard legacy footer</footer></article></main></body></html>')
+    response = Response(url, body)
+    class RecordingClient:
+        def __init__(self): self.calls = []
+        def get(self, requested):
+            self.calls.append(requested)
+            return response
+    client = RecordingClient()
+    result = materials.collect_reading_materials(client, baseline=[], prior_evidence=[], reader_policy_sha256='a' * 64,
+                                                 specs=(), preserved_news=[{'company': 'Transocean', 'url': url}])
+    expected = fetch_article(Client({url: response}), url)[1]
+    material, source = result['materials'][0], result['sources'][0]
+    assert client.calls == [url]
+    assert material['legacyArticleSha256'] == source['legacyArticleSha256'] == expected
+    assert 'legacyArticleSha256' not in material['readingInput']
+    assert material['documentSha256'] == materials.document_sha256(response.content)
+    assert material['readingInput']['sourceSha256'] == source_sha256(material['readingInput']['pages'])
+    assert 'The Deepwater Proteus' in material['readingInput']['pages'][0]['text']
+    assert 'U.S. Gulf.' in material['readingInput']['pages'][0]['text']
+    assert 'discard legacy footer' in material['readingInput']['pages'][0]['text']
+
+
+def test_news_pdf_does_not_claim_a_legacy_html_article_hash(monkeypatch):
+    class PDF:
+        pages = [SimpleNamespace(extract_text=lambda: 'Native PDF page text')]
+        def __enter__(self): return self
+        def __exit__(self, *args): pass
+    monkeypatch.setattr(materials.pdfplumber, 'open', lambda _: PDF())
+    url = 'https://noblecorp.com/wp-content/uploads/2026/10/release.pdf'
+    result = materials.collect_reading_materials(Client({url: Response(url, b'%PDF-document', 'application/pdf')}),
+                                                 baseline=[], prior_evidence=[], reader_policy_sha256='a' * 64,
+                                                 specs=(), preserved_news=[{'company': 'Noble', 'url': url}])
+    assert result['materials'][0]['legacyArticleSha256'] is None
+    assert result['sources'][0]['legacyArticleSha256'] is None
+    assert result['materials'][0]['readingInput']['pages'][0]['image']
+
+
+def test_unreadable_html_does_not_offer_a_legacy_hash_as_success():
+    url = 'https://www.deepwater.com/news/detail?ID=404'
+    result = materials.collect_reading_materials(Client({url: Response(url, '<article><h1>Title only</h1></article>')}),
+                                                 baseline=[], prior_evidence=[], reader_policy_sha256='a' * 64,
+                                                 specs=(), preserved_news=[{'company': 'Transocean', 'url': url}])
+    assert result['materials'] == []
+    assert result['sources'][0]['legacyArticleSha256'] is None
+    assert result['sources'][0]['bodyRead'] is False
