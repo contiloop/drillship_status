@@ -19,6 +19,7 @@ from urllib.parse import urlparse, urlunparse
 from bs4 import BeautifulSoup, Tag
 import pdfplumber
 
+from .core import clean_text
 from .document_ocr import PageOCR, TesseractPageOCR
 from .reading_contracts import ReadingPage, context_sha256, source_sha256
 from .sources import (
@@ -127,6 +128,21 @@ def _html_text_flow(root: Tag) -> str:
             node.insert_before(" ")
             node.insert_after(" ")
     return _normalize_text_whitespace(flow.get_text(separator="", strip=False))
+
+
+def _legacy_article_sha256(html_text: str) -> str:
+    """Reproduce sources.fetch_article's historical hash without another GET.
+
+    This compatibility digest deliberately keeps the old text-node separators,
+    selector ordering and removed chrome. It is metadata only: the reader still
+    receives the complete corrected DOM text flow under sourceSha256.
+    """
+    soup = BeautifulSoup(html_text, "lxml")
+    for node in soup.select("script,style,nav,header,footer"):
+        node.decompose()
+    article = soup.select_one("article.news,article,.module-news-details,main") or soup
+    text = clean_text(article.get_text(" ", strip=True))
+    return document_sha256(text.encode("utf-8"))
 
 
 def extract_document_pages(
@@ -240,6 +256,8 @@ def collect_reading_materials(
     ``preserved_materials`` additionally retains company/kind/url for unfinished
     or held reports and news no longer present in current discovery indexes.
     ``materials`` entries contain readingInput + original-byte documentSha256.
+    HTML news also supplies legacyArticleSha256 outside readingInput, computed
+    from the very same HTTP response using the historical article hash recipe.
     ``sources`` records separate HTTP status from bodyRead/error/lastSuccessAt;
     ``errors`` is the failing subset plus discovery failures. ``changed`` aliases
     ``readingInputChanged``; ``documentChanged`` separately compares raw bytes.
@@ -298,6 +316,7 @@ def collect_reading_materials(
             "discoveryMode": candidate.get("discoveryMode"), "lastAttemptAt": now,
             "lastSuccessAt": previous.get("lastSuccessAt"),
             "documentSha256": previous.get("documentSha256"), "sourceSha256": previous.get("sourceSha256"),
+            "legacyArticleSha256": None,
             "lastSuccessfulDocumentSha256": previous.get("lastSuccessfulDocumentSha256", previous.get("documentSha256")),
             "bodyRead": False, "httpStatus": None, "error": None, "changed": None,
             "documentChanged": None, "readingInputChanged": None, "extractionVersion": EXTRACTION_VERSION,
@@ -313,6 +332,8 @@ def collect_reading_materials(
             extraction_warnings: list[str] = []
             pages = extract_document_pages(response.content, response.headers.get("content-type", ""), kind=kind, page_ocr=page_ocr,
                                            extraction_warnings=extraction_warnings)
+            if kind == "official-news" and not response.content.lstrip().startswith(b"%PDF-"):
+                record["legacyArticleSha256"] = _legacy_article_sha256(response.text)
             record["extractionWarnings"] = extraction_warnings
             if record["publishedAt"] is None and not response.content.lstrip().startswith(b"%PDF-"):
                 record["publishedAt"] = html_publication_date(response.content)
@@ -328,6 +349,7 @@ def collect_reading_materials(
                 "contextSha256": context, "readerPolicySha256": reader_policy_sha256,
             }
             result["materials"].append({"readingInput": request, "documentSha256": record["documentSha256"],
+                                        "legacyArticleSha256": record["legacyArticleSha256"],
                                         "retrievedAt": now, "discoveryMode": record["discoveryMode"],
                                         "extractionVersion": EXTRACTION_VERSION, "extractionWarnings": extraction_warnings})
         except Exception as error:
