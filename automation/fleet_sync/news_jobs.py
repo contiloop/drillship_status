@@ -1,6 +1,7 @@
 """Deterministic server-side change detection, shared with the local reader.
 
-This module never invokes Codex. Jobs are source/context hashes, not commands.
+Compatibility helpers for the retired v1 ledger and fixture tests only.
+Production v2 scheduling lives in reading_pipeline; these helpers never write.
 """
 from __future__ import annotations
 
@@ -9,7 +10,7 @@ from pathlib import Path
 
 from .codex_reader import PROMPT, SCHEMA
 from .core import content_hash
-from .news_review import REVIEW_VERSION, event_date, reconcile_reviews
+from .news_review import REVIEW_VERSION, event_date
 
 
 def eligible_events(events: list[dict], dates: dict[str, str]) -> list[dict]:
@@ -27,7 +28,6 @@ def reading_context(root: Path, baseline: list[dict], events: list[dict], dates:
                       and any(e.get("url") == r["url"] and e.get("articleSha256") == r["sourceSha256"] for e in events)),
                      key=lambda r: (r["publishedAt"], r["url"]))
     fleet = copy.deepcopy(baseline)
-    reconcile_reviews(root, fleet, copy.deepcopy(events), dates, reviews=earlier)
     company_fleet = [s for s in fleet if s["company"] == event["company"]]
     announcements = [{"publishedAt": r["publishedAt"], "url": r["url"], "result": r["result"]}
                      for r in earlier if r["company"] == event["company"] and r["publishedAt"] > dates[event["company"]]]
