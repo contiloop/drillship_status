@@ -20,13 +20,9 @@ from typing import Any
 
 from .reading_contracts import READER_RESPONSE_SCHEMA, TITLE_TRIAGE_SCHEMA, ReadingInput, validate_reading_input
 from .reading_service import (
-    CORRECTION_PROMPT, DUPLICATE_CHECK_PROMPT, MODEL, READER_PROMPT, REASONING_EFFORT, SERVICE_TIER, TRIAGE_PROMPT,
+    CORRECTION_PROMPT, DUPLICATE_CHECK_PROMPT, MODEL, REASONING_EFFORT, SERVICE_TIER, TRIAGE_PROMPT,
     ReaderConfigurationError, ReaderOutputError, ReaderUsageLimited, prompt_for_reading, target_vessel_ids,
 )
-
-# Compatibility for news job fingerprints (news_jobs.py).
-PROMPT = READER_PROMPT
-SCHEMA = READER_RESPONSE_SCHEMA
 
 CLI_CONFIG = (
     'model_provider="openai"',
@@ -47,8 +43,7 @@ _BLOCKED_ENV = {"OPENAI_API_KEY", "CODEX_API_KEY", "OPENAI_BASE_URL"}
 
 
 class CodexReader:
-    def __init__(self, *, timeout: int = 600, policy: str | None = None):
-        # ``policy`` is accepted for older callers and ignored.
+    def __init__(self, *, timeout: int = 600):
         self.timeout = timeout
 
     # --- ReadingService adapter API ---------------------------------------
@@ -59,8 +54,8 @@ class CodexReader:
     def read_corrected(self, request: ReadingInput, *, previous_response: Any, error: str) -> Any:
         return self._read(request, correction={"error": error, "rejectedOutput": previous_response})
 
-    def read_rechecked(self, request: ReadingInput, *, recheck: dict) -> Any:
-        return self._read(request, correction=None, recheck=recheck)
+    def read_rechecked(self, request: ReadingInput, *, recheck: dict, correction: dict | None = None) -> Any:
+        return self._read(request, correction=correction, recheck=recheck)
 
     def triage(self, items: list[dict], *, correction: dict | None = None) -> Any:
         schema = deepcopy(TITLE_TRIAGE_SCHEMA)
@@ -78,9 +73,10 @@ class CodexReader:
         validate_reading_input(request)
         schema = _request_schema(request)
         supplied, images, manifest = _strip_page_images(request)
-        prompt = prompt_for_reading(request) + _correction_text(correction)
+        prompt = prompt_for_reading(request)
         if recheck is not None:
             prompt += DUPLICATE_CHECK_PROMPT + json.dumps(recheck, ensure_ascii=False, default=str) + "\n"
+        prompt += _correction_text(correction)
         if manifest:
             prompt += "\nPAGE_IMAGE_ATTACHMENTS_JSON:\n" + json.dumps(manifest, ensure_ascii=False, allow_nan=False)
         prompt += "\nINPUT_JSON:\n" + json.dumps(supplied, ensure_ascii=False, allow_nan=False)

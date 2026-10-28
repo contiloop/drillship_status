@@ -157,7 +157,9 @@ class LegacyIndex:
 
     def handled(self, material: dict) -> bool:
         if material["kind"] == "fleet-report":
-            return (material["company"], material["documentSha256"]) in self.report_hashes
+            # Old records hold raw-byte hashes; for an HTML report only rawSha256 can match.
+            return any((material["company"], digest) in self.report_hashes
+                       for digest in (material["documentSha256"], material.get("rawSha256")))
         urls = {material.get("url"), material.get("finalUrl")}
         return bool(urls & self.article_urls) or (material.get("legacyArticleSha256") in self.article_hashes)
 
@@ -166,7 +168,7 @@ def register_material(records: dict, material: dict, legacy: LegacyIndex, *, now
     """Record one fetched document; returns its record, or None when nothing is queued.
 
     * same (sourceId, documentSha256) already recorded -> unchanged (no job)
-    * news whose title triage excluded it before -> never re-triaged (R7)
+    * news whose title triage excluded it before -> never re-triaged
     * first sighting that the old pipeline handled -> completed / migrated
     * otherwise -> pending job; older unfinished revisions of the same source
       are dropped (nothing was applied from them)

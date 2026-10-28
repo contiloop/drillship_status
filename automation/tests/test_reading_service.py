@@ -14,7 +14,7 @@ from automation.fleet_sync.reading_contracts import TITLE_TRIAGE_SCHEMA, stored_
 from automation.fleet_sync.reading_service import (
     FLEET_REPORT_PROMPT, NEWS_PROMPT, STORED_RESULT_PROMPT, TRIAGE_PROMPT,
     ReaderConfigurationError, ReaderOutputError, ReaderUsageLimited, ReadingFailed, ReadingService,
-    build_reader_policy, prompt_for_reading,
+    prompt_for_reading,
 )
 
 PNG = base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=")
@@ -71,8 +71,8 @@ class Reader:
     def read_corrected(self, req, *, previous_response, error):
         return self._next({"request": req, "correction": {"error": error, "rejectedOutput": previous_response}})
 
-    def read_rechecked(self, req, *, recheck):
-        return self._next({"request": req, "recheck": recheck})
+    def read_rechecked(self, req, *, recheck, correction=None):
+        return self._next({"request": req, "recheck": recheck, "correction": correction})
 
     def triage(self, items, *, correction=None):
         return self._next({"items": items, "correction": correction})
@@ -122,13 +122,6 @@ def test_stored_prompt_recovers_without_claiming_a_reread():
     assert "저장된 읽기 결과로 보완" in STORED_RESULT_PROMPT
     assert "did not re-read" in flat(STORED_RESULT_PROMPT)
     assert "do not duplicate" in flat(STORED_RESULT_PROMPT)
-
-
-def test_reader_policy_is_a_stable_description_without_prompt_text():
-    policy = json.loads(build_reader_policy(extraction_version="v9"))
-    assert policy["model"] == "gpt-6-luna" and policy["extractionVersion"] == "v9"
-    assert "prompt" not in policy
-    assert build_reader_policy(extraction_version="v9") == build_reader_policy(extraction_version="v9")
 
 
 # --- service retry -------------------------------------------------------------
@@ -417,6 +410,35 @@ def test_undisclosed_clients_count_as_the_same_client_and_new_rows_are_compared_
                               {"vesselId": "b", "contractId": None, "action": "upsert", "row": second}]), response([]))
     ReadingService(reader).read(request())
     assert [p["vesselId"] for p in reader.calls[1]["recheck"]["overlaps"]] == ["b"]
+
+
+def test_malformed_re_ask_keeps_the_first_validated_answer():
+    duplicate = response([{"vesselId": "a", "contractId": None, "action": "upsert",
+                           "row": row(startDate="2027-08-01", endDate="2028-05-31")}])
+    reader = Reader(duplicate, {"bad": 1}, {"bad": 2}, {"bad": 3})
+    outcome = ReadingService(reader).read(request())
+    assert outcome.response == duplicate and outcome.attempts == 4
+    assert [d["contractId"] for d in outcome.validation.decisions] == [None]
+
+
+def test_format_retry_during_the_re_ask_keeps_the_overlaps():
+    duplicate = response([{"vesselId": "a", "contractId": None, "action": "upsert",
+                           "row": row(startDate="2027-08-01", endDate="2028-05-31")}])
+    reader = Reader(duplicate, {"bad": 1}, response())
+    outcome = ReadingService(reader).read(request())
+    assert outcome.response == response() and outcome.attempts == 3
+    retry = reader.calls[2]
+    assert retry["recheck"] == reader.calls[1]["recheck"] and retry["recheck"]["overlaps"]
+    assert retry["correction"]["rejectedOutput"] == {"bad": 1}
+
+
+def test_codex_recheck_correction_prompt_carries_both(monkeypatch):
+    captured = {}
+    monkeypatch.setattr(CodexReader, "_exec", lambda self, prompt, schema, images: captured.setdefault("prompt", prompt))
+    CodexReader().read_rechecked(request(), recheck={"previousOutput": {}, "overlaps": [{"vesselId": "a"}]},
+                                 correction={"error": "decisions missing", "rejectedOutput": {"bad": 1}})
+    assert "RECHECK_JSON" in captured["prompt"] and "CORRECTION_JSON" in captured["prompt"]
+    assert captured["prompt"].index("RECHECK_JSON") < captured["prompt"].index("CORRECTION_JSON")
 
 
 def test_codex_recheck_prompt_carries_the_earlier_output_and_overlaps(monkeypatch):

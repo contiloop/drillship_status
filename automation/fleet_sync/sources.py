@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from .core import clean_text, file_sha256
+from .core import clean_text
 from .model import Company
 
 
@@ -106,17 +106,13 @@ class HttpClient:
         *,
         timeout: int,
         byte_limit: int,
-        json_payload: dict | None = None,
     ) -> requests.Response:
-        current_method = method
         current_url = url
-        current_payload = json_payload
         for redirect_count in range(self.MAX_REDIRECTS + 1):
             self._validate_url(current_url)
             response = self.session.request(
-                current_method,
+                method,
                 current_url,
-                json=current_payload,
                 timeout=timeout,
                 allow_redirects=False,
                 stream=True,
@@ -134,11 +130,6 @@ class HttpClient:
                 # Validate before the next request so an allowlisted host cannot
                 # bounce credentials or traffic to an arbitrary destination.
                 self._validate_url(next_url)
-                if response.status_code == 303 or (
-                    current_method == "POST" and response.status_code in {301, 302}
-                ):
-                    current_method = "GET"
-                    current_payload = None
                 response.close()
                 current_url = next_url
                 continue
@@ -185,15 +176,6 @@ class HttpClient:
             url,
             timeout=timeout,
             byte_limit=25 * 1024 * 1024,
-        )
-
-    def post_json(self, url: str, payload: dict, *, timeout: int = 45) -> requests.Response:
-        return self._request(
-            "POST",
-            url,
-            timeout=timeout,
-            byte_limit=5 * 1024 * 1024,
-            json_payload=payload,
         )
 
 
@@ -371,186 +353,6 @@ def _discover_valaris_sec(client: HttpClient) -> str:
                 return exhibit_url
         time.sleep(0.12)
     raise ValueError("SEC submissions did not expose a Valaris fleet-status exhibit")
-
-
-def fetch_article(client: HttpClient, url: str) -> tuple[str, str]:
-    """Read an issuer article, not a listing snippet; return text and its hash."""
-    response = client.get(url)
-    soup = BeautifulSoup(response.text, "lxml")
-    for node in soup.select("script,style,nav,header,footer"):
-        node.decompose()
-    article = soup.select_one("article.news,article,.module-news-details,main") or soup
-    text = clean_text(article.get_text(" ", strip=True))
-    if len(text) < 300:
-        raise ValueError("article body is empty or unexpectedly short")
-    return text, file_sha256(text.encode("utf-8"))
-
-
-def collect_official_news(
-    client: HttpClient,
-    spec: SourceSpec,
-    vessel_names: list[str],
-    *,
-    limit: int = 20,
-) -> tuple[list[dict], str | None]:
-    q4_warning: str | None = None
-    if spec.company in {"Valaris", "Seadrill"}:
-        try:
-            q4_events = _collect_q4_news(client, spec, vessel_names, limit=limit)
-            if q4_events:
-                return q4_events, None
-            q4_warning = "Q4 service returned no matching monitored items; rendered-page fallback used"
-        except Exception as error:
-            # Fall through to the rendered official page. Some Q4 tenants
-            # intermittently disable the service endpoint during publishing.
-            q4_warning = f"Q4 service {_error_summary(error)}; rendered-page fallback used"
-    try:
-        response = client.get(spec.news_url)
-    except Exception as error:
-        detail = _error_summary(error)
-        if q4_warning:
-            detail = f"{q4_warning}; rendered page {detail}"
-        return [], detail
-
-    soup = BeautifulSoup(response.text, "lxml")
-    keywords = re.compile(r"\b(contract|fleet|award|extension|option|backlog|drillship|rig|results)\b", re.I)
-    events: list[dict] = []
-    seen: set[str] = set()
-    for link in soup.find_all("a", href=True):
-        title = clean_text(unescape(link.get_text(" ")))
-        if len(title) < 12 or not keywords.search(title):
-            continue
-        url = urljoin(response.url, link["href"])
-        parsed_url = urlparse(url)
-        if url in seen or parsed_url.scheme != "https" or parsed_url.hostname not in ALLOWED_HOSTS:
-            continue
-        seen.add(url)
-        parent_text = clean_text((link.find_parent(["tr", "article", "li", "div"]) or link).get_text(" "))
-        detail_text = parent_text
-        date_match = re.search(
-            r"\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2},\s+\d{4}\b",
-            parent_text,
-            re.I,
-        )
-        matched_vessels = [name for name in vessel_names if name.casefold() in parent_text.casefold()]
-        body_hash = None
-        article_error = None
-        if parsed_url.path not in {"", "/"}:
-            try:
-                detail_text, body_hash = fetch_article(client, url)
-                matched_vessels = [
-                    name for name in vessel_names if name.casefold() in detail_text.casefold()
-                ]
-                if date_match is None:
-                    date_match = re.search(
-                        r"\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2},\s+\d{4}\b",
-                        detail_text,
-                        re.I,
-                    )
-            except Exception as error:
-                # A listing item is still a useful review signal when the
-                # detail page temporarily rejects automated access.
-                article_error = _error_summary(error)
-        event = {
-            "company": spec.company,
-            "title": title,
-            "url": url,
-            "publishedAt": date_match.group(0) if date_match else None,
-            "vessels": matched_vessels,
-            "classification": "official-news-signal",
-            "autoApplied": False,
-            "articleSha256": body_hash,
-            "articleReadError": article_error,
-        }
-        events.append(event)
-        if len(events) >= limit:
-            break
-    if not events:
-        detail = "official news page returned no matching monitored items"
-        if q4_warning:
-            detail = f"{q4_warning}; {detail}"
-        return [], detail
-    return events, q4_warning
-
-
-def _collect_q4_news(
-    client: HttpClient,
-    spec: SourceSpec,
-    vessel_names: list[str],
-    *,
-    limit: int,
-) -> list[dict]:
-    host = urlparse(spec.news_url)
-    endpoint = f"https://{host.hostname}/Services/PressReleaseService.svc/GetPressReleaseList"
-    year = datetime.now(timezone.utc).year
-    payload = {
-        "serviceDto": {
-            "ViewType": "2",
-            "ViewDate": "",
-            "RevisionNumber": "1",
-            "LanguageId": "1",
-            "Signature": "",
-            "ItemCount": 40,
-            "StartIndex": 0,
-            "TagList": [],
-            "IncludeTags": True,
-        },
-        "excludeSelection": 1,
-        "year": year,
-        "pressReleaseBodyType": 0,
-        "pressReleaseSelection": 3,
-        "pressReleaseCategoryWorkflowId": "00000000-0000-0000-0000-000000000000",
-    }
-    items = client.post_json(endpoint, payload).json().get("GetPressReleaseListResult", [])
-    keywords = re.compile(r"\b(contract|fleet|award|extension|option|backlog|drillship|rig|results)\b", re.I)
-    events: list[dict] = []
-    for item in items:
-        title = clean_text(item.get("Headline"))
-        if not keywords.search(title):
-            continue
-        if re.search(r"\b(voting|annual general meeting)\b", title, re.I):
-            continue
-        url = urljoin(spec.news_url, item.get("LinkToDetailPage") or item.get("LinkToUrl") or "")
-        parsed_url = urlparse(url)
-        if parsed_url.scheme != "https" or parsed_url.hostname not in ALLOWED_HOSTS:
-            continue
-        text = clean_text(
-            " ".join(
-                str(item.get(key) or "")
-                for key in ("Headline", "ShortDescription", "ShortBody", "Body")
-            )
-        )
-        matched_vessels = [name for name in vessel_names if name.casefold() in text.casefold()]
-        body_hash = None
-        article_error = None
-        try:
-            detail, body_hash = fetch_article(client, url)
-            matched_vessels = [
-                name for name in vessel_names if name.casefold() in detail.casefold()
-            ]
-        except Exception as error:
-            article_error = _error_summary(error)
-        raw_date = clean_text(item.get("PressReleaseDate"))
-        try:
-            published_at = datetime.strptime(raw_date, "%m/%d/%Y %H:%M:%S").date().isoformat()
-        except ValueError:
-            published_at = raw_date or None
-        events.append(
-            {
-                "company": spec.company,
-                "title": title,
-                "url": url,
-                "publishedAt": published_at,
-                "vessels": matched_vessels,
-                "classification": "official-news-signal",
-                "autoApplied": False,
-                "articleSha256": body_hash,
-                "articleReadError": article_error,
-            }
-        )
-        if len(events) >= limit:
-            break
-    return events
 
 
 def retrieved_at() -> str:

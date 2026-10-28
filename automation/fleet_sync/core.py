@@ -21,10 +21,6 @@ def content_hash(value: object, length: int = 16) -> str:
     return hashlib.sha256(canonical_json(value).encode("utf-8")).hexdigest()[:length]
 
 
-def file_sha256(content: bytes) -> str:
-    return hashlib.sha256(content).hexdigest()
-
-
 def load_json(path: Path) -> object:
     return json.loads(path.read_text(encoding="utf-8"))
 

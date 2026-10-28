@@ -49,7 +49,6 @@ import base64
 import binascii
 from dataclasses import dataclass, field
 from datetime import date
-import hashlib
 import json
 import math
 import re
@@ -532,11 +531,11 @@ def _check_image(locator: str, image: Any) -> int:
     return len(content)
 
 
-def validate_reading_input(request: Any, *, reader_policy: str | None = None) -> None:
+def validate_reading_input(request: Any) -> None:
     """Basic shape and page-image checks; raises DocumentValidationError.
 
-    ``reader_policy`` is accepted for compatibility and ignored. Extra fields
-    (old hashes, priorEvidence, storedReading, ...) are tolerated, not verified.
+    Extra fields (old hashes, priorEvidence, storedReading, ...) are tolerated,
+    not verified.
     """
     try:
         if not isinstance(request, dict):
@@ -605,25 +604,3 @@ def validate_news_queue(queue: Any) -> None:
             ids.add(job["jobId"])
     except (ValueError, TypeError) as error:
         raise DocumentValidationError(str(error)) from error
-
-
-# --- compatibility (callers outside this task still import these) ----------
-
-def _digest(value: Any) -> str:
-    text = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False)
-    return hashlib.sha256(text.encode("utf-8")).hexdigest()
-
-
-def source_sha256(pages: list[ReadingPage]) -> str:
-    """Compatibility: digest of pages. Not verified by this module."""
-    return _digest(pages)
-
-
-def context_sha256(baseline: list[dict], prior_evidence: list[dict]) -> str:
-    """Compatibility: digest of reader context. Not verified by this module."""
-    return _digest({"baseline": baseline, "priorEvidence": prior_evidence})
-
-
-def policy_sha256(reader_policy: str) -> str:
-    """Compatibility: digest of reader policy text. Not verified by this module."""
-    return hashlib.sha256(reader_policy.encode("utf-8")).hexdigest()

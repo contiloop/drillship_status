@@ -271,11 +271,6 @@ def test_wire_schema_shape():
     assert "null" in interp["properties"]["awardType"]["type"]
 
 
-def test_wire_schema_is_accepted_by_reading_service_translator():
-    from automation.fleet_sync.reading_service import structured_output_schema
-    assert structured_output_schema(READER_RESPONSE_SCHEMA) == READER_RESPONSE_SCHEMA
-
-
 def test_triage_returns_only_known_ids_in_input_order():
     assert select_triage_ids({"selected": ["b", "zzz", "a", "b", 3]}, ["a", "b", "c"]) == ["a", "b"]
     assert select_triage_ids({"selected": []}, ["a"]) == []
@@ -289,8 +284,7 @@ def test_triage_returns_only_known_ids_in_input_order():
 
 def test_reading_input_basic_shape_and_no_hashes_required():
     validate_reading_input(request())
-    validate_reading_input(request(openHolds=[{"contractId": "old-a"}], inputMode="document"),
-                           reader_policy="ignored")
+    validate_reading_input(request(openHolds=[{"contractId": "old-a"}], inputMode="document"))
     # Old hash envelope fields may still be present and are not verified.
     validate_reading_input(request(sourceSha256="0" * 64, contextSha256="1" * 64, readerPolicySha256="x"))
 

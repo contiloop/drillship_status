@@ -39,12 +39,11 @@ from .news_jobs import (
 )
 from .pipeline import IntegrityError, _prune_obsolete_payloads, _semantic_changes, validate_fleet
 from .reading_contracts import DEFAULT_NEWS_CATEGORY, MalformedResponseError, stored_review_page, validate_reading_response
-
-REPORT_CATEGORY = "Fleet Status"
-from .reading_service import ReaderConfigurationError, ReaderUsageLimited, ReadingService
+from .reading_service import ReaderConfigurationError, ReaderUsageLimited, ReadingFailed, ReadingService
 from .source_materials import PRESERVED_MATERIAL_DISCOVERY, collect_reading_materials, fetch_document_sha256
 from .sources import SOURCE_SPECS, HttpClient
 
+REPORT_CATEGORY = "Fleet Status"
 RECORDS_PATH = Path("data/provenance/readings.json")
 OLD_SOURCES_PATH = Path("data/provenance/sources.json")
 OLD_REVIEWS_PATH = Path("data/news/reviews.json")
@@ -172,7 +171,9 @@ def apply_reading(fleet: list[dict], request: dict, record: dict, response: dict
             changes.append({"contractId": contract_id, "before": deepcopy(old), **_texts(decision, ("reasonKo", "quote"))})
             applied = True
         elif action == "withdraw":
-            old = next(row for row in ship["contracts"] if row["id"] == contract_id)
+            old = next((row for row in ship["contracts"] if row["id"] == contract_id), None)
+            if old is None:
+                continue  # already withdrawn by an earlier decision in this response
             ship["contracts"].remove(old)
             changes.append({"contractId": contract_id, "before": deepcopy(old), **_texts(decision, ("reasonKo", "quote"))})
             applied = True
@@ -376,7 +377,7 @@ class _Run:
         self.events = _merge_events(self.events, new_events)
 
     def _tag_events(self) -> None:
-        """Give every news-list event a category once, from its title only (R5)."""
+        """Give every news-list event a category once, from its title only."""
         for event in self.events:
             if not event.get("newsCategory") and event.get("classification") == "official-report-reading":
                 event["newsCategory"] = REPORT_CATEGORY
@@ -436,8 +437,15 @@ class _Run:
                 return cached
             except MalformedResponseError:
                 pass
-        self.model_calls += 1
-        outcome = self.service.read(request)
+        try:
+            outcome = self.service.read(request)
+        except ReadingFailed as error:
+            self.model_calls += error.attempts
+            raise
+        except Exception:
+            self.model_calls += 1
+            raise
+        self.model_calls += outcome.attempts
         self.cache["responses"][record["jobId"]] = _json_safe(outcome.response)
         self._save_cache()
         return outcome.response
@@ -455,21 +463,27 @@ class _Run:
     def _read_one(self, record: dict) -> None:
         request = self._request(record)
         response = self._response(record, request)
-        # The service validated already; validate again so no port can bypass it.
-        validation = validate_reading_response(response, request)
         if record.get("inputMode") != "stored-result":
             fresh = self.recheck(record)
             if fresh != record["documentSha256"]:
                 self._requeue_changed(record, fresh)
                 return
+        try:
+            self._apply(record, request, response)
+        except Exception:
+            # Ask the model again next time instead of replaying a response that failed.
+            self.cache["responses"].pop(record["jobId"], None)
+            self._save_cache()
+            raise
+
+    def _apply(self, record: dict, request: dict, response: Any) -> None:
+        # The service validated already; validate again so no port can bypass it.
+        validation = validate_reading_response(response, request)
         candidate = deepcopy(self.fleet)
         result = apply_reading(candidate, request, record, response, validation)
         try:
             validate_fleet(candidate, self.registered)
         except IntegrityError as error:
-            # Ask the model again next time instead of replaying this response.
-            self.cache["responses"].pop(record["jobId"], None)
-            self._save_cache()
             raise IntegrityError(f"dataset integrity failed; document not applied: {error}") from error
         self.fleet = candidate
         self.events = _merge_events(self.events, result["events"])

@@ -509,7 +509,6 @@ def test_ocr_whitespace_is_normalized_by_the_same_page_boundary(monkeypatch):
 
 
 def test_legacy_article_hash_matches_old_reader_from_the_same_single_get():
-    from automation.fleet_sync.sources import fetch_article
     url = 'https://www.deepwater.com/news/detail?ID=30626'
     body = ('<html><head><script>discard script</script></head><body><nav>discard nav</nav>'
             '<main><article class="news"><header>discard legacy header</header>'
@@ -524,11 +523,13 @@ def test_legacy_article_hash_matches_old_reader_from_the_same_single_get():
             return response
     client = RecordingClient()
     result = materials.collect_reading_materials(client, specs=(), preserved_news=[{'company': 'Transocean', 'url': url}])
-    expected = fetch_article(Client({url: response}), url)[1]
+    # Digest the removed sources.fetch_article returned for this page.
+    expected = 'e519b66f8d47b54722a98cdc44a75923fb2a1d24305c2619e4235c244179e248'
     material, source = result['materials'][0], result['sources'][0]
     assert client.calls == [url]
     assert material['legacyArticleSha256'] == source['legacyArticleSha256'] == expected
     assert material['documentSha256'] == materials.content_fingerprint(response.content, material['pages'])
+    assert material['rawSha256'] == materials.document_sha256(response.content) != material['documentSha256']
     assert 'The Deepwater Proteus' in material['pages'][0]['text']
     assert 'U.S. Gulf.' in material['pages'][0]['text']
     assert 'discard legacy footer' in material['pages'][0]['text']

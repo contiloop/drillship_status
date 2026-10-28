@@ -6,7 +6,7 @@ import requests
 
 from automation.fleet_sync import sources as source_module
 from automation.fleet_sync.pipeline import _prune_obsolete_payloads
-from automation.fleet_sync.sources import HttpClient, SOURCE_SPECS, fetch_article
+from automation.fleet_sync.sources import HttpClient, SOURCE_SPECS
 
 
 def test_valaris_prefers_stable_official_index_before_sec(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -45,20 +45,6 @@ def test_obsolete_content_addressed_payloads_are_pruned(tmp_path) -> None:
         "fleet.keep.json",
         "manifest.json",
     ]
-
-
-def test_news_reader_extracts_article_not_navigation_or_scripts() -> None:
-    class Client:
-        def get(self, url):
-            return _response(url, 200, (
-                '<nav>unrelated stock data</nav><article class="news">'
-                + 'An official contract announcement with source terms. ' * 10
-                + '<script>untrusted script</script></article>'
-            ).encode())
-    text, sha = fetch_article(Client(), "https://www.deepwater.com/news/detail?ID=1")
-    assert "official contract" in text
-    assert "unrelated stock" not in text and "untrusted script" not in text
-    assert len(sha) == 64
 
 
 class _FakeSession:

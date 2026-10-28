@@ -3,7 +3,7 @@
 ``python -m automation.fleet_sync --write [--mode server|local]``
 
 * server (default; GitHub Actions): discover and fetch official sources,
-  compare raw document hashes and publish the job queue and source status.
+  compare document fingerprints and publish the job queue and source status.
   Never calls a model and never changes contract data.
 * local (operator's Mac): additionally triages news titles and reads pending
   documents with Codex, applying only validated items.

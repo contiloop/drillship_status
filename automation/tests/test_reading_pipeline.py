@@ -183,11 +183,32 @@ def test_same_document_rerun_makes_no_model_call_and_no_duplicate(root):
     assert published(root)[0]['newsQueue']['pendingCount'] == 0
 
 
+def test_model_calls_count_every_format_retry(root):
+    class Malformed(FakeReader):
+        def read(self, request):
+            output = super().read(request)
+            return {'bad': True} if len(self.reads) == 1 else output
+    reader = Malformed(lambda request: [decision()])
+    result = run(root, reader, collector(material('award')))
+    assert result['modelCalls'] == 3  # one triage + two reads
+    assert run(root, reader, collector(material('award')), now=NOW + 60)['modelCalls'] == 0
+
+
+def test_model_calls_count_attempts_of_a_failed_reading(root):
+    class AlwaysMalformed(FakeReader):
+        def read(self, request):
+            super().read(request)
+            return {'bad': True}
+    reader = AlwaysMalformed()
+    result = run(root, reader, collector(material('award')))
+    assert len(reader.reads) == 3 and result['modelCalls'] == 4  # one triage + three reads
+    assert len(result['failedJobIds']) == 1
+
+
 def test_prompt_or_baseline_change_does_not_requeue(root, monkeypatch):
     reader = FakeReader(lambda request: [decision()])
     run(root, reader, collector(material('award')))
     monkeypatch.setattr(reading_service, 'NEWS_PROMPT', 'a different prompt')
-    monkeypatch.setattr(reading_service, 'PROMPT_VERSION', 'fleet-reading-v99')
     # A second document changes the baseline; the first is still not re-read.
     result = run(root, reader, collector(material('award'), material('second', sha='b')), now=NOW + 60)
     assert [r['url'] for r in reader.reads] == ['https://noblecorp.com/press-release/award/',
@@ -346,6 +367,34 @@ def test_withdraw_removes_contract_and_keeps_before_value(root):
     assert record['changes'] == [{'contractId': CONTRACT, 'before': old, 'reasonKo': '근거', 'quote': 'quote'}]
 
 
+def test_repeated_withdraw_of_the_same_contract_is_a_no_op(root):
+    old = next(c for c in contracts(published(root)[1]) if c['id'] == CONTRACT)
+    withdraw = decision(action='withdraw', contract=CONTRACT, row=None)
+    reader = FakeReader(lambda request: [withdraw, withdraw])
+    result = run(root, reader, collector(material('cancel')))
+    assert result['failedJobIds'] == [] and len(result['completedJobIds']) == 1
+    assert CONTRACT not in {c['id'] for c in contracts(published(root)[1])}
+    record = next(iter(documents(root).values()))
+    assert record['status'] == 'completed' and record['outcome'] == 'applied'
+    assert record['changes'] == [{'contractId': CONTRACT, 'before': old, 'reasonKo': '근거', 'quote': 'quote'}]
+
+
+def test_response_that_fails_to_apply_is_not_replayed(root, monkeypatch):
+    real = reading_pipeline.apply_reading
+    def broken(*args):
+        raise RuntimeError('controlled apply failure')
+    monkeypatch.setattr(reading_pipeline, 'apply_reading', broken)
+    reader = FakeReader(lambda request: [decision()])
+    collect = collector(material('award'))
+    run(root, reader, collect)
+    record = next(iter(documents(root).values()))
+    assert record['status'] == 'failed' and 'controlled apply failure' in record['lastError']
+    assert load_json(root / '.cache/reading-responses.json')['responses'] == {}
+    monkeypatch.setattr(reading_pipeline, 'apply_reading', real)
+    result = run(root, reader, collect, now=NOW + 400)
+    assert len(reader.reads) == 2 and result['failedJobIds'] == []
+
+
 def test_upsert_existing_replaces_fields_keeps_id_and_sets_source_fields(root):
     reader = FakeReader(lambda request: [decision(contract=CONTRACT, row=row(dayRate=410000))])
     run(root, reader, collector(material('extension')))
@@ -399,6 +448,19 @@ def test_migration_marks_previously_handled_documents_without_model_calls(root):
     result = run(root, reader, collector(old_report, old_url, reviewed, old_hash, new_report, material('fresh', sha='8')), now=NOW + 60)
     assert len(reader.triages) == 1 and [i['url'] for i in reader.triages[0]] == ['https://noblecorp.com/press-release/fresh/']
     assert [r['url'] for r in reader.reads] == ['https://noblecorp.com/download/new/']
+
+
+def test_html_report_migrates_by_its_old_raw_byte_hash(root):
+    html_report = material('old-html-report', kind='fleet-report', sha='7', url='https://noblecorp.com/download/old/')
+    html_report['rawSha256'] = OLD_NOBLE_REPORT
+    reader = FakeReader()
+    result = run(root, reader, collector(html_report))
+    assert result['modelCalls'] == 0 and reader.reads == []
+    assert [(r['status'], r['outcome']) for r in documents(root).values()] == [('completed', 'migrated')]
+    changed = material('changed-html-report', kind='fleet-report', sha='6', url='https://noblecorp.com/download/changed/')
+    changed['rawSha256'] = '5' * 64
+    run(root, reader, collector(html_report, changed), now=NOW + 60)
+    assert [r['url'] for r in reader.reads] == ['https://noblecorp.com/download/changed/']
 
 
 def test_old_schema_record_file_keeps_completed_hashes(root):

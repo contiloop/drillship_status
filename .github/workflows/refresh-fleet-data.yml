@@ -18,7 +18,7 @@ env:
 jobs:
   validate:
     name: Validate and package generated data
-    # T6 enables detection only after the compatible Mac worker is installed.
+    # Detection stays off until the compatible Mac worker is installed.
     if: ${{ vars.FLEET_READER_V2_ENABLED == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20

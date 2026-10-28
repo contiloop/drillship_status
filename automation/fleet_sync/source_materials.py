@@ -1,4 +1,4 @@
-"""Official source acquisition and raw-byte change detection, without interpretation.
+"""Official source acquisition and document fingerprinting, without interpretation.
 
 Every successfully fetched material is returned, including unchanged material;
 the reading pipeline owns job identity and completion. Failed sources retain
@@ -263,10 +263,11 @@ def collect_reading_materials(
     even when they fell out of the discovery listings (e.g. pending jobs).
 
     ``materials``: ``{sourceId, company, kind, url, finalUrl, title, publishedAt, pages,
-    documentSha256, legacyArticleSha256, retrievedAt, discoveryMode,
-    extractionWarnings}``. ``documentSha256`` is ``content_fingerprint`` (PDF bytes, HTML article text);
-    ``legacyArticleSha256`` reproduces the old article text hash for HTML news
-    (migration matching only). ``sources`` has one record per candidate with
+    documentSha256, rawSha256, legacyArticleSha256, retrievedAt, discoveryMode,
+    extractionWarnings}``. ``documentSha256`` is ``content_fingerprint`` (PDF
+    bytes, HTML article text). ``rawSha256`` (response bytes, as the old pipeline
+    hashed fleet reports) and ``legacyArticleSha256`` (the old article text hash
+    for HTML news) are for migration matching only. ``sources`` has one record per candidate with
     httpStatus/error/lastSuccessAt; ``errors`` is the failing subset plus
     discovery failures. No files are written.
     """
@@ -341,7 +342,8 @@ def collect_reading_materials(
             result["materials"].append({
                 "sourceId": identity, "company": company, "kind": kind, "url": url, "finalUrl": response.url,
                 "title": record["title"], "publishedAt": record["publishedAt"], "pages": pages,
-                "documentSha256": digest, "legacyArticleSha256": record["legacyArticleSha256"],
+                "documentSha256": digest, "rawSha256": document_sha256(response.content),
+                "legacyArticleSha256": record["legacyArticleSha256"],
                 "retrievedAt": now, "discoveryMode": record["discoveryMode"], "extractionWarnings": extraction_warnings})
         except Exception as error:
             record["error"] = f"{type(error).__name__}: {error}"
@@ -352,7 +354,7 @@ def collect_reading_materials(
 
 
 def fetch_document_sha256(company: str, url: str, kind: str = "official-news", client: HttpClient | None = None) -> str:
-    """Re-fetch one official document and return its fingerprint (R21 check)."""
+    """Re-fetch one official document and return its fingerprint, to detect a change during reading."""
     validate_official_source(company, url)
     response = (client or HttpClient()).get(url)
     validate_official_source(company, response.url)
