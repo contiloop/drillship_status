@@ -6,29 +6,41 @@ complete baseline (all vessels, including those with no contracts).
 
 Hash format: UTF-8 JSON with ensure_ascii=False, sort_keys=True, separators=(",",
 ":") and allow_nan=False. sourceSha256 covers the ordered pages array, including
-locators and all input text. contextSha256 covers {baseline, priorEvidence}.
+locators, all input text and attached image payloads. contextSha256 covers {baseline, priorEvidence}.
 The source document's original bytes remain a separate documentSha256 ledger
 concern; neither of these hashes claims to be a document-byte digest.
 """
 from __future__ import annotations
 
+import base64
+import binascii
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import datetime
+from io import BytesIO
 import hashlib
 import json
 import math
 import re
+import warnings
 from typing import Any, Literal, NotRequired, Protocol, TypedDict
 
 from jsonschema import Draft202012Validator, FormatChecker
+from PIL import Image
 
 from .model import AwardType, Company, ContractStatus, DateBasis, DatePrecision, RateBasis, ReadingAction, ReadingKind, ShipStatus
+
+
+class ReadingPageImage(TypedDict):
+    mimeType: Literal["image/png"]
+    sha256: str
+    dataBase64: str
 
 
 class ReadingPage(TypedDict):
     locator: str
     text: str
+    image: NotRequired[ReadingPageImage]
 
 
 class ReadingEvidence(TypedDict):
@@ -208,7 +220,17 @@ def _enum(*values: str) -> dict:
     return {"type": "string", "enum": list(values)}
 
 
-PAGE_SCHEMA = _object({"locator": ID, "text": STRING})
+# Limits apply to decoded PNG bytes (the transport adds base64 overhead).
+# These bounds accommodate every page of the four fixture reports at 144 DPI.
+MAX_PAGE_IMAGE_BYTES = 5 * 1024 * 1024
+MAX_DOCUMENT_IMAGE_BYTES = 40 * 1024 * 1024
+MAX_PAGE_IMAGE_PIXELS = 10_000_000
+_PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+PAGE_IMAGE_SCHEMA = _object({"mimeType": {"type": "string", "const": "image/png"},
+                             "sha256": HASH, "dataBase64": ID})
+PAGE_SCHEMA = _object({"locator": ID, "text": STRING}, {"image": PAGE_IMAGE_SCHEMA})
+PAGE_SCHEMA["if"] = {"not": {"required": ["image"]}}
+PAGE_SCHEMA["then"] = {"properties": {"text": {"type": "string", "minLength": 1}}}
 EVIDENCE_SCHEMA = _object({"fields": {**_array(ID), "minItems": 1, "uniqueItems": True},
                            "sourceId": ID, "locator": ID, "quote": ID})
 INTERPRETATION_SCHEMA = _object({
@@ -334,7 +356,7 @@ def duration_days(*, years: float = 0, months: float = 0, days: float = 0) -> fl
 
 
 def source_sha256(pages: list[ReadingPage]) -> str:
-    """Digest exactly the ordered locator/text input, not original PDF bytes."""
+    """Digest ordered pages including text, locators and any complete image payload."""
     return _digest(pages)
 
 
@@ -368,6 +390,54 @@ def _registry(request: ReadingInput) -> tuple[dict[str, dict], dict[str, tuple[s
     return vessels, contracts
 
 
+def _validate_page_images(pages: list[ReadingPage]) -> None:
+    total_bytes = 0
+    for page in pages:
+        image = page.get("image")
+        if image is None:
+            if not page["text"].strip():
+                raise ValueError(f"{page['locator']}: nonempty text or an attached image is required")
+            continue
+        encoded = image["dataBase64"]
+        # Check encoded length before allocating decoded bytes. The decoded
+        # check also handles the last partial base64 group at the exact limit.
+        if len(encoded) > ((MAX_PAGE_IMAGE_BYTES + 2) // 3) * 4:
+            raise ValueError(f"{page['locator']}: page image byte limit exceeded")
+        try:
+            content = base64.b64decode(encoded, validate=True)
+        except (binascii.Error, ValueError) as error:
+            raise ValueError(f"{page['locator']}: image dataBase64 is not strict base64") from error
+        if base64.b64encode(content).decode("ascii") != encoded:
+            raise ValueError(f"{page['locator']}: image dataBase64 is not canonical base64")
+        if len(content) > MAX_PAGE_IMAGE_BYTES:
+            raise ValueError(f"{page['locator']}: page image byte limit exceeded")
+        total_bytes += len(content)
+        if total_bytes > MAX_DOCUMENT_IMAGE_BYTES:
+            raise ValueError("document image byte limit exceeded")
+        if not content.startswith(_PNG_SIGNATURE):
+            raise ValueError(f"{page['locator']}: image is missing the PNG signature")
+        if hashlib.sha256(content).hexdigest() != image["sha256"]:
+            raise ValueError(f"{page['locator']}: image sha256 does not match PNG bytes")
+        try:
+            # Reuse the pinned image decoder for chunk CRC, PNG structure and
+            # actual decompression. Check dimensions before pixel allocation.
+            with warnings.catch_warnings():
+                warnings.simplefilter("error", Image.DecompressionBombWarning)
+                with Image.open(BytesIO(content)) as png:
+                    if png.format != "PNG":
+                        raise ValueError("image must decode as PNG")
+                    if png.width * png.height > MAX_PAGE_IMAGE_PIXELS:
+                        raise ValueError("page image pixel limit exceeded")
+                    if getattr(png, "is_animated", False):
+                        raise ValueError("page image must be a static PNG")
+                    png.verify()
+                with Image.open(BytesIO(content)) as png:
+                    png.load()
+        except (OSError, SyntaxError, ValueError, Image.DecompressionBombError,
+                Image.DecompressionBombWarning) as error:
+            raise ValueError(f"{page['locator']}: invalid PNG image: {error}") from error
+
+
 def validate_reading_input(request: ReadingInput, *, reader_policy: str | None = None) -> None:
     """Raise DocumentValidationError on invalid input or stale input hashes.
 
@@ -376,6 +446,7 @@ def validate_reading_input(request: ReadingInput, *, reader_policy: str | None =
     """
     try:
         _validate_schema(request, READING_INPUT_SCHEMA)
+        _validate_page_images(request["pages"])
         locators = [page["locator"] for page in request["pages"]]
         if len(set(locators)) != len(locators):
             raise ValueError("pages locators must be unique")
