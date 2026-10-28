@@ -22,12 +22,28 @@ def launch_agent(root: Path, executable: str, paths: list[str]) -> dict:
             "StandardErrorPath": str(root / ".cache/news-worker-error.log")}
 
 
-def main() -> int:
+def uninstall() -> int:
+    target = Path.home() / "Library/LaunchAgents" / f"{LABEL}.plist"
+    service = f"gui/{os.getuid()}/{LABEL}"
+    if subprocess.run(["launchctl", "print", service], capture_output=True).returncode == 0:
+        subprocess.run(["launchctl", "bootout", service], check=True)
+    if target.exists():
+        if plistlib.loads(target.read_bytes()).get("Label") != LABEL:
+            raise RuntimeError("refusing to remove an unrelated launch agent")
+        target.unlink()
+    print(f"Removed {service}.")
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path.cwd())
-    args = parser.parse_args()
+    parser.add_argument("--uninstall", action="store_true", help="stop and remove the launch agent")
+    args = parser.parse_args(argv)
     if sys.platform != "darwin":
         parser.error("this installer requires macOS launchd")
+    if args.uninstall:
+        return uninstall()
     root = args.root.resolve()
     paths = []
     for tool in ("codex", "node", "npm", "git"):
@@ -49,7 +65,7 @@ def main() -> int:
     target.chmod(0o600)
     subprocess.run(["launchctl", "bootstrap", domain, str(target)], check=True)
     subprocess.run(["launchctl", "print", service], check=True, capture_output=True)
-    print(f"Installed compatible v1/v2 worker {service}: server queue checked every 5 minutes, Codex only for pending work.")
+    print(f"Installed {service}: checks the server queue every 5 minutes; Codex runs only for pending jobs.")
     return 0
 
 

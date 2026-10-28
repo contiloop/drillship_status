@@ -1,4 +1,10 @@
-"""Isolated local publisher; only generated JSON and the readings journal leave it."""
+"""Local publisher: read in a temporary clone of main, then push only generated data.
+
+Allowed paths: public/data, data/provenance, data/news (JSON only, no symlinks).
+The push is never forced; when main moved, the whole run retries on the new
+main (the response cache avoids repeated model calls). Success requires the
+Vercel deployment to serve exactly the new manifest and payloads.
+"""
 from __future__ import annotations
 
 import argparse
@@ -65,34 +71,19 @@ def verify_deployment(checkout: Path, expected: dict, *, opener=urlopen) -> bool
     return True
 
 
-def verify_publication_sources(checkout: Path, base: str, *, recheck=None) -> None:
-    """Recheck original bytes after tests/build, immediately before committing."""
-    from .fleet_sync.reading_pipeline import _verify_source
-    journal = json.loads((checkout / 'data/provenance/readings.json').read_text())
-    recheck = recheck or _verify_source
-    checked = set()
-    for job in journal['jobs']:
-        if job['status'] != 'completed' or job.get('baseRevision') != base:
-            continue
-        identity = (job['sourceId'], job['documentSha256'])
-        if identity in checked:
-            continue
-        source = journal['sources'][job['sourceId']]
-        material = {'readingInput': {'company': source['company'], 'url': source.get('finalUrl') or source['url']}}
-        if recheck(material) != job['documentSha256']:
-            raise StaleBase('source changed after reading/build; retry against current original bytes')
-        checked.add(identity)
-
-
-def _publish_checkout(root: Path, remote: str, recovery: Path, *, deploy_timeout: int) -> dict:
+def _publish_checkout(root: Path, remote: str, cache: Path, *, deploy_timeout: int, stored_results: bool = False) -> dict:
     with tempfile.TemporaryDirectory(prefix='drillship-publish-') as temp:
         checkout = (Path(temp) / 'checkout').resolve()
         command(['git', 'clone', '--quiet', '--branch', 'main', '--single-branch', remote, str(checkout)], root)
         base = command(['git', 'rev-parse', 'HEAD'], checkout, capture=True)
-        raw = command([sys.executable, '-m', 'automation.review_news', '--recovery-path', str(recovery)], checkout, capture=True)
-        review = json.loads(raw)
+        args = [sys.executable, '-m', 'automation.review_news', '--cache-path', str(cache)]
+        if stored_results:
+            args.append('--stored-results')
+        review = json.loads(command(args, checkout, capture=True))
         if review.get('skipped'):
             return review
+        if not review.get('ok'):
+            raise RuntimeError(f'local reading run failed: {review}')
         command([sys.executable, '-m', 'pytest', 'automation/tests', '-q'], checkout)
         command(['npm', 'ci', '--ignore-scripts', '--no-audit', '--no-fund'], checkout)
         command(['npm', 'run', 'test:ui'], checkout)
@@ -101,12 +92,11 @@ def _publish_checkout(root: Path, remote: str, recovery: Path, *, deploy_timeout
         untracked = command(['git', 'ls-files', '--others', '--exclude-standard', '-z'], checkout, capture=True).split('\0')
         changed = [p for p in [*tracked, *untracked] if p]
         validate_publication_paths(checkout, changed)
-        receipts = {'completedJobIds': review.get('handledJobIds', review.get('completedJobIds', [])),
-                    'failedJobIds': review.get('failedJobIds', []), 'pendingJobIds': review.get('pendingJobIds', [])}
+        receipts = {key: review.get(key) for key in ('completedJobIds', 'failedJobIds', 'pendingJobIds', 'modelCalls',
+                                                       'usageLimitedUntil', 'retryAfter')}
         expected = json.loads((checkout / 'public/data/manifest.json').read_text())
         if changed:
-            verify_publication_sources(checkout, base)
-            command(['git', 'add', '--', *PUBLISH_PATHS], checkout)
+            command(['git', 'add', '-A', '--', *PUBLISH_PATHS], checkout)
             staged = command(['git', 'diff', '--cached', '--name-only', '-z'], checkout, capture=True).split('\0')
             validate_publication_paths(checkout, [p for p in staged if p])
             command(['git', 'diff', '--cached', '--check'], checkout)
@@ -116,7 +106,7 @@ def _publish_checkout(root: Path, remote: str, recovery: Path, *, deploy_timeout
             command(['git', '-c', 'user.name=contiloop', '-c', 'user.email=contiloop@users.noreply.github.com',
                      'commit', '-m', 'data: apply validated official document readings'], checkout)
             try:
-                command(['git', 'push', 'origin', 'HEAD:main'], checkout)
+                command(['git', 'push', 'origin', 'HEAD:main'], checkout)  # never forced
             except subprocess.CalledProcessError:
                 latest = command(['git', 'ls-remote', 'origin', 'refs/heads/main'], checkout, capture=True).split()[0]
                 if latest != base:
@@ -127,15 +117,16 @@ def _publish_checkout(root: Path, remote: str, recovery: Path, *, deploy_timeout
             try:
                 if verify_deployment(checkout, expected):
                     return {'ok': True, 'changed': bool(changed), 'deploymentVerified': True,
-                            'stateFingerprint': expected['stateFingerprint'], 'production': PRODUCTION, **receipts}
+                            'stateFingerprint': expected['stateFingerprint'], 'production': PRODUCTION,
+                            'queueFingerprint': expected['newsQueue']['fingerprint'], **receipts}
             except (OSError, ValueError, KeyError):
                 pass
             time.sleep(10)
-        # No receipts escape this function until payload verification succeeds.
-        raise RuntimeError('production manifest/payload verification timed out; jobs are not acknowledged')
+        raise RuntimeError('production manifest/payload verification timed out')
 
 
-def publish(root: Path, *, deploy_timeout: int = 600) -> dict:
+def publish(root: Path, *, deploy_timeout: int = 600, stored_results: bool = False) -> dict:
+    """Read locally in a fresh clone of main and publish; retries on a newer main."""
     root = root.resolve()
     lock_path = root / '.cache/codex-news-update.lock'
     from .fleet_sync.reading_pipeline import _assert_no_links
@@ -147,22 +138,25 @@ def publish(root: Path, *, deploy_timeout: int = 600) -> dict:
         except BlockingIOError:
             return {'ok': True, 'skipped': 'another document publication is running'}
         remote = command(['git', 'remote', 'get-url', 'origin'], root, capture=True)
-        recovery = root / '.cache/readings-recovery.json'
+        # Responses survive a discarded clone, so a retry does not call the model again.
+        cache = root / '.cache/reading-responses.json'
         for attempt in range(3):
             try:
-                return _publish_checkout(root, remote, recovery, deploy_timeout=deploy_timeout)
+                return _publish_checkout(root, remote, cache, deploy_timeout=deploy_timeout, stored_results=stored_results)
             except StaleBase:
                 if attempt == 2:
                     raise
         raise AssertionError('unreachable')
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, default=Path.cwd())
-    args = parser.parse_args()
+    parser.add_argument('--stored-results', action='store_true',
+                        help='one-time recovery: also read saved reviews from data/news/reviews.json')
+    args = parser.parse_args(argv)
     try:
-        print(json.dumps(publish(args.root.resolve()), ensure_ascii=False, indent=2))
+        print(json.dumps(publish(args.root.resolve(), stored_results=args.stored_results), ensure_ascii=False, indent=2))
         return 0
     except Exception as exc:
         print(json.dumps({'ok': False, 'error': str(exc)}, ensure_ascii=False))

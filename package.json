@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "data:sync": ".venv/bin/python -m automation.fleet_sync --write",
-    "data:check": ".venv/bin/python -m automation.fleet_sync --check",
+    "data:check": ".venv/bin/python -m automation.fleet_sync --mode server",
     "test": ".venv/bin/python -m pytest automation/tests -q && npm run test:ui",
     "test:ui": "node --test tests/*.test.cjs",
     "verify": "npm run test && npm run build",
