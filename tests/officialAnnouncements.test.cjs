@@ -61,7 +61,7 @@ test('KG2 renders all announced terms without inventing exact dates or a dayrate
   assert.equal((html.match(/<dt /g) || []).length, 7);
   assert.match(html, /Dhirubhai Deepwater KG2/);
   assert.match(html, /August 20, 2026/);
-  assert.match(html, /정확한 일자가 없는 일정은 가동률·평균 공시 dayrate 집계에서 제외/);
+  assert.match(html, /배치에 의존하는 일정은 가동률·평균 공시 dayrate 집계에서 제외/);
   assert.doesNotMatch(html, /2027-01-01|2029-01-01|411,|\$0/);
 });
 
@@ -70,7 +70,7 @@ test('generic news distinguishes missing extracted facts from disclosed absence'
   const html = render(event);
   assert.match(html, /확인된 정보 없음/);
   assert.match(html, /발표일 확인되지 않음/);
-  assert.doesNotMatch(html, /미공개|구속력|2031/);
+  assert.doesNotMatch(JSON.stringify(announcementDetails(event)), /미공개|구속력|2031/);
 });
 
 test('LOA retains month precision and falls back only to report provenance', () => {
@@ -110,7 +110,11 @@ test('Codex-reviewed incomplete terms are distinct from unread articles', () => 
   assert.match(html, /기본 880일|추가 최대 880일/);
   assert.doesNotMatch(html, /Codex|gpt-6-luna|Fast off/);
   assert.match(render({ ...reviewed, facts: { ...reviewed.facts, expectedStart: 'fourth quarter of 2026' } }), /fourth quarter of 2026/);
-  assert.match(render({ ...reviewed, autoApplied: true }), /계약표 반영/);
+  const applied = render({ ...reviewed, autoApplied: true });
+  assert.match(applied, /Fleet Status 반영/);
+  assert.match(applied, /원문 날짜 표현·정밀도와 표시 날짜를 구분/);
+  assert.match(applied, /미공개·환산 요율도 평균 공시 dayrate에 포함하지 않습니다/);
+  assert.doesNotMatch(applied, /월초·월말|계약표/);
   assert.match(render({ ...reviewed, reviewStatus: 'conflict' }), /조건 충돌/);
   assert.match(render({ ...kg2, llmReview: undefined }), /확인 대기/);
   assert.match(html, /^<details[^>]*><summary/);
@@ -124,7 +128,8 @@ test('applied announcements are archived and every detail stays collapsed', () =
   assert(grouped.unresolved.every(e => !e.autoApplied));
   const html = renderToStaticMarkup(React.createElement(Announcements, {events, sources: manifest.sources}));
   assert.match(html, /미확정 조건 6건/);
-  assert.match(html, /계약표 반영 이력 2건/);
+  assert.match(html, /Fleet Status 반영 이력 2건/);
+  assert.doesNotMatch(html, /계약표/);
   assert.doesNotMatch(html, /<details[^>]*\sopen(?:\s|=|>)|Codex|gpt-6-luna/);
 });
 
@@ -143,6 +148,8 @@ test('real applied contracts render as accessible selectable bars without a news
   assert.match(html, /West Capella · Firm · PTTEP · 2026-03 ~ 2028-02/);
   assert.match(html, /Sonangol Libongos · Firm · Undisclosed · 2027-03 ~ 2030-01/);
   assert.match(html, /aria-pressed="false"/);
+  assert.match(html, /aria-label="Fleet Status"/);
+  assert.doesNotMatch(html, /계약표/);
   assert.doesNotMatch(html, /Codex|공식 발표|<article/);
   const app = fs.readFileSync('App.tsx', 'utf8');
   assert(app.indexOf('<FleetGantt') < app.indexOf('<MarketChart'));
@@ -155,7 +162,7 @@ test('generated feed renders separately without mutating fleet or announcement d
   for (const event of pending) {
     const html = render(event, manifest.sources.find(source => source.company === event.company));
     assert.equal((html.match(/<dt /g) || []).length, 7);
-    assert.match(html, /정확한 일자가 없는 일정은 가동률·평균 공시 dayrate 집계에서 제외/);
+    assert.match(html, /배치에 의존하는 일정은 가동률·평균 공시 dayrate 집계에서 제외/);
   }
   assert.equal(JSON.stringify({ fleet, events }), before);
 });

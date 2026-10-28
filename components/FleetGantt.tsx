@@ -87,7 +87,7 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships, events = [] }) => {
   const minWidth = Math.max(1200, (totalMonths / 3) * 120);
 
   return (
-    <section aria-label="계약표" onKeyDown={event => { if (event.key === 'Escape') setSelectedId(null); }} className="bg-slate-900/50 rounded-2xl border border-slate-800 overflow-hidden relative z-10">
+    <section aria-label="Fleet Status" onKeyDown={event => { if (event.key === 'Escape') setSelectedId(null); }} className="bg-slate-900/50 rounded-2xl border border-slate-800 overflow-hidden relative z-10">
       <div className="p-4 border-b border-slate-800 bg-slate-900/80 flex flex-col md:flex-row justify-between gap-3 items-start md:items-center">
         <div>
           <h3 className="text-base font-bold text-white flex items-center gap-2">
