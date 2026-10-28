@@ -5,6 +5,7 @@ import {
 } from 'recharts';
 import { Drillship, Company, Generation } from '../types';
 import { getComputedStatus } from '../utils/shipStatus';
+import { isCurrentReportedRate as currentReportedRate } from '../utils/contractTimeline';
 
 interface MarketChartProps {
   ships: Drillship[];
@@ -14,7 +15,7 @@ const MarketChart: React.FC<MarketChartProps> = ({ ships }) => {
   const [view, setView] = useState<'generation' | 'company'>('generation');
   const today = new Date().toISOString().slice(0, 10);
   const isCurrentReportedRate = (contract: Drillship['contracts'][number]) =>
-    contract.status === 'Firm' && contract.dayRate > 0 && contract.startDate <= today && contract.endDate >= today;
+    currentReportedRate(contract, today);
 
   const generations: Generation[] = ['6G', '7G', '7G+', '8G'];
   const companies: Company[] = ['Transocean', 'Valaris', 'Noble', 'Seadrill'];

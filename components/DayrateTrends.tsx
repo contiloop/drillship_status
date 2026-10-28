@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import { Area, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Scatter, XAxis, YAxis } from 'recharts';
-import type { Drillship, FleetSource, Generation, OfficialEvent } from '../types';
+import type { Drillship, FleetSource, Generation } from '../types';
 import { DAYRATE_START_YEAR, dayrateDomain, dayrateObservations, dayrateSeries, dayrateTrend, durationRadius, GENERATIONS, type DayrateObservation } from '../utils/dayrateTrends';
 import { contractSource } from '../utils/contractTimeline';
 
-interface Props { ships: Drillship[]; events: OfficialEvent[]; sources: FleetSource[] }
+interface Props { ships: Drillship[]; sources: FleetSource[] }
 const money = (rate: number) => `$${Math.round(rate).toLocaleString('en-US')}`;
 const shortName = (name: string) => name.replace(/^(Deepwater|Dhirubhai Deepwater|VALARIS|Noble) /, '');
 const ticker = { Transocean: 'RIG', Valaris: 'VAL', Noble: 'NE', Seadrill: 'SDRL' };
@@ -16,13 +16,13 @@ function saveSetting(key: string, value: string) {
   window.history.replaceState(null, '', url);
 }
 
-export default function DayrateTrends({ ships, events, sources }: Props) {
+export default function DayrateTrends({ ships, sources }: Props) {
   const [generation, setGeneration] = useState<Generation>(() => GENERATIONS.find(gen => gen === setting('dayrateGen')) || '7G');
   const [includeBacklog, setIncludeBacklog] = useState(() => setting('dayrateBasis') !== 'reported');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [chartSize, setChartSize] = useState({ width: 0, height: 510 });
   const narrow = chartSize.width > 0 && chartSize.width < 600;
-  const all = useMemo(() => dayrateObservations(ships, events, sources), [ships, events, sources]);
+  const all = useMemo(() => dayrateObservations(ships, sources), [ships, sources]);
   const rows = useMemo(() => dayrateSeries(all, generation, includeBacklog), [all, generation, includeBacklog]);
   const trend = useMemo(() => dayrateTrend(rows), [rows]);
   const fromYear = DAYRATE_START_YEAR[generation];

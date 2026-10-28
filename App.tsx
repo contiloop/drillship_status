@@ -11,6 +11,7 @@ import FleetGantt from './components/FleetGantt';
 import Announcements from './components/Announcements';
 import defaultData from './data/data_as_of_26_01_07.json';
 import { countFirmCoveredDays, getComputedStatus } from './utils/shipStatus';
+import { isCurrentReportedRate } from './utils/contractTimeline';
 
 const DayrateTrends = lazy(() => import('./components/DayrateTrends'));
 
@@ -127,7 +128,7 @@ export default function App() {
   const activeShips = filteredShips.filter(s => getComputedStatus(s, today) === 'Active').length;
   const todayStr = today.toISOString().slice(0, 10);
   const allContracts = filteredShips.flatMap(s => s.contracts).filter(c =>
-    c.status === 'Firm' && c.startDate <= todayStr && c.endDate >= todayStr
+    isCurrentReportedRate(c, todayStr)
   );
   const avgDayrate = allContracts.filter(c => c.dayRate > 0).reduce((a, b, _, arr) => a + (b.dayRate / arr.length), 0);
   const coldStacked = filteredShips.filter(s => getComputedStatus(s, today) === 'Cold-Stacked').length;
@@ -236,7 +237,7 @@ export default function App() {
               {activeTab === 'readme' && 'Database Management'}
               {activeTab === 'news' && '뉴스·공시'}
             </h2>
-            <p className="mt-2 text-[11px] text-slate-500">{dataSource === 'live' ? `공식 출처 ${manifest?.sourceCount ?? 0}/4` : dataSource === 'custom' ? '사용자 데이터' : '기본 데이터'} · {manifest?.generatedAt ? `갱신 ${new Date(manifest.generatedAt).toLocaleString()}` : '불러오는 중'}</p>
+            <p className="mt-2 text-[11px] text-slate-500">{dataSource === 'live' ? `공식 출처 ${manifest?.sourceCount ?? 0}/4` : dataSource === 'custom' ? '사용자 데이터' : '기본 데이터'} · {manifest?.generatedAt ? `자료 확인 ${new Date(manifest.generatedAt).toLocaleString()}` : '불러오는 중'}</p>
             {(activeTab === 'news' || activeTab === 'readme') && <p className="mt-2 text-xs text-slate-500">{reportDateRange} · {reportSources.map(source => `${source.company} ${source.reportDate}`).join(' · ')}</p>}
             {syncError && <p className="text-[11px] text-amber-500/80 mt-2">Live sync fallback: {syncError}</p>}
           </div>
@@ -257,7 +258,7 @@ export default function App() {
         </header>
 
         {activeTab === 'news' ? <Announcements events={officialEvents} sources={reportSources} /> : activeTab === 'dayrates' ? (
-          <Suspense fallback={<p role="status" className="py-12 text-sm text-slate-400">Dayrates 불러오는 중…</p>}><DayrateTrends ships={ships} events={officialEvents} sources={reportSources} /></Suspense>
+          <Suspense fallback={<p role="status" className="py-12 text-sm text-slate-400">Dayrates 불러오는 중…</p>}><DayrateTrends ships={ships} sources={reportSources} /></Suspense>
         ) : (activeTab === 'overview' || activeTab === 'transocean' || activeTab === 'valaris' || activeTab === 'noble' || activeTab === 'seadrill') ? (
           <div className="space-y-5">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
@@ -313,7 +314,7 @@ export default function App() {
 
             {filteredShips.length > 0 ? (
               <>
-                <FleetGantt ships={filteredShips} events={officialEvents} />
+                <FleetGantt ships={filteredShips} />
                 <details className="rounded-xl border border-slate-800 p-4">
                   <summary className="cursor-pointer text-sm font-bold text-slate-400">시장 분석 차트</summary>
                   <div className="mt-4"><MarketChart ships={filteredShips} /></div>

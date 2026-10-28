@@ -6,14 +6,13 @@ Transocean, Valaris, Noble, Seadrill의 공식 fleet status report와 공식 IR/
 
 ## 자동 갱신 흐름
 
-1. GitHub Actions가 6시간마다 각 회사의 공식 보고서 인덱스와 IR 뉴스 페이지를 확인하고, Valaris는 공식 인덱스 장애 시 SEC 제출 자료도 검증된 대체 원천으로 확인합니다.
-2. 최신 PDF 또는 SEC HTML의 원문 형식, 파일 크기, 해시, 보고서 날짜를 검증합니다.
-3. 회사별 결정론적 파서가 선박·계약·dayrate·상태를 추출합니다.
-4. 62척 master registry, 날짜, enum, 계약 ID, 출처 추적성, 보고서 rollback을 검증합니다.
-5. 검증을 모두 통과한 경우에만 `public/data/manifest.json`과 content-addressed fleet JSON을 커밋합니다.
-6. 기존 Vercel Git 연동이 `main`의 새 커밋을 프로덕션으로 배포합니다.
+1. 서버(GitHub Actions, 6시간마다): 공식 보고서 PDF·SEC HTML·뉴스를 수집하고 문서 내용 지문(`documentSha256`: PDF는 파일 바이트, 기사 HTML은 본문 글자)을 기록과 비교합니다. 기사 주변의 주가 표시처럼 본문 밖이 바뀌어도 같은 문서로 봅니다. 새 보고서 revision은 `fleet-report`, 새 기사는 `official-news` 작업으로 `manifest.newsQueue`(schemaVersion 2)에 올립니다. 서버는 모델을 호출하지 않고 계약 데이터를 바꾸지 않습니다. 접근 실패는 HTTP 상태와 마지막 성공 시각을 남기고 기존 데이터를 유지합니다.
+2. Mac 실행기(launchd, 5분마다): 프로덕션 큐에 대기 작업이 있을 때만 임시 clone에서 로컬 실행을 시작합니다.
+3. 로컬 실행: 새 기사 제목을 한 번의 Codex 호출로 분류(title triage)하고, 선택되지 않은 기사는 본문을 읽지 않고 제목+링크로만 남깁니다. 선택된 기사와 보고서는 ChatGPT 로그인 Codex CLI(`gpt-6-luna`, medium)로 하나씩 읽고, 코드는 화면 안전성(등록 선박·기존 계약 ID·날짜·숫자·상태값)과 전체 데이터 무결성만 검사한 뒤 통과 항목만 적용합니다.
+4. 같은 문서(같은 sourceId·같은 원본 해시)는 다시 읽지 않습니다. 프롬프트나 baseline이 바뀌어도 재큐하지 않습니다.
+5. 테스트·빌드를 통과한 JSON만 비강제 push하고, main 경합 시 새 clone에서 재시도하며, Vercel 배포 내용이 일치해야 완료로 봅니다. Codex 사용량 한도에 걸리면 실패로 세지 않고 재설정 시각까지 기다립니다.
 
-모호한 뉴스, LOA, 정확한 날짜가 없는 option은 canonical 확정 계약으로 승격하지 않습니다. `public/data/events.<hash>.json`에 근거를 남기며, 기존 검증 데이터를 덮어쓰지 않습니다. 공개되지 않은 dayrate는 기존 UI 호환을 위해 `0`으로 직렬화하되 provenance에는 `undisclosed`로 기록합니다. 화면의 백로그 환산 요율은 이 값과 별도로 계산합니다. 6시간 주기의 공식 원천 polling이며 스트리밍 실시간 피드는 아닙니다.
+읽기 실패 자료의 기존 계약과 완료된 과거 계약을 보존합니다. 새 보고서의 누락만으로 계약을 삭제하지 않으며, 모델이 명시적 변경·취소 근거를 확인한 경우에만 수정·철회합니다. 미공개 공시 일당은 `0`, 백로그 환산액은 `interpretation`에 별도 보관합니다.
 
 ## 계약표 중심 화면
 
@@ -21,17 +20,17 @@ Transocean, Valaris, Noble, Seadrill의 공식 fleet status report와 공식 IR/
 
 계약표를 처음 열거나 회사를 바꾸면 현재 분기부터 보이도록 가로 스크롤 위치를 맞춥니다. 이전 분기도 왼쪽으로 스크롤해 확인할 수 있으며, 계약의 원래 날짜는 바꾸지 않습니다. 분기는 브라우저의 현재 날짜로 계산합니다(10–12월은 Q4).
 
-**뉴스·공시** 탭(`#news`)에는 미확정 조건과 원문 근거를 보관합니다. 각 항목은 기본적으로 접혀 있으며, canonical 계약표에 반영한 발표는 접힌 **반영 이력**으로 이동합니다. 내부 모델명·설정·대조 과정은 화면에 노출하지 않고 증거 원장에 보관합니다.
+**뉴스·공시** 탭(`#news`)은 모든 보고서·기사를 날짜순 한 목록으로 보여 주고, 항목마다 종류 태그(계약 · 실적 · 일정 · 자금·주주 · 경영·인사 · Fleet Status · 기타)를 붙입니다. 계약 조건이 있는 항목은 접힌 카드로 열어 볼 수 있습니다. 내부 모델명·설정·대조 과정은 화면에 노출하지 않고 증거 원장에 보관합니다.
 
 ### 계약 상태와 백로그 환산 요율
 
-- `utils/newsEconomics.ts`는 검증된 뉴스의 선박별 직접 인용을 화면 전용 모델로 투영합니다. 새 뉴스가 갱신되면 같은 규칙이 자동 적용됩니다. 모델 설정이나 canonical 데이터는 바꾸지 않습니다.
+- `utils/newsEconomics.ts`는 모델이 남긴 `interpretation`을 화면 값으로 투영합니다. 문장에서 날짜·금액·기간을 다시 해석하지 않습니다.
 - 같은 기본 수주의 금액과 작업 기간이 모두 확인되면 `계약 가치 ÷ 기간(일)`을 **$…k**로 바 안에 바로 표시합니다. '추정' 꼬리표는 붙이지 않고 선택 상세에서 공시값/백로그 환산값을 구분합니다. 1년=365일, 1개월=365/12일 가정은 선택 상세에 명시합니다. 최대 기간만 공개된 경우에는 단일 요율을 계산하지 않습니다.
 - 추가 서비스·이동 비용 포함/제외, 계산식, 원문은 바를 눌러 확인합니다. 이 값은 계약 가치의 일평균 환산액이며 공시 operating dayrate가 아닙니다. 미공개 비용을 임의로 빼지 않습니다.
-- 연장 수주 여러 건은 같은 인용 문장에 묶인 금액·기간 쌍으로 각각 계산합니다. 기존 계약 전체 기간으로 나누거나 별개 요율을 평균내지 않습니다. West Capella는 연장 120일/$41m, 120일/$53m을 별도로 표시합니다.
-- 새 수주도 기존 계약과 같은 줄·높이·상태별 색상으로 표시하며, 바 안에는 **고객명 · $요율**만 표시합니다. 체결 계약은 기존 Firm 스타일, LOA는 기존 Contingent 스타일을 사용합니다. 분기·반기·연도 개시 예정만 공개된 경우 해당 구간 첫날을 배치 기준으로 잡고, 기본 계약 기간만큼만 그려 종료일을 하나로 표시합니다. 원문에 직접 연속 작업 조건이 있으면 앞선 Firm 계약 종료 다음 날과 공개 개시 구간 첫날 중 늦은 날부터 배치합니다. 이 날짜가 공개 개시 구간을 벗어나면 임의로 이동시키지 않습니다. 원문의 개시 정밀도와 날짜 배치 기준은 선택 상세에 보존하며 공시된 정확한 날짜로 취급하지 않습니다. 미행사 옵션 기간은 합산하지 않습니다.
-- 해당 발표가 이미 canonical row에 반영되었으면 중복 예상 바를 만들지 않습니다. 기사 URL·선박이 일치하는 단일 row에만 경제 조건을 연결합니다. 선박명만 보고 다른 계약에 요율을 붙이지 않습니다.
-- 정확한 일자가 없는 일정 범위와 백로그 환산 요율은 가동률·활성 상태·평균 공시 dayrate·기존 시장 통계에 포함하지 않습니다. 별도 Dayrates 탭에서는 아래 규칙에 따라 구별해서 표시합니다. 체결 여부와 원문 날짜 정밀도는 따로 보존하며, 표시 이름만 바꿔 미공개 요율을 공시값으로 기록하지 않습니다. 금액·기간이 없거나 인용이 모호한 경우에는 요율을 생성하지 않고 뉴스에 근거를 남깁니다.
+- 연장 구간별 금액·대응 기간은 모델이 선택하고 각각 row로 보존합니다. Codex는 금액과 기간(일수)만 주고, 나눗셈은 코드가 하며 합산 수주액을 선박마다 중복 배분하지 않습니다.
+- 새 수주는 검증·적용된 canonical row를 기존 Fleet Status 바 스타일로 표시합니다. 모델이 날짜 배치와 상태를 결정하고 원문 정밀도·한국어 배치 근거를 보존합니다. LOA나 미행사 옵션을 Firm으로 승격하지 않습니다.
+- 이벤트의 미적용 row에서 별도 계약 바를 만들지 않습니다. 적용 이벤트의 `readingDecision.contractId`와 `row.id`는 canonical 계약 ID를 가리킵니다.
+- 대략적인 일정(mid 2027, Q4 2027 등)은 Codex가 구체 날짜로 배치하며(예: mid → 6월 무렵), 별도 표시 없이 막대와 통계에 그대로 씁니다. 이후 공시가 나오면 고쳐집니다. 백로그 환산 요율은 평균 공시 dayrate에 넣지 않습니다. 별도 Dayrates 탭에서는 아래 규칙에 따라 구별해서 표시합니다. 체결 여부와 원문 날짜 정밀도는 따로 보존하며, 표시 이름만 바꿔 미공개 요율을 공시값으로 기록하지 않습니다. 금액·기간이 없거나 인용이 모호한 경우에는 요율을 생성하지 않고 뉴스에 근거를 남깁니다.
 
 ### 세대별 Dayrates
 
@@ -45,34 +44,44 @@ Transocean, Valaris, Noble, Seadrill의 공식 fleet status report와 공식 IR/
 - 음영은 인접 계약 구간의 LOESS 잔차에 대한 ±1 **표본 표준편차**입니다. 신뢰구간·예측구간이 아닙니다. 각 구간을 동일 가중치로 계산하고 계약 기간은 점 크기에만 반영합니다. [LOESS 방법 설명(NIST)](https://www.itl.nist.gov/div898/handbook/pmd/section1/pmd144.htm).
 - `tests/dayrateTrends.test.cjs`는 실제 데이터의 세대별 표본·출처·환산 근거, 제외 규칙, 소표본, 선형/상수/잡음 데이터의 통계 계산, 점 면적, 축 범위를 검증합니다.
 
-## Codex 뉴스 원문 대조 (API 아님)
+## 운영: 복원·실행기·진단
 
-GitHub Actions가 6시간마다 수집하며, 원문 해시·기존 계약·이전 발표·읽기 지침이 바뀐 기사만 `manifest.newsQueue`에 등록합니다. HTTP 오류는 다음 서버 수집에서 재시도하며 LLM 작업을 만들지 않습니다. **이 채팅을 주기적으로 깨우는 Codex 예약 실행은 사용하지 않습니다.**
-
-Mac의 launchd 실행기는 공개 manifest의 대기 작업 유무만 5분마다 확인합니다. 작업이 없으면 Git clone·원문 수집·모델 호출 없이 종료합니다. 새 작업이 있으면 아래 게시 명령을 실행합니다. Mac이 잠들거나 꺼진 동안 작업은 서버에 남고, 다시 실행 가능해지면 처리됩니다. **Codex 앱 창은 필요 없고, 로그인된 사용자 세션·인터넷·Codex CLI 인증이 필요합니다.**
+복원(새 Mac 또는 재설치):
 
 ```bash
-codex login                         # ChatGPT 계정 로그인 (API key 로그인 불가)
-.venv/bin/python -m automation.update_news
-.venv/bin/python -m automation.install_news_worker  # 로그인 사용자 launchd에 설치
-.venv/bin/python -m automation.news_worker          # 서버 대기 작업 1회 확인
+brew install python@3.12 node@22 tesseract
+python3.12 -m venv .venv
+.venv/bin/python -m pip install --require-hashes -r automation/requirements.lock
+npm ci
+codex login            # ChatGPT 로그인 (API 키 사용 안 함)
 ```
 
-재설치 시 Python 3.12, Node 22, Codex CLI 0.162.1 이상을 설치하고 아래 로컬 실행 절차로 의존성을 복원한 뒤 `codex login`, `automation.install_news_worker`를 실행합니다. 인증 파일을 서버나 GitHub secret으로 복사하지 않습니다. launchd 설정은 `~/Library/LaunchAgents/com.contiloop.drillship-news-worker.plist`, 상태와 로그는 프로젝트 `.cache/news-worker-*`에 저장합니다.
+서버 workflow는 저장소 Actions 변수 `FLEET_READER_V2_ENABLED=true`일 때만 실행됩니다(실행기 설치 후 켭니다).
+
+실행기 설치/제거(launchd `com.contiloop.drillship-news-worker`, 5분 간격):
 
 ```bash
+.venv/bin/python -m automation.install_news_worker            # 설치
+.venv/bin/python -m automation.install_news_worker --uninstall
 launchctl print gui/$(id -u)/com.contiloop.drillship-news-worker
-launchctl bootout gui/$(id -u)/com.contiloop.drillship-news-worker  # 실행기 중지
 ```
 
-- `codex_reader.py`: ChatGPT 인증 여부 확인, `gpt-6-luna`, `model_reasoning_effort=medium`, `service_tier=default`(Fast off)를 실행마다 명시. API 키 환경 변수 제거. 원문+기존 계약을 입력하며 도구/쓰기 권한 없는 읽기 전용 실행으로 구조화 JSON만 받습니다.
-- `news_review.py`: 원문 SHA-256, 선박 registry, 원문 직접 인용, 날짜 정밀도, 일당 공개 여부를 검증하고 결정론적으로 대조합니다. 모델 출력이 임의 파일 편집이나 배포 명령이 될 수 없습니다.
-- `data/news/reviews.json`: 기사별 Codex 해석·직접 인용·모델 설정·확인 시각을 보존합니다. 원문·기존 계약·이전 발표·읽기 지침이 같으면 재호출하지 않고, 변경되면 다시 읽습니다. 기사 시점보다 앞선 증거만 비교에 사용하여 자기 자신의 수정 내용을 다시 근거로 삼지 않습니다. 후속 FSR이 발표일을 넘으면 FSR을 우선합니다.
-- `update_news.py`: 임시 clone에서 수집/대조/테스트/빌드 후 데이터 경로만 커밋·push하고 실제 Vercel manifest/payload를 확인합니다. 사용자의 작업 파일은 수정하지 않습니다. 동시 push 충돌은 강제 덮어쓰기 없이 실패하고 다음 실행에서 최신 main으로 재시도합니다.
-- `news_jobs.py`: 서버와 로컬이 동일한 읽기 조건과 컨텍스트 해시를 공유합니다. 원문·비교 맥락이 같은 기사는 큐에 등록하지 않습니다.
-- `news_worker.py`: 서버 큐가 비었으면 모델을 호출하지 않습니다. 처리한 큐는 중복 실행하지 않고, 실패는 5분부터 최대 6시간까지 지수 백오프로 재시도합니다. 서버 JSON은 실행 명령이 될 수 없으며, 게시기는 신뢰하는 저장소에서 원문을 다시 검증합니다.
-- Transocean은 IR 호스트의 403을 우회 조작하지 않고 같은 발행사의 `https://www.deepwater.com/news` 공식 원문을 사용합니다.
-- canonical 미공개 일당을 계약 가치÷기간으로 덮어쓰지 않습니다. 화면에서만 백로그 환산 요율과 기본 기간 길이의 계약 바를 제공합니다. 기존 옵션 행사와 새 수주를 구별하고, 합산 수주액을 개별 선박에 중복 배정하지 않습니다.
+수동 실행(실제 수집·Codex 호출·push를 수행):
+
+```bash
+.venv/bin/python -m automation.news_worker                    # 큐 확인 후 필요할 때만 게시
+.venv/bin/python -m automation.update_news                    # 큐와 무관하게 로컬 읽기 + 게시
+.venv/bin/python -m automation.update_news --stored-results   # 1회 복구: data/news/reviews.json 저장 결과 반영
+```
+
+`--stored-results`는 저장된 리뷰마다 `stored:<url>` 작업을 한 번만 만들고(완료 기록이 재실행을 막음) 현재 fleet를 baseline으로 읽어 적용합니다. 반영된 행에는 `inputMode: "stored-result"`와 `storedReading.reviewedAt`이 붙습니다.
+
+진단:
+
+- `data/provenance/readings.json`: 문서별 기록(`status` pending/failed/completed, `outcome`, `lastError`, `failureCount`, `nextAttemptAfter`, `openHolds`, 변경 전 값 `changes`)과 최근 수집 오류.
+- 공개 `manifest.json`의 `readingStatus`(마지막 수집/읽기/적용 시각, `usageLimitedUntil`, collectionErrors, readingErrors)와 `sources`/`sourceHealth`.
+- 실행기: `.cache/news-worker-state.json`(대기 시각·오류), `.cache/news-worker.log`, `.cache/news-worker-error.log`. 응답 캐시 `.cache/reading-responses.json`은 재시도 시 모델 재호출을 막는 로컬 파일이며 Git에 올리지 않습니다.
+- 기술 실패는 5분부터 두 배씩 최대 6시간 백오프로 해당 작업만 재시도하고, 같은 실행의 성공 결과는 게시됩니다. 구 기록(`data/provenance/sources.json`, `observations.json`, `data/news/reviews.json`)은 최초 이전(migration)과 저장 결과 복구에만 읽고 다시 쓰지 않습니다.
 
 ## 공식 원천
 
@@ -86,49 +95,36 @@ launchctl bootout gui/$(id -u)/com.contiloop.drillship-news-worker  # 실행기 
 ## 로컬 실행
 
 ```bash
-python3 -m venv .venv
-. .venv/bin/activate
-python -m pip install --require-hashes -r automation/requirements.lock
-npm ci
-npm run data:check
 npm run dev
-```
-
-검증된 데이터를 실제 생성하려면:
-
-```bash
-npm run data:sync
-npm run verify
+npm run data:check     # 서버 모드 수집만, 파일 쓰기 없음 (네트워크 사용)
+npm run verify         # .venv/bin/python 테스트 + UI 테스트 + 빌드
 ```
 
 ## 생성 산출물
 
-- `public/data/manifest.json`: 현재 데이터 해시, 보고서 기준일, 공식 출처
-- `public/data/fleet.<hash>.json`: 62척 canonical fleet data
-- `public/data/events.<hash>.json`: 자동 반영하지 않은 공식 뉴스/공시 signal
-- `public/data/changes.json`: 직전 데이터와의 semantic diff 요약
-- `data/provenance/sources.json`: 문서 URL, SHA-256, parser version
-- `data/provenance/observations.json`: 계약별 페이지/행 evidence
-- `automation/tests/fixtures/reports/`: CI에서도 실행되는 현재 공식 보고서 golden fixtures
+- `public/data/manifest.json`: 데이터 해시, 보고서 기준일·출처 상태, `newsQueue`, `readingStatus`
+- `public/data/fleet.<hash>.json`: 62척 fleet data
+- `public/data/events.<hash>.json`: 공식 기사 목록(제목+링크)과 읽기 결정별 이벤트(`readingDecision`)
+- `public/data/changes.json`: 직전 데이터와의 변경 요약
+- `data/provenance/readings.json`: 문서 기록(위 진단 참고)
 
 ## 데이터 규칙
 
 - 계약 상태: `Firm`, `Option`, `Contingent`
 - 선박 상태: `Active`, `Idle`, `Warm-Stacked`, `Cold-Stacked`
-- 월 정밀도 원문의 시작일은 월 1일, 종료일은 월 말로 투영합니다.
-- Noble의 종료 token은 exclusive boundary이므로 바로 전날로 저장합니다.
+- 날짜·기간·정밀도와 ISO 표시 배치는 모델의 판단과 한국어 근거를 보존합니다.
 - 경제적 가동률은 `Firm` 구간의 합집합으로 계산하여 같은 달 전환 계약의 겹침을 이중 계산하지 않습니다.
 - total contract value÷기본 기간은 화면 전용 환산값으로 표시하고, 공시 dayrate 및 확정 일자 기준 통계와 구분합니다.
-- 최신 snapshot에 없는 완료 계약은 이력 보존 규칙에 따라 유지하고, stale future 계약은 제거합니다.
+- 최신 보고서에 없는 계약도 유지하며 명시적인 모델 withdraw만 철회합니다. 변경 전 값과 완료된 과거 계약을 보존합니다.
 - 선박의 원문 상태에는 `statusAsOf`를 함께 저장하며, 그 이후 시작한 현재 Firm 계약만 화면의 유효 상태를 Active로 전환합니다.
 
 ## 운영 명령
 
 ```bash
-python3 -m automation.fleet_sync --check   # fetch + parse + validate, no write
-python3 -m automation.fleet_sync --write   # validated generated artifacts only
-python3 -m pytest automation/tests -q
+.venv/bin/python -m automation.fleet_sync --write --mode server   # 서버 수집 + 큐 게시 (Actions와 동일)
+.venv/bin/python -m automation.fleet_sync --write --mode local    # 이 checkout에서 로컬 읽기 (push 없음)
+.venv/bin/python -m pytest automation/tests -q
 npm run build
 ```
 
-`npm run build`는 TypeScript 검사와 프로덕션 번들 생성을 함께 수행합니다. 파싱 또는 스키마가 달라지면 workflow는 실패하며 마지막 정상 데이터와 프로덕션 사이트는 그대로 유지됩니다.
+보고서 기준일을 확인하지 못하면 마지막으로 확인된 날짜를 유지하며 수집 시각으로 대체하지 않습니다. 통합 무결성 검사에 실패한 문서는 전체를 적용하지 않고 해당 작업만 실패 처리합니다. Ubuntu에서는 `tesseract-ocr tesseract-ocr-eng`가 필요하며 workflow가 설치합니다.

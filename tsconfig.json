@@ -25,6 +25,9 @@
       ]
     },
     "allowImportingTsExtensions": true,
-    "noEmit": true
-  }
+    "noEmit": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./.cache/tsconfig.tsbuildinfo"
+  },
+  "exclude": ["node_modules", "dist", ".dryforge", ".cache"]
 }

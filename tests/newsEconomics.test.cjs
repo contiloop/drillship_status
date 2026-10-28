@@ -9,148 +9,144 @@ const compile = (module, filename) => module._compile(ts.transpileModule(fs.read
 }).outputText, filename);
 require.extensions['.tsx'] = compile;
 require.extensions['.ts'] = compile;
-const { awardDuration, newsEconomics, timelineContracts, backlogRateLabel, economicsDetails } = require('../utils/newsEconomics.ts');
+const { newsEconomics, timelineContracts, economicsDetails } = require('../utils/newsEconomics.ts');
+const { getComputedStatus, countFirmCoveredDays } = require('../utils/shipStatus.ts');
+const { isStatisticalContract, isCurrentReportedRate, contractPeriod, contractSpan, reportedRate, interpretationDetails } = require('../utils/contractTimeline.ts');
+const { dayrateObservations } = require('../utils/dayrateTrends.ts');
 const { default: Gantt, ContractDetails } = require('../components/FleetGantt.tsx');
-const manifest = JSON.parse(fs.readFileSync('public/data/manifest.json', 'utf8'));
-const events = JSON.parse(fs.readFileSync(`public/data/${manifest.eventsFile}`, 'utf8')).events;
-const fleet = JSON.parse(fs.readFileSync(`public/data/${manifest.fleetFile}`, 'utf8'));
-const eventFor = (vessel, url) => events.find(e => e.vessel === vessel && e.llmReview && (!url || e.url.includes(url)));
-const shipFor = name => fleet.find(s => s.name === name);
 
-test('real award values divided only by their own firm durations', () => {
-  for (const [vessel, url, amount, days, label] of [
-    ['Deepwater Conqueror', '30626', 225e6, 450, '$500k'],
-    ['Deepwater Conqueror', '30551', 80e6, 170, '$471k'],
-    ['Deepwater Proteus', '', 325e6, 700, '$464k'],
-    ['West Carina', '', 420e6, 880, '$477k'],
-    ['Dhirubhai Deepwater KG2', '', 300e6, 730, '$411k'],
-  ]) {
-    const economics = newsEconomics(eventFor(vessel, url));
-    assert.equal(economics.scope, 'award');
-    assert.equal(economics.rates.length, 1);
-    assert.equal(economics.rates[0].usdPerDay, amount / days);
-    assert.equal(economics.rates[0].duration.days, days);
-    assert.equal(backlogRateLabel(economics, true), label);
-  }
-});
+// New reader shape: no dateBasis/precision/rateBasis enums.
+const interpretation = patch => ({ sourceStartText: 'fourth quarter of 2026', sourceEndText: null,
+  placementBasis: '앞선 계약 종료일에 연결', awardType: 'signed-contract', termText: '880 days', optionText: 'up to 880 days',
+  valueText: '$420 million', valueUsd: 420e6, baseDurationDays: 880, derivedUsdPerDay: 420e6 / 880,
+  includes: ['동원 비용'], excludes: ['추가 서비스'], ...patch });
+// Old published shape with legacy enum fields.
+const legacyInterpretation = patch => interpretation({ startPrecision: 'quarter', endPrecision: 'approximate', dateBasis: 'placement',
+  rateBasis: 'backlog-derived', reportedUsdPerDay: null, durationAssumption: '기본 880일', maximumTerm: false, ...patch });
+const row = patch => ({ id: 'model-row', vesselId: 'ship', startDate: '2026-10-28', endDate: '2029-03-25',
+  dayRate: 0, client: 'Client', region: 'Brazil', status: 'Firm', sourceUrl: 'https://example.com/award',
+  interpretation: interpretation(), ...patch });
+const ship = contracts => ({ id: 'ship', name: 'Ship', company: 'Seadrill', generation: '7G+', status: 'Idle', statusAsOf: '2026-08-01', contracts });
+const event = decision => ({ company: 'Seadrill', vessel: 'Ship', classification: 'official-news-signal', autoApplied: true,
+  url: 'https://example.com/award', readingDecision: decision });
+const detail = selected => renderToStaticMarkup(React.createElement(ContractDetails, { selected, shipName: 'Ship', onClose() {} }));
+const displayed = contract => timelineContracts(ship([contract]))[0];
 
-test('KG2 includes base only, not the two-year option, and states conversion and fees', () => {
-  const event = eventFor('Dhirubhai Deepwater KG2');
-  const economics = newsEconomics(event);
-  assert.equal(economics.rates[0].duration.days, 730);
-  assert.match(economicsDetails(economics), /300,000,000.*730일.*1년=365일 가정/);
-  assert.match(economicsDetails(economics), /포함: 추가 서비스·동원 비용/);
-  assert.match(economicsDetails(economics), /공시 dayrate 아님/);
-  assert.equal(event.facts.dayRateUsd, undefined);
-});
-
-test('Capella extension tranches remain separate and never rate the whole legacy row', () => {
-  const economics = newsEconomics(eventFor('West Capella'));
-  assert.equal(economics.scope, 'extension');
-  assert.deepEqual(economics.rates.map(r => [r.valueUsd, r.duration.days]), [[41e6, 120], [53e6, 120]]);
-  assert.equal(backlogRateLabel(economics, true), '연장 $342k / $442k');
-  assert.match(economicsDetails(economics), /기존 계약 전체 요율 아님/);
-  const rows = timelineContracts(shipFor('West Capella'), events);
+test('bars come only from fleet contract rows; events never add or move a bar', () => {
+  const canonical = row();
+  const notice = event({ action: 'upsert', contractId: 'model-row', row: { ...canonical, startDate: '2027-01-01' } });
+  const legacy = { ...event(), facts: { expectedStart: 'Q1 2027', announcedValueUsdApprox: 420e6, termText: '880 days' },
+    evidence: [{ field: 'termText', quote: '880 days for $420 million' }] };
+  assert.equal(timelineContracts.length, 1);
+  const rows = timelineContracts(ship([canonical]));
   assert.equal(rows.length, 1);
-  assert.equal(rows[0].dayRate, 0);
-  assert.equal(rows[0].economics.rates.length, 2);
+  assert.equal(rows[0].startDate, '2026-10-28');
+  assert.deepEqual(timelineContracts(ship([])), []);
+  const html = renderToStaticMarkup(React.createElement(Gantt, { ships: [ship([])], events: [notice, legacy] }));
+  assert.doesNotMatch(html, /aria-pressed/);
+  assert.equal(newsEconomics(legacy), undefined);
 });
 
-test('missing backlog, missing term, conflicting evidence, maximum-only duration fail closed', () => {
-  assert.equal(newsEconomics(eventFor('Sonangol Libongos')), undefined);
-  assert.equal(newsEconomics(eventFor('VALARIS DS-18')), undefined);
-  const event = eventFor('West Carina');
-  assert.equal(newsEconomics({ ...event, reviewStatus: 'conflict' }), undefined);
-  assert.equal(newsEconomics({ ...event, llmReview: undefined }), undefined);
-  assert.equal(newsEconomics({ ...event, url: 'javascript:alert(1)' }), undefined);
-  assert.equal(newsEconomics({ ...event, evidence: [] }), undefined);
-  assert.equal(newsEconomics({ ...event, evidence: [{field:'termText',quote:'up to 880 days'}, ...event.evidence.filter(e => e.field !== 'termText')] }), undefined);
-  assert.equal(awardDuration({ ...event, evidence: [{field:'termText',quote:'120 days and 180 days'}] }), undefined);
+test('reported rate is dayRate > 0 regardless of interpretation fields', () => {
+  const noBasis = row({ dayRate: 400000, interpretation: interpretation({ derivedUsdPerDay: null }) });
+  assert.equal(reportedRate(noBasis), 400000);
+  assert.equal(reportedRate(row({ dayRate: 400000, interpretation: legacyInterpretation({ rateBasis: 'undisclosed' }) })), 400000);
+  assert.equal(reportedRate(row({ dayRate: 0 })), 0);
+  assert.equal(reportedRate(row({ dayRate: Infinity })), 0);
+  assert.equal(isCurrentReportedRate(noBasis, '2026-10-29'), true);
 });
 
-test('bar spans one base term, with the source precision and placement basis only in details', () => {
-  const row = timelineContracts(shipFor('Dhirubhai Deepwater KG2'), events).find(c => c.forecast);
-  assert.equal(row.forecast.startLabel, '2027년 1분기');
-  assert.equal(row.forecast.awardLabel, 'LOA');
-  assert.match(row.forecast.windowLabel, /730|2년/);
-  assert.equal(row.startDate, '2027-01-01');
-  assert.equal(row.endDate, '2028-12-31');
-  assert.equal(row.forecast.windowLabel, '2027-01-01 – 2028-12-31 · 2년');
-  assert.equal(row.dayRate, 0);
-  assert.equal(row.status, 'Contingent');
-  const html = renderToStaticMarkup(React.createElement(ContractDetails, {selected: row, shipName:'KG2', onClose:()=>{}}));
-  assert.match(html, /\$410,959 \/ 일 \(백로그 환산\)/);
-  assert.match(html, /공개된 2027년 1분기의 첫날\(2027-01-01\)부터 배치/);
-  assert.match(html, /정확한 개시·종료일은 공개되지 않았습니다/);
-  assert.match(html, /1년=365일 가정/);
-  assert.doesNotMatch(html, /종료 예상|일정 범위|2029-03-30/);
-});
-
-test('all six reviewed unscheduled awards get duration-sized bars, no guessed DS18 rate', () => {
-  const before = JSON.stringify({fleet, events});
-  const rows = fleet.flatMap(s => timelineContracts(s, events));
-  assert.equal(rows.filter(c => c.forecast).length, 6);
-  const conqueror = timelineContracts(shipFor('Deepwater Conqueror'), events);
-  assert.equal(conqueror.filter(c => c.forecast).length, 2);
-  assert(conqueror.filter(c => c.forecast).every(c => c.status === 'Firm' && c.forecast.awardLabel === 'Firm'));
-  assert.equal(timelineContracts(shipFor('West Carina'), events).find(c => c.forecast).status, 'Firm');
-  assert.equal(conqueror.find(c => !c.forecast).dayRate, 530000);
-  const ds18 = timelineContracts(shipFor('VALARIS DS-18'), events).find(c => c.forecast);
-  assert.equal(ds18.forecast.duration.maximum, true);
-  assert.equal(ds18.forecast.duration.label, '최대 7개월');
-  assert.equal(ds18.startDate, '2026-10-01');
-  assert.equal(ds18.endDate, '2027-04-30');
-  assert.equal(ds18.economics, undefined);
-  assert.equal(JSON.stringify({fleet, events}), before);
-});
-
-test('new and existing bars use the same client/rate labels, styling, height and row', () => {
-  const html = renderToStaticMarkup(React.createElement(Gantt, { ships: fleet, events }));
-  assert.match(html, />ONGC • \$411k<\/span>/);
-  assert.match(html, />Undisclosed operator • \$477k<\/span>/);
-  assert.match(html, /연장 \$342k \/ \$442k/);
-  assert.match(html, /Deepwater Conqueror · Firm.*\$530,000 \/ 일 \(공시\)/);
-  assert.match(html, /요율은 공시값 또는 계약 가치÷기본 작업 기간/);
-  assert.doesNotMatch(html, /추정|예상 범위|종료 예상|개시 구간 공개|Codex 계약 대조/);
-  const bars = [...html.matchAll(/<button\b[^>]*aria-pressed[^>]*>[\s\S]*?<\/button>/g)].map(m => m[0]);
-  for (const bar of bars) {
-    assert.match(bar, /height:30px;top:4px/);
-    assert.doesNotMatch(bar, /justify-center|bg-blue-600\/70/);
-    assert.doesNotMatch(bar.split('<span')[1], />Firm ·|>LOA ·|개시 예정/);
-    if (bar.includes('· Firm ·')) assert.match(bar, /bg-blue-600 border-black\/20/);
+test('derived rate exists iff derivedUsdPerDay is a positive finite number', () => {
+  assert.equal(displayed(row()).economics.usdPerDay, 420e6 / 880);
+  assert.equal(displayed(row({ interpretation: interpretation({ rateBasis: undefined }) })).economics.usdPerDay, 420e6 / 880);
+  assert.equal(displayed(row({ interpretation: legacyInterpretation({ rateBasis: 'undisclosed' }) })).economics.usdPerDay, 420e6 / 880);
+  assert.equal(displayed(row({ interpretation: interpretation({ derivedUsdPerDay: 123456, valueUsd: null, baseDurationDays: null }) })).economics.usdPerDay, 123456);
+  for (const derivedUsdPerDay of [null, undefined, 0, -1, Infinity, NaN, '477272']) {
+    assert.equal(displayed(row({ interpretation: interpretation({ derivedUsdPerDay }) })).economics, undefined, String(derivedUsdPerDay));
   }
-  assert.doesNotMatch(html, /height:(76|112)px/);
+  assert.equal(displayed(row({ interpretation: undefined })).economics, undefined);
 });
 
-test('explicit consecutive campaigns join after the prior firm end regardless of feed order', () => {
-  const ship = shipFor('Deepwater Conqueror');
-  const rows = timelineContracts(ship, events).filter(c => c.forecast);
-  const first = rows.find(c => c.sourceUrl.includes('30551'));
-  const second = rows.find(c => c.sourceUrl.includes('30626'));
-  assert.equal(first.startDate, '2027-02-01');
-  assert.equal(Date.parse(first.endDate) - Date.parse(first.startDate), 169 * 86400000);
-  assert.equal(Date.parse(second.startDate), Date.parse(first.endDate) + 86400000);
-  assert.equal(Date.parse(second.endDate) - Date.parse(second.startDate), 449 * 86400000);
-  assert.match(first.forecast.placementBasis, /앞선 계약 종료 다음 날/);
-  assert.deepEqual(timelineContracts(ship, [...events].reverse()), timelineContracts(ship, events));
-  const carina = timelineContracts(shipFor('West Carina'), events).find(c => c.forecast);
-  assert.equal(Date.parse(carina.endDate) - Date.parse(carina.startDate), 879 * 86400000);
+test('bar label shows reported rate first, derived rate otherwise, unchanged style', () => {
+  const derived = renderToStaticMarkup(React.createElement(Gantt, { ships: [ship([row()])] }));
+  assert.match(derived, /Client • \$477k/);
+  assert.match(derived, /height:30px;top:4px/);
+  assert.match(derived, /bg-blue-600 border-black\/20/);
+  assert.doesNotMatch(derived, /추정|estimate/i);
+  const reported = renderToStaticMarkup(React.createElement(Gantt, { ships: [ship([row({ dayRate: 400000 })])] }));
+  assert.match(reported, /Client • \$400k/);
+  assert.match(reported, /\$400,000 \/ 일 \(공시\)/);
+  const none = renderToStaticMarkup(React.createElement(Gantt, { ships: [ship([row({ interpretation: interpretation({ derivedUsdPerDay: null }) })])] }));
+  assert.match(none, /일당 미공개/);
 });
 
-test('continuation outside its source window is not silently shifted to an invented schedule', () => {
-  const event = eventFor('Deepwater Conqueror', '30551');
-  const ship = shipFor('Deepwater Conqueror');
-  const conflict = {...ship, contracts: ship.contracts.map(c => ({...c, endDate: '2028-01-31'}))};
-  assert.equal(timelineContracts(conflict, [event]).filter(c => c.forecast).length, 0);
-});
-
-test('covered/superseded jobs and repeated events cannot duplicate or revive forecasts', () => {
-  const ship = shipFor('West Carina');
-  const event = eventFor(ship.name);
-  assert.equal(timelineContracts(ship, [event, event]).filter(c => c.forecast).length, 1);
-  for (const status of ['covered-by-report', 'superseded', 'conflict', 'pending', 'not-contract-news']) {
-    assert.equal(timelineContracts(ship, [{...event, reviewStatus:status}]).filter(c => c.forecast).length, 0);
+test('placed/approximate dates count in utilization, status and bars like any contract', () => {
+  const today = new Date('2026-10-29T00:00:00Z');
+  for (const interp of [interpretation(), legacyInterpretation(), legacyInterpretation({ dateBasis: 'unresolved' })]) {
+    const placed = row({ interpretation: interp });
+    assert.equal(isStatisticalContract(placed), true);
+    assert.equal(getComputedStatus(ship([placed]), today), 'Active');
+    assert.equal(countFirmCoveredDays(ship([placed]), today, today), 1);
+    assert.notEqual(contractSpan(placed, 2026, 2030), null);
   }
-  const other = { ...event, vessel: 'Different Vessel' };
-  assert.equal(timelineContracts(ship, [other]).filter(c => c.forecast).length, 0);
+  for (const patch of [{ startDate: '2026-02-30' }, { endDate: 'tomorrow' }, { startDate: '2029-04-01' }]) {
+    const invalid = row(patch);
+    assert.equal(isStatisticalContract(invalid), false);
+    assert.equal(dayrateObservations([ship([invalid])]).length, 0);
+  }
+  assert.equal(contractPeriod(row()), '2026-10-28 ~ 2029-03-25');
+  assert.equal(contractPeriod({ startDate: '2026-10-01', endDate: '2029-03-31' }), '2026-10 ~ 2029-03');
+});
+
+test('reported and derived stay separate in Dayrates observations', () => {
+  const [derived] = dayrateObservations([ship([row()])]);
+  assert.equal(derived.basis, 'backlog');
+  assert.equal(derived.rate, 420e6 / 880);
+  const [reported] = dayrateObservations([ship([row({ dayRate: 400000 })])]);
+  assert.equal(reported.basis, 'reported');
+  assert.equal(reported.rate, 400000);
+  for (const status of ['Option', 'Contingent']) assert.equal(dayrateObservations([ship([row({ status })])]).length, 0);
+});
+
+test('contract detail shows source wording, placement, terms, costs, formula and URL without undefined', () => {
+  const html = detail(displayed(row()));
+  for (const value of ['원문 시작: fourth quarter of 2026', '일정 배치: 앞선 계약 종료일에 연결', '880 days', 'up to 880 days', '$420 million',
+    '포함: 동원 비용', '제외: 추가 서비스', '$420,000,000 ÷ 880일 = $477,273 / 일', 'href="https://example.com/award"']) assert(html.includes(value), value);
+  assert.doesNotMatch(html, /undefined|null|\((quarter|approximate|day|month)\)|집계에서 제외|원문 종료/);
+});
+
+test('missing includes/excludes and sparse interpretations render without crashing', () => {
+  const sparse = row({ interpretation: { derivedUsdPerDay: null } });
+  const html = detail(displayed(sparse));
+  assert.doesNotMatch(html, /undefined|포함:|제외:/);
+  assert.equal(interpretationDetails(sparse), '');
+  assert.equal(interpretationDetails({ sourceEndText: 'mid-2028' }), '원문 종료: mid-2028');
+  const noLists = row({ interpretation: interpretation({ includes: undefined, excludes: undefined }) });
+  assert.doesNotMatch(detail(displayed(noLists)), /undefined|포함:|제외:/);
+});
+
+test('legacy rows (old enum fields or no interpretation) render', () => {
+  const legacy = row({ dayRate: 400000, interpretation: legacyInterpretation({ dateBasis: 'source', startPrecision: 'month', endPrecision: 'month', rateBasis: 'reported', reportedUsdPerDay: 400000, maximumTerm: true }) });
+  const html = detail(displayed(legacy));
+  assert.match(html, /\$400,000 \/ 일 \(공시\)/);
+  assert.doesNotMatch(html, /undefined|\(month\)|집계에서 제외/);
+  const plain = row({ interpretation: undefined, dayRate: 300000, datePrecision: { start: 'month', end: 'month' } });
+  assert.match(detail(displayed(plain)), /\(월 단위\)/);
+  assert.doesNotMatch(detail(displayed(plain)), /undefined/);
+});
+
+test('stored-result label shows original reading time only in the detail panel', () => {
+  const stored = row({ inputMode: 'stored-result', storedReading: { reviewedAt: '2026-08-20T09:10:00Z' } });
+  const gantt = renderToStaticMarkup(React.createElement(Gantt, { ships: [ship([stored])] }));
+  assert.doesNotMatch(gantt, /저장된 읽기 결과로 보완/);
+  const html = detail(displayed(stored));
+  assert.match(html, /저장된 읽기 결과로 보완 · 원래 읽은 시각 2026-08-20T09:10:00Z/);
+  assert.match(html, /원문 URL/);
+  assert.match(detail(displayed(row({ inputMode: 'stored-result' }))), /원래 읽은 시각 확인되지 않음/);
+  assert.doesNotMatch(detail(displayed(row())), /저장된 읽기 결과로 보완/);
+});
+
+test('economics details mark the derived value as not a disclosed dayrate', () => {
+  assert.match(economicsDetails(displayed(row()).economics), /공시 dayrate 아님/);
+  assert.equal(economicsDetails({ scope: 'award', usdPerDay: 123456 }), '$123,456 / 일 · 계약 가치의 일평균 환산액 · 공시 dayrate 아님');
 });

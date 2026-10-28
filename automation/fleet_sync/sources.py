@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from .core import clean_text, file_sha256
+from .core import clean_text
 from .model import Company
 
 
@@ -23,6 +23,8 @@ ALLOWED_HOSTS = {
     "www.valaris.com",
     "s23.q4cdn.com",
     "noblecorp.com",
+    # Issuer investor index links directly to this official release host.
+    "noble.gcs-web.com",
     "www.seadrill.com",
     "ir.seadrill.com",
     "data.sec.gov",
@@ -104,17 +106,13 @@ class HttpClient:
         *,
         timeout: int,
         byte_limit: int,
-        json_payload: dict | None = None,
     ) -> requests.Response:
-        current_method = method
         current_url = url
-        current_payload = json_payload
         for redirect_count in range(self.MAX_REDIRECTS + 1):
             self._validate_url(current_url)
             response = self.session.request(
-                current_method,
+                method,
                 current_url,
-                json=current_payload,
                 timeout=timeout,
                 allow_redirects=False,
                 stream=True,
@@ -132,11 +130,6 @@ class HttpClient:
                 # Validate before the next request so an allowlisted host cannot
                 # bounce credentials or traffic to an arbitrary destination.
                 self._validate_url(next_url)
-                if response.status_code == 303 or (
-                    current_method == "POST" and response.status_code in {301, 302}
-                ):
-                    current_method = "GET"
-                    current_payload = None
                 response.close()
                 current_url = next_url
                 continue
@@ -185,17 +178,12 @@ class HttpClient:
             byte_limit=25 * 1024 * 1024,
         )
 
-    def post_json(self, url: str, payload: dict, *, timeout: int = 45) -> requests.Response:
-        return self._request(
-            "POST",
-            url,
-            timeout=timeout,
-            byte_limit=5 * 1024 * 1024,
-            json_payload=payload,
-        )
 
-
-def discover_document(client: HttpClient, spec: SourceSpec) -> tuple[str, str]:
+def discover_document(
+    client: HttpClient, spec: SourceSpec, *, diagnostics: list[dict] | None = None,
+) -> tuple[str, str]:
+    """Keep the legacy URL/mode result and optionally retain attempt failures."""
+    attempt_url = spec.index_url
     try:
         if spec.company == "Transocean":
             return _discover_transocean(client, spec), "official-index"
@@ -203,6 +191,9 @@ def discover_document(client: HttpClient, spec: SourceSpec) -> tuple[str, str]:
             try:
                 return _discover_valaris_official(client, spec), "official-index"
             except Exception as official_error:
+                if diagnostics is not None:
+                    diagnostics.append(_discovery_diagnostic(official_error, spec.index_url, "official-report-index"))
+                attempt_url = "https://data.sec.gov/submissions/CIK0000314808.json"
                 return (
                     _discover_valaris_sec(client),
                     f"sec-submissions-after-official-{type(official_error).__name__}",
@@ -212,8 +203,9 @@ def discover_document(client: HttpClient, spec: SourceSpec) -> tuple[str, str]:
         if spec.company == "Seadrill":
             return _discover_seadrill(client, spec), "official-wordpress-api"
     except Exception as error:
-        # The known-good official document is intentionally a last-resort safety
-        # net. Parsing and freshness validation still run before publication.
+        # Keep the failed discovery attempt separate from its official fallback.
+        if diagnostics is not None:
+            diagnostics.append(_discovery_diagnostic(error, attempt_url, "official-report-discovery"))
         return spec.fallback_document_url, f"fallback-after-{type(error).__name__}"
     raise AssertionError(spec.company)
 
@@ -224,6 +216,17 @@ def _error_summary(error: Exception) -> str:
     if isinstance(error, requests.HTTPError) and error.response is not None:
         return f"{type(error).__name__}({error.response.status_code})"
     return type(error).__name__
+
+
+def _discovery_diagnostic(error: Exception, url: str, stage: str, **metadata: object) -> dict:
+    """Structured attempt evidence; consumers never parse human warning text."""
+    response = getattr(error, "response", None)
+    return {
+        "url": getattr(response, "url", None) or url,
+        "stage": stage, "errorType": type(error).__name__,
+        "error": f"{type(error).__name__}: {error}",
+        "httpStatus": getattr(response, "status_code", None), **metadata,
+    }
 
 
 def _discover_transocean(client: HttpClient, spec: SourceSpec) -> str:
@@ -352,185 +355,144 @@ def _discover_valaris_sec(client: HttpClient) -> str:
     raise ValueError("SEC submissions did not expose a Valaris fleet-status exhibit")
 
 
-def fetch_article(client: HttpClient, url: str) -> tuple[str, str]:
-    """Read an issuer article, not a listing snippet; return text and its hash."""
-    response = client.get(url)
-    soup = BeautifulSoup(response.text, "lxml")
-    for node in soup.select("script,style,nav,header,footer"):
-        node.decompose()
-    article = soup.select_one("article.news,article,.module-news-details,main") or soup
-    text = clean_text(article.get_text(" ", strip=True))
-    if len(text) < 300:
-        raise ValueError("article body is empty or unexpectedly short")
-    return text, file_sha256(text.encode("utf-8"))
-
-
-def collect_official_news(
-    client: HttpClient,
-    spec: SourceSpec,
-    vessel_names: list[str],
-    *,
-    limit: int = 20,
-) -> tuple[list[dict], str | None]:
-    q4_warning: str | None = None
-    if spec.company in {"Valaris", "Seadrill"}:
-        try:
-            q4_events = _collect_q4_news(client, spec, vessel_names, limit=limit)
-            if q4_events:
-                return q4_events, None
-            q4_warning = "Q4 service returned no matching monitored items; rendered-page fallback used"
-        except Exception as error:
-            # Fall through to the rendered official page. Some Q4 tenants
-            # intermittently disable the service endpoint during publishing.
-            q4_warning = f"Q4 service {_error_summary(error)}; rendered-page fallback used"
-    try:
-        response = client.get(spec.news_url)
-    except Exception as error:
-        detail = _error_summary(error)
-        if q4_warning:
-            detail = f"{q4_warning}; rendered page {detail}"
-        return [], detail
-
-    soup = BeautifulSoup(response.text, "lxml")
-    keywords = re.compile(r"\b(contract|fleet|award|extension|option|backlog|drillship|rig|results)\b", re.I)
-    events: list[dict] = []
-    seen: set[str] = set()
-    for link in soup.find_all("a", href=True):
-        title = clean_text(unescape(link.get_text(" ")))
-        if len(title) < 12 or not keywords.search(title):
-            continue
-        url = urljoin(response.url, link["href"])
-        parsed_url = urlparse(url)
-        if url in seen or parsed_url.scheme != "https" or parsed_url.hostname not in ALLOWED_HOSTS:
-            continue
-        seen.add(url)
-        parent_text = clean_text((link.find_parent(["tr", "article", "li", "div"]) or link).get_text(" "))
-        detail_text = parent_text
-        date_match = re.search(
-            r"\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2},\s+\d{4}\b",
-            parent_text,
-            re.I,
-        )
-        matched_vessels = [name for name in vessel_names if name.casefold() in parent_text.casefold()]
-        body_hash = None
-        article_error = None
-        if parsed_url.path not in {"", "/"}:
-            try:
-                detail_text, body_hash = fetch_article(client, url)
-                matched_vessels = [
-                    name for name in vessel_names if name.casefold() in detail_text.casefold()
-                ]
-                if date_match is None:
-                    date_match = re.search(
-                        r"\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2},\s+\d{4}\b",
-                        detail_text,
-                        re.I,
-                    )
-            except Exception as error:
-                # A listing item is still a useful review signal when the
-                # detail page temporarily rejects automated access.
-                article_error = _error_summary(error)
-        event = {
-            "company": spec.company,
-            "title": title,
-            "url": url,
-            "publishedAt": date_match.group(0) if date_match else None,
-            "vessels": matched_vessels,
-            "classification": "official-news-signal",
-            "autoApplied": False,
-            "articleSha256": body_hash,
-            "articleReadError": article_error,
-        }
-        events.append(event)
-        if len(events) >= limit:
-            break
-    if not events:
-        detail = "official news page returned no matching monitored items"
-        if q4_warning:
-            detail = f"{q4_warning}; {detail}"
-        return [], detail
-    return events, q4_warning
-
-
-def _collect_q4_news(
-    client: HttpClient,
-    spec: SourceSpec,
-    vessel_names: list[str],
-    *,
-    limit: int,
-) -> list[dict]:
-    host = urlparse(spec.news_url)
-    endpoint = f"https://{host.hostname}/Services/PressReleaseService.svc/GetPressReleaseList"
-    year = datetime.now(timezone.utc).year
-    payload = {
-        "serviceDto": {
-            "ViewType": "2",
-            "ViewDate": "",
-            "RevisionNumber": "1",
-            "LanguageId": "1",
-            "Signature": "",
-            "ItemCount": 40,
-            "StartIndex": 0,
-            "TagList": [],
-            "IncludeTags": True,
-        },
-        "excludeSelection": 1,
-        "year": year,
-        "pressReleaseBodyType": 0,
-        "pressReleaseSelection": 3,
-        "pressReleaseCategoryWorkflowId": "00000000-0000-0000-0000-000000000000",
-    }
-    items = client.post_json(endpoint, payload).json().get("GetPressReleaseListResult", [])
-    keywords = re.compile(r"\b(contract|fleet|award|extension|option|backlog|drillship|rig|results)\b", re.I)
-    events: list[dict] = []
-    for item in items:
-        title = clean_text(item.get("Headline"))
-        if not keywords.search(title):
-            continue
-        if re.search(r"\b(voting|annual general meeting)\b", title, re.I):
-            continue
-        url = urljoin(spec.news_url, item.get("LinkToDetailPage") or item.get("LinkToUrl") or "")
-        parsed_url = urlparse(url)
-        if parsed_url.scheme != "https" or parsed_url.hostname not in ALLOWED_HOSTS:
-            continue
-        text = clean_text(
-            " ".join(
-                str(item.get(key) or "")
-                for key in ("Headline", "ShortDescription", "ShortBody", "Body")
-            )
-        )
-        matched_vessels = [name for name in vessel_names if name.casefold() in text.casefold()]
-        body_hash = None
-        article_error = None
-        try:
-            detail, body_hash = fetch_article(client, url)
-            matched_vessels = [
-                name for name in vessel_names if name.casefold() in detail.casefold()
-            ]
-        except Exception as error:
-            article_error = _error_summary(error)
-        raw_date = clean_text(item.get("PressReleaseDate"))
-        try:
-            published_at = datetime.strptime(raw_date, "%m/%d/%Y %H:%M:%S").date().isoformat()
-        except ValueError:
-            published_at = raw_date or None
-        events.append(
-            {
-                "company": spec.company,
-                "title": title,
-                "url": url,
-                "publishedAt": published_at,
-                "vessels": matched_vessels,
-                "classification": "official-news-signal",
-                "autoApplied": False,
-                "articleSha256": body_hash,
-                "articleReadError": article_error,
-            }
-        )
-        if len(events) >= limit:
-            break
-    return events
-
-
 def retrieved_at() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def publication_date(value: object) -> str | None:
+    """Normalize explicit publisher metadata, never dates in contract prose."""
+    text = clean_text(value)
+    if not text:
+        return None
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        return parsed.isoformat() if "T" in text else parsed.date().isoformat()
+    except ValueError:
+        pass
+    for pattern in ("%m/%d/%Y %H:%M:%S", "%B %d, %Y", "%b %d, %Y", "%m/%d/%Y"):
+        try:
+            return datetime.strptime(text, pattern).date().isoformat()
+        except ValueError:
+            continue
+    return None
+
+
+def discover_official_news(
+    client: HttpClient, spec: SourceSpec, *, limit: int = 20,
+    diagnostics: list[dict] | None = None,
+) -> tuple[list[dict], str | None]:
+    """Discover official articles without judging headline/vessel relevance.
+
+    Each listing and Q4 item is an independent attempt. Optional structured
+    diagnostics preserve HTTP status/item identity; warnings remain compatible
+    with existing callers. Full article acquisition belongs to source_materials.
+    """
+    if limit <= 0:
+        return [], None
+    events: list[dict] = []
+    seen: set[str] = set()
+    warnings: list[str] = []
+
+    def failed(error: Exception, url: str, stage: str, **metadata: object) -> None:
+        if diagnostics is not None:
+            diagnostics.append(_discovery_diagnostic(error, url, stage, **metadata))
+        warnings.append(f"{stage} {_error_summary(error)}")
+
+    if spec.company in {"Valaris", "Seadrill"}:
+        host = urlparse(spec.news_url).hostname
+        query = urlencode({
+            "LanguageId": 1, "bodyType": 0, "pressReleaseDateFilter": 3,
+            "categoryId": "00000000-0000-0000-0000-000000000000",
+            "pageSize": limit, "pageNumber": 0, "tagList": "",
+            "includeTags": "true", "year": -1, "excludeSelection": 1,
+        })
+        endpoint = f"https://{host}/feed/PressRelease.svc/GetPressReleaseList?{query}"
+        try:
+            items = client.get(endpoint).json()["GetPressReleaseListResult"]
+            if not isinstance(items, list):
+                raise ValueError("Q4 list result is not an array")
+            for index, item in enumerate(items):
+                try:
+                    if not isinstance(item, dict):
+                        raise ValueError("Q4 list item is not an object")
+                    href = item.get("LinkToDetailPage") or item.get("LinkToUrl")
+                    if not isinstance(href, str) or not href:
+                        raise ValueError("Q4 article has no detail URL")
+                    url = urljoin(spec.news_url, href)
+                    if url in seen:
+                        continue
+                    seen.add(url)
+                    events.append({
+                        "company": spec.company, "url": url,
+                        "title": clean_text(item.get("Headline")),
+                        "publishedAt": publication_date(item.get("PressReleaseDate")),
+                        "discoveryMode": "official-q4-public-feed",
+                    })
+                    if len(events) >= limit:
+                        break
+                except Exception as error:
+                    failed(error, endpoint, f"Q4 item[{index}]", itemIndex=index)
+            if events:
+                return events, "; ".join(warnings) or None
+            failed(ValueError("Q4 public feed returned no valid article URLs"), endpoint, "official-q4-public-feed")
+        except Exception as error:
+            failed(error, endpoint, "official-q4-public-feed")
+
+    # The primary listing and the Noble PDF listing are deliberately sibling
+    # attempts: an HTTP failure in either cannot prevent the other being read.
+    try:
+        response = client.get(spec.news_url)
+        soup = BeautifulSoup(response.text, "lxml")
+        for index, link in enumerate(soup.find_all("a", href=True)):
+            try:
+                url = urljoin(response.url, link["href"])
+                parsed = urlparse(url)
+                # Route shapes and dates are collection metadata, not relevance.
+                is_article = (
+                    bool(re.search(r"/news/detail/?$", parsed.path, re.I))
+                    and bool(dict(parse_qsl(parsed.query)).get("ID"))
+                ) or bool(re.search(r"/news/news-details/|/news-releases/news-release-details/", parsed.path, re.I))
+                if not is_article or url in seen:
+                    continue
+                seen.add(url)
+                container = link.find_parent(["tr", "article", "li"]) or link.parent
+                time_node = container.find("time") if container else None
+                published = publication_date(time_node.get("datetime") or time_node.get_text()) if time_node else None
+                if published is None and container:
+                    date_match = re.search(r"\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},\s+\d{4}\b|\b\d{2}/\d{2}/\d{4}\b", container.get_text(" "))
+                    published = publication_date(date_match.group(0)) if date_match else None
+                events.append({
+                    "company": spec.company, "url": url,
+                    "title": clean_text(unescape(link.get_text(" "))),
+                    "publishedAt": published, "discoveryMode": "official-news-index",
+                })
+                if len(events) >= limit:
+                    break
+            except Exception as error:
+                failed(error, spec.news_url, "official-news-index-item", itemIndex=index)
+    except Exception as error:
+        failed(error, spec.news_url, "official-news-index")
+
+    if spec.company == "Noble":
+        releases_url = "https://noblecorp.com/our-investors/reports-filings/quarterly-results/"
+        try:
+            releases = client.get(releases_url)
+            release_soup = BeautifulSoup(releases.text, "lxml")
+            count = 0
+            for link in release_soup.find_all("a", href=True):
+                if clean_text(link.get_text(" ")).casefold() != "earnings release":
+                    continue
+                url = urljoin(releases.url, link["href"])
+                if url in seen:
+                    continue
+                seen.add(url)
+                events.append({"company": spec.company, "url": url, "title": "Earnings Release",
+                               "publishedAt": None, "discoveryMode": "official-quarterly-release-pdf"})
+                count += 1
+                if count >= limit:
+                    break
+        except Exception as error:
+            failed(error, releases_url, "official-quarterly-release-index")
+    if not events:
+        failed(ValueError("official indices did not expose article URLs"), spec.news_url, "official-news-discovery")
+    return events, "; ".join(warnings) or None

@@ -1,4 +1,5 @@
 import { Drillship } from '../types';
+import { isStatisticalContract } from './contractTimeline';
 
 export type ComputedStatus = 'Active' | 'Idle' | 'Warm-Stacked' | 'Cold-Stacked';
 
@@ -15,7 +16,7 @@ export type ComputedStatus = 'Active' | 'Idle' | 'Warm-Stacked' | 'Cold-Stacked'
 export function getComputedStatus(ship: Drillship, today: Date = new Date()): ComputedStatus {
   const todayStr = today.toISOString().split('T')[0];
   const currentFirmContracts = ship.contracts.filter(contract => {
-    return contract.status === 'Firm' && contract.startDate <= todayStr && contract.endDate >= todayStr;
+    return contract.status === 'Firm' && isStatisticalContract(contract) && contract.startDate <= todayStr && contract.endDate >= todayStr;
   });
 
   if (ship.status === 'Active') {
@@ -52,7 +53,7 @@ export function getIdlePeriods(
   const periods: IdlePeriod[] = [];
 
   // 계약을 시작일 기준으로 정렬
-  const sortedContracts = ship.contracts.filter(contract => contract.status === 'Firm').sort((a, b) =>
+  const sortedContracts = ship.contracts.filter(contract => contract.status === 'Firm' && isStatisticalContract(contract)).sort((a, b) =>
     a.startDate.localeCompare(b.startDate)
   );
 
@@ -104,7 +105,7 @@ export function countFirmCoveredDays(ship: Drillship, rangeStart: Date, rangeEnd
   const from = rangeStart.toISOString().slice(0, 10);
   const to = rangeEnd.toISOString().slice(0, 10);
   const intervals = ship.contracts
-    .filter(contract => contract.status === 'Firm' && contract.endDate >= from && contract.startDate <= to)
+    .filter(contract => contract.status === 'Firm' && isStatisticalContract(contract) && contract.endDate >= from && contract.startDate <= to)
     .map(contract => [contract.startDate < from ? from : contract.startDate, contract.endDate > to ? to : contract.endDate] as const)
     .sort((a, b) => a[0].localeCompare(b[0]));
 
