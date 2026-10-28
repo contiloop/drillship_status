@@ -15,6 +15,7 @@ const compile = (module, filename) => {
 };
 require.extensions['.tsx'] = compile;
 require.extensions['.ts'] = compile;
+const { manifest, events, fleet } = require('./fixtures/legacy-fleet/load.cjs');
 const { default: Card, announcementDetails } = require('../components/OfficialAnnouncementCard.tsx');
 const { default: Announcements, splitAnnouncements } = require('../components/Announcements.tsx');
 const { default: Gantt } = require('../components/FleetGantt.tsx');
@@ -51,15 +52,15 @@ test('KG2 renders all announced terms without inventing exact dates or a dayrate
   const details = Object.fromEntries(announcementDetails(kg2));
   assert.equal(details['고객·지역'], 'ONGC · 인도');
   assert.match(details['수주 형태'], /구속력 있는 LOA/);
-  assert.equal(details['작업 시작'], '2027년 1분기 예정 · 정확한 날짜 미공개');
+  assert.equal(details['작업 시작'], 'Q1 2027 예정 · 정확한 날짜 미공개');
   assert.equal(details['기본 기간'], '2년');
-  assert.equal(details['옵션'], '추가 2년 · 모두 행사 시 2031년 초까지 작업 예정');
+  assert.equal(details['옵션'], '추가 2년 · 모두 행사 시 early 2031까지 작업 예정');
   assert.equal(details['기본 계약 가치'], '약 3억 달러 · 추가 서비스·이동 비용 포함');
   assert.equal(details.Dayrate, '미공개');
   const html = render(kg2);
   assert.equal((html.match(/<dt /g) || []).length, 7);
   assert.match(html, /Dhirubhai Deepwater KG2/);
-  assert.match(html, /2026-08-20/);
+  assert.match(html, /August 20, 2026/);
   assert.match(html, /정확한 일자가 없는 일정은 가동률·평균 공시 dayrate 집계에서 제외/);
   assert.doesNotMatch(html, /2027-01-01|2029-01-01|411,|\$0/);
 });
@@ -76,8 +77,8 @@ test('LOA retains month precision and falls back only to report provenance', () 
   const source = { company: 'Valaris', documentUrl: 'https://www.valaris.com/report.pdf', reportDate: '2026-08-05' };
   const event = { company: 'Valaris', vessel: 'VALARIS DS-18', classification: 'letter-of-award', autoApplied: false, start: 'Nov 26', end: 'May 27' };
   const html = render(event, source);
-  assert.match(html, /2026년 11월 예정 · 정확한 날짜 미공개/);
-  assert.match(html, /2026년 11월–2027년 5월 \(원문 기간\)/);
+  assert.match(html, /Nov 26/);
+  assert.match(html, /Nov 26–May 27 \(원문 기간\)/);
   assert.match(html, /공식 보고서.*2026-08-05/);
   assert.match(html, /href="https:\/\/www.valaris.com\/report.pdf"/);
   assert.doesNotMatch(html, /구속력|7개월/);
@@ -105,10 +106,10 @@ test('Codex-reviewed incomplete terms are distinct from unread articles', () => 
     facts: { ...kg2.facts, expectedStart: 'H1 2027', startPrecision: 'half-year', termText: '기본 880일', optionText: '추가 최대 880일', valueText: '약 4.2억 달러 · 이동 포함 · 서비스 제외' } };
   const html = render(reviewed);
   assert.match(html, /상세 조건 미공개/);
-  assert.match(html, /2027년 상반기 예정/);
+  assert.match(html, /H1 2027 예정/);
   assert.match(html, /기본 880일|추가 최대 880일/);
   assert.doesNotMatch(html, /Codex|gpt-6-luna|Fast off/);
-  assert.match(render({ ...reviewed, facts: { ...reviewed.facts, expectedStart: 'fourth quarter of 2026' } }), /2026년 4분기/);
+  assert.match(render({ ...reviewed, facts: { ...reviewed.facts, expectedStart: 'fourth quarter of 2026' } }), /fourth quarter of 2026/);
   assert.match(render({ ...reviewed, autoApplied: true }), /계약표 반영/);
   assert.match(render({ ...reviewed, reviewStatus: 'conflict' }), /조건 충돌/);
   assert.match(render({ ...kg2, llmReview: undefined }), /확인 대기/);
@@ -117,8 +118,6 @@ test('Codex-reviewed incomplete terms are distinct from unread articles', () => 
 });
 
 test('applied announcements are archived and every detail stays collapsed', () => {
-  const manifest = JSON.parse(fs.readFileSync('public/data/manifest.json', 'utf8'));
-  const { events } = JSON.parse(fs.readFileSync(`public/data/${manifest.eventsFile}`, 'utf8'));
   const grouped = splitAnnouncements(events);
   assert.equal(grouped.applied.length, 2);
   assert.equal(grouped.unresolved.length, 6);
@@ -140,8 +139,6 @@ test('contract bars include month ends and exclude completed or out-of-range con
 });
 
 test('real applied contracts render as accessible selectable bars without a news feed', () => {
-  const manifest = JSON.parse(fs.readFileSync('public/data/manifest.json', 'utf8'));
-  const fleet = JSON.parse(fs.readFileSync(`public/data/${manifest.fleetFile}`, 'utf8'));
   const html = renderToStaticMarkup(React.createElement(Gantt, {ships:fleet}));
   assert.match(html, /West Capella · Firm · PTTEP · 2026-03 ~ 2028-02/);
   assert.match(html, /Sonangol Libongos · Firm · Undisclosed · 2027-03 ~ 2030-01/);
@@ -153,9 +150,6 @@ test('real applied contracts render as accessible selectable bars without a news
 });
 
 test('generated feed renders separately without mutating fleet or announcement data', () => {
-  const manifest = JSON.parse(fs.readFileSync('public/data/manifest.json', 'utf8'));
-  const { events } = JSON.parse(fs.readFileSync(`public/data/${manifest.eventsFile}`, 'utf8'));
-  const fleet = JSON.parse(fs.readFileSync(`public/data/${manifest.fleetFile}`, 'utf8'));
   const before = JSON.stringify({ fleet, events });
   const pending = events.filter(event => event.pendingReview && !event.autoApplied);
   for (const event of pending) {

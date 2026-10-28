@@ -11,6 +11,7 @@ import FleetGantt from './components/FleetGantt';
 import Announcements from './components/Announcements';
 import defaultData from './data/data_as_of_26_01_07.json';
 import { countFirmCoveredDays, getComputedStatus } from './utils/shipStatus';
+import { isCurrentReportedRate } from './utils/contractTimeline';
 
 const DayrateTrends = lazy(() => import('./components/DayrateTrends'));
 
@@ -127,7 +128,7 @@ export default function App() {
   const activeShips = filteredShips.filter(s => getComputedStatus(s, today) === 'Active').length;
   const todayStr = today.toISOString().slice(0, 10);
   const allContracts = filteredShips.flatMap(s => s.contracts).filter(c =>
-    c.status === 'Firm' && c.startDate <= todayStr && c.endDate >= todayStr
+    isCurrentReportedRate(c, todayStr)
   );
   const avgDayrate = allContracts.filter(c => c.dayRate > 0).reduce((a, b, _, arr) => a + (b.dayRate / arr.length), 0);
   const coldStacked = filteredShips.filter(s => getComputedStatus(s, today) === 'Cold-Stacked').length;

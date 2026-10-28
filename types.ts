@@ -65,6 +65,7 @@ export interface FleetManifest {
 }
 
 export interface OfficialEvent {
+  readingDecision?: ReadingDecision;
   company: Company;
   title?: string;
   url?: string;

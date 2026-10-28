@@ -1,12 +1,18 @@
 import React from 'react';
 import type { FleetSource, OfficialEvent } from '../types';
+import { isIsoDate } from '../utils/contractTimeline';
 import OfficialAnnouncementCard from './OfficialAnnouncementCard';
+
+const publicationTime = (event: OfficialEvent) => {
+  const date = event.publishedAt?.slice(0, 10) || '';
+  return isIsoDate(date) ? Date.parse(`${date}T00:00:00Z`) : 0;
+};
 
 export function splitAnnouncements(events: OfficialEvent[]) {
   const relevant = [...events]
     .filter(event => !['superseded', 'covered-by-report', 'not-contract-news'].includes(event.reviewStatus || ''))
-    .filter(event => Boolean(event.llmReview && event.vessel) || (event.pendingReview !== false && !event.autoApplied))
-    .sort((a, b) => (Date.parse(b.publishedAt || '') || 0) - (Date.parse(a.publishedAt || '') || 0));
+    .filter(event => Boolean((event.llmReview || event.readingDecision) && event.vessel) || (event.pendingReview !== false && !event.autoApplied))
+    .sort((a, b) => publicationTime(b) - publicationTime(a));
   return { unresolved: relevant.filter(e => !e.autoApplied), applied: relevant.filter(e => e.autoApplied) };
 }
 
