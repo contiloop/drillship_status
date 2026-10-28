@@ -8,6 +8,7 @@ import pytest
 from automation.fleet_sync.core import load_json
 from automation.fleet_sync.reading_contracts import context_sha256, source_sha256
 from automation.fleet_sync.reading_pipeline import execute
+from automation.fleet_sync.reading_service import ReaderConfigurationError
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -85,6 +86,38 @@ def test_partial_failure_is_published_and_only_failure_retries(tmp_path):
     assert service.calls == ['a', 'b', 'b']
 
 
+class ConfigurationService(Service):
+    def __init__(self, fail='a'):
+        super().__init__()
+        self.config_fail = fail
+
+    def read(self, request):
+        if request['sourceId'] == self.config_fail:
+            self.calls.append(request['sourceId'])
+            raise ReaderConfigurationError('invalid_json_schema: controlled shared configuration failure')
+        return super().read(request)
+
+
+def test_configuration_failure_persists_failed_job_and_stops_later_calls(tmp_path):
+    root, service = setup_root(tmp_path), ConfigurationService()
+    result = run(root, service, collector_for('a', 'b'), now=100)
+    assert service.calls == ['a']
+    assert result['modelCalls'] == 1
+    jobs = {job['sourceId']: job for job in load_json(root / 'data/provenance/readings.json')['jobs']}
+    assert jobs['a']['status'] == 'failed' and jobs['a']['nextAttemptAfter'] > 100
+    assert 'ReaderConfigurationError' in jobs['a']['lastError']
+    assert jobs['a']['attemptHistory'][-1]['status'] == 'failed'
+    assert jobs['b']['status'] == 'pending' and jobs['b']['attempts'] == 0
+    assert result['manifest']['newsQueue']['pendingCount'] == 2
+
+
+def test_general_document_failure_still_allows_later_documents(tmp_path):
+    root, service = setup_root(tmp_path), Service(fail={'a'})
+    result = run(root, service, collector_for('a', 'b'), now=100)
+    assert service.calls == ['a', 'b']
+    assert len(result['completedJobIds']) == 1 and len(result['failedJobIds']) == 1
+
+
 def test_source_change_during_read_never_completes_old_job(tmp_path):
     root, service = setup_root(tmp_path), Service()
     result = execute(root, mode='local', write=True, service=service, collector=collector_for('a'),
@@ -137,6 +170,34 @@ class DecisionService(Service):
         if self.invalid:
             outcome.response['decisions'].append({**deepcopy(decision), 'vesselId': 'foreign-vessel'})
         return outcome
+
+
+def test_success_before_configuration_failure_preserves_application_and_cache(tmp_path):
+    class PartialConfigurationService(DecisionService):
+        def read(self, request):
+            if request['sourceId'] == 'b':
+                self.calls.append('b')
+                raise ReaderConfigurationError('invalid_json_schema: controlled shared configuration failure')
+            return super().read(request)
+
+    root = setup_root(tmp_path)
+    service = PartialConfigurationService(action='upsert')
+    before = load_json(root / 'data/data_as_of_26_01_07.json')
+    cache_path = root / '.cache/recovery.json'
+    result = run(root, service, collector_for('a', 'b', 'c'), recovery_path=cache_path, now=100)
+    assert result['ok'] and service.calls == ['a', 'b']
+    assert result['modelCalls'] == 2
+    jobs = {job['sourceId']: job for job in load_json(root / 'data/provenance/readings.json')['jobs']}
+    assert jobs['a']['status'] == 'completed' and jobs['a']['outcome'] == 'applied'
+    assert jobs['b']['status'] == 'failed' and jobs['b']['nextAttemptAfter'] > 100
+    assert jobs['c']['status'] == 'pending' and 'lastAttemptAt' not in jobs['c']
+    fleet = load_json(root / 'public/data' / result['manifest']['fleetFile'])
+    assert sum(len(v['contracts']) for v in fleet) == sum(len(v['contracts']) for v in before) + 1
+    events = load_json(root / 'public/data' / result['manifest']['eventsFile'])['events']
+    assert len(events) == 1 and events[0]['url'].endswith('/a') and events[0]['autoApplied']
+    entries = load_json(cache_path)['entries']
+    assert len(entries) == 1 and next(iter(entries.values()))['inputIdentity']['sourceId'] == 'a'
+    assert result['manifest']['newsQueue']['pendingCount'] == 2
 
 
 def test_held_same_input_is_completed_and_new_source_context_rereads(tmp_path):

@@ -18,7 +18,8 @@ from typing import Any
 
 from .reading_contracts import DocumentValidationError, READER_RESPONSE_SCHEMA, ReadingInput, ReadingResponse, validate_reading_input
 from .reading_service import (
-    CLI_CONFIG, MODEL, READER_POLICY, READER_PROMPT, ReaderOutputError,
+    CLI_CONFIG, CLI_RESPONSE_SCHEMA, MODEL, READER_POLICY, READER_PROMPT,
+    ReaderConfigurationError, ReaderOutputError,
 )
 
 # Import compatibility for legacy job fingerprint callers until active wiring
@@ -54,7 +55,7 @@ class CodexReader:
         with tempfile.TemporaryDirectory(prefix="drillship-codex-") as temp:
             path = Path(temp)
             supplied, attachments = _prepare_page_images(request, path)
-            (path / "schema.json").write_text(json.dumps(SCHEMA, ensure_ascii=False), encoding="utf-8")
+            (path / "schema.json").write_text(json.dumps(CLI_RESPONSE_SCHEMA, ensure_ascii=False), encoding="utf-8")
             command = [executable, "exec", "--ignore-user-config", "--ignore-rules", "--ephemeral",
                        "--skip-git-repo-check", "--cd", temp, "--model", MODEL]
             for config in CLI_CONFIG:
@@ -76,7 +77,8 @@ class CodexReader:
             prompt += "\nINPUT_JSON:\n" + json.dumps(supplied, ensure_ascii=False, allow_nan=False)
             result = subprocess.run(command, input=prompt, text=True, capture_output=True, env=env, timeout=self.timeout)
             if result.returncode:
-                raise RuntimeError(f"Codex reading failed (exit {result.returncode}): {result.stderr[-1200:]}")
+                error_type = ReaderConfigurationError if _invalid_schema_error(result.stderr) else RuntimeError
+                raise error_type(f"Codex reading failed (exit {result.returncode}): {result.stderr[-1200:]}")
             output = path / "result.json"
             if not output.exists():
                 raise ReaderOutputError("Codex returned no structured output file", raw_output="")
@@ -89,6 +91,30 @@ class CodexReader:
 
 def _invalid_constant(value: str) -> None:
     raise ValueError(f"non-finite JSON number: {value}")
+
+
+def _invalid_schema_error(stderr: str) -> bool:
+    """Recognize CLI error events, without scanning echoed document content.
+
+    Codex emits either JSONL events or an `ERROR: {JSON}` line. Only an error
+    event's structured code identifies a shared schema failure. Prose, nested
+    arbitrary JSON fragments and malformed diagnostics remain ordinary errors.
+    """
+    for line in stderr.splitlines():
+        candidate = line.strip()
+        if candidate.startswith("ERROR: "):
+            candidate = candidate[len("ERROR: "):]
+        elif not candidate.startswith("{"):
+            continue
+        try:
+            event = json.loads(candidate)
+        except (ValueError, RecursionError):
+            continue
+        if (isinstance(event, dict) and event.get("type") == "error"
+                and isinstance(event.get("error"), dict)
+                and event["error"].get("code") == "invalid_json_schema"):
+            return True
+    return False
 
 
 def _prepare_page_images(request: ReadingInput, path: Path) -> tuple[dict, list[dict]]:

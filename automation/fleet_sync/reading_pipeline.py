@@ -19,7 +19,7 @@ from typing import Any
 
 from .core import content_hash, load_json
 from .reading_contracts import DocumentValidationError, context_sha256, policy_sha256, validate_reading_response, validate_news_queue
-from .reading_service import ReadingService, build_reader_policy
+from .reading_service import ReaderConfigurationError, ReadingService, build_reader_policy
 from .source_materials import EXTRACTION_VERSION, PRESERVED_MATERIAL_DISCOVERY, collect_reading_materials, document_sha256, validate_official_source
 from .sources import HttpClient
 
@@ -473,6 +473,11 @@ def _execute(root: Path, *, mode, write, service, collector, recheck, base_revis
                     'status': 'failed', 'at': at, 'error': job['lastError'], 'baseRevision': base_revision,
                     'contextSha256': request['contextSha256'], 'sourceSha256': request['sourceSha256']})
                 failed.append(job['jobId'])
+                if isinstance(error, ReaderConfigurationError):
+                    # A shared decoder/schema failure cannot be repaired by
+                    # sending the next document. Persist this failure/backoff;
+                    # keep prior successes/cache and later pending jobs intact.
+                    break
     # Acknowledge our own resulting baseline/evidence in the same publication.
     # A subsequent external baseline/source/evidence change opens a new epoch.
     for company, epoch in epochs.items():

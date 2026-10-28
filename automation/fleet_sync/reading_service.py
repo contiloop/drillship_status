@@ -20,7 +20,7 @@ from .reading_contracts import (
 MODEL = "gpt-6-luna"
 REASONING_EFFORT = "medium"
 SERVICE_TIER = "default"
-POLICY_VERSION = "fleet-reading-v2.2"
+POLICY_VERSION = "fleet-reading-v2.3"
 IMAGE_DELIVERY = {
     "version": "png-page-attachments-v1", "order": "input-page-order",
     "inlineImageData": "omitted-after-validation",
@@ -129,6 +129,45 @@ evidence; return the complete structured result only.
 """
 
 
+def structured_output_schema(schema: dict) -> dict:
+    """Translate schema nodes into the documented Structured Outputs subset.
+
+    Local validation retains every original constraint. Only known unsupported
+    transport keywords are removed; const becomes its equivalent singleton
+    enum. Unknown future keywords fail explicitly rather than silently widening
+    the response contract. Property/definition names and enum values are data,
+    so this walks only schema-bearing positions.
+
+    https://developers.openai.com/api/docs/guides/structured-outputs#supported-schemas
+    """
+    removed = {"$schema", "uniqueItems", "minLength", "maxLength"}
+    literal = {"type", "required", "additionalProperties", "enum", "$ref", "description", "title",
+               "pattern", "format", "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum",
+               "multipleOf", "minItems", "maxItems"}
+    result = {}
+    for keyword, value in schema.items():
+        if keyword in removed or keyword == "const":
+            continue
+        if keyword in {"properties", "$defs"}:
+            result[keyword] = {name: structured_output_schema(node) for name, node in value.items()}
+        elif keyword == "anyOf":
+            result[keyword] = [structured_output_schema(node) for node in value]
+        elif keyword == "items":
+            result[keyword] = structured_output_schema(value)
+        elif keyword in literal:
+            result[keyword] = deepcopy(value)
+        else:
+            raise ValueError(f"unsupported transport schema keyword: {keyword}")
+    if "const" in schema:
+        if "enum" in schema and schema["const"] not in schema["enum"]:
+            raise ValueError("transport schema const conflicts with enum")
+        result["enum"] = [deepcopy(schema["const"])]
+    return result
+
+
+CLI_RESPONSE_SCHEMA = structured_output_schema(READER_RESPONSE_SCHEMA)
+
+
 def build_reader_policy(*, extraction_version: str = "") -> str:
     """Stable cache policy; callers pass the extraction adapter's version.
 
@@ -139,6 +178,7 @@ def build_reader_policy(*, extraction_version: str = "") -> str:
     return json.dumps({
         "policyVersion": POLICY_VERSION, "prompt": READER_PROMPT,
         "responseSchema": READER_RESPONSE_SCHEMA, "model": MODEL,
+        "transportResponseSchema": CLI_RESPONSE_SCHEMA,
         "reasoningEffort": REASONING_EFFORT, "serviceTier": SERVICE_TIER,
         "extractionVersion": extraction_version, "cliConfig": list(CLI_CONFIG),
         "imageDelivery": IMAGE_DELIVERY,
@@ -148,6 +188,10 @@ def build_reader_policy(*, extraction_version: str = "") -> str:
 
 READER_POLICY = build_reader_policy()
 POLICY_SHA256 = policy_sha256(READER_POLICY)
+
+
+class ReaderConfigurationError(RuntimeError):
+    """Shared reader configuration was rejected; stop this run's model calls."""
 
 
 class ReaderOutputError(ValueError):
