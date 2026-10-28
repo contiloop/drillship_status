@@ -16,7 +16,7 @@ import re
 from typing import Any, Iterable, Mapping
 from urllib.parse import urlparse, urlunparse
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 import pdfplumber
 
 from .document_ocr import PageOCR, TesseractPageOCR
@@ -28,7 +28,7 @@ from .sources import (
 
 # Bump when extraction/locator behavior changes; the reader policy owner includes
 # this in its policy text/hash so old completion records cannot hide new input.
-EXTRACTION_VERSION = "official-materials-v3-pdf-image144-ocr-tsv"
+EXTRACTION_VERSION = "official-materials-v4-dom-flow-whitespace-pdf-image144-ocr-tsv"
 PRESERVED_MATERIAL_DISCOVERY = "preserved-reading-material"
 PDF_IMAGE_DPI = 144
 MAX_PAGE_IMAGE_BYTES = 5 * 1024 * 1024
@@ -96,6 +96,39 @@ def render_page_image(page: Any, *, locator: str) -> dict:
             "dataBase64": b64encode(content).decode("ascii")}
 
 
+# Default HTML block boundaries, including table cells and explicit breaks.
+# Inline/custom tags contribute only their own DOM text; their boundaries must
+# never add a space to words, numbers or adjacent punctuation.
+_HTML_BLOCK_TAGS = frozenset({
+    "address", "article", "aside", "blockquote", "br", "caption", "dd", "details",
+    "dialog", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form",
+    "h1", "h2", "h3", "h4", "h5", "h6", "header", "hgroup", "hr", "legend", "li",
+    "main", "menu", "nav", "ol", "p", "pre", "section", "summary", "table", "tbody",
+    "td", "tfoot", "th", "thead", "tr", "ul",
+})
+
+
+def _normalize_text_whitespace(text: str) -> str:
+    """Change whitespace only; retain every non-whitespace character in order."""
+    return " ".join(text.split())
+
+
+def _html_text_flow(root: Tag) -> str:
+    """Follow DOM text flow, separating only block boundaries before collapse.
+
+    Joining stripped text nodes inserts punctuation/word breaks that a browser
+    never displays. Preserve node text and existing inter-node whitespace first;
+    a block/line-break contributes a separator on either side. get_text keeps
+    comments out, and the caller has already removed script/style/template noise.
+    """
+    flow = deepcopy(root)
+    for node in flow.find_all(True):
+        if node.name in _HTML_BLOCK_TAGS:
+            node.insert_before(" ")
+            node.insert_after(" ")
+    return _normalize_text_whitespace(flow.get_text(separator="", strip=False))
+
+
 def extract_document_pages(
     content: bytes, content_type: str, *, kind: str, page_ocr: PageOCR | None = None,
     extraction_warnings: list[str] | None = None,
@@ -133,7 +166,7 @@ def extract_document_pages(
                         if extraction_warnings is not None:
                             extraction_warnings.append(f"{locator}: {type(error).__name__}: {error}")
                         text = ""
-                pages.append({"locator": locator, "text": text, "image": image})
+                pages.append({"locator": locator, "text": _normalize_text_whitespace(text), "image": image})
             return pages
     if "pdf" in content_type.lower():
         raise ValueError("PDF response did not contain a PDF document")
@@ -165,10 +198,10 @@ def extract_document_pages(
     body_copy = BeautifulSoup(str(selected), "lxml")
     for node in body_copy.select("h1,h2,h3,h4,h5,h6"):
         node.decompose()
-    body_text = body_copy.get_text(" ", strip=True)
+    body_text = _html_text_flow(body_copy)
     if len(body_text) < 100:
         raise ValueError("HTML body is empty or unexpectedly short")
-    text = selected.get_text("\n", strip=True)
+    text = _html_text_flow(selected)
     return [{"locator": f"html:{selector}", "text": text}]
 
 

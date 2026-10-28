@@ -474,3 +474,64 @@ def test_generic_preserved_materials_refetch_news_and_old_reports_with_official_
     assert {m['readingInput']['url'] for m in result['materials']} == {old_report, old_news}
     assert result['errors'][0]['url'] == 'https://evil.example/body'
     assert 'not allowlisted' in result['errors'][0]['error']
+
+
+def test_inline_dom_flow_preserves_words_amounts_and_punctuation_without_inserted_spaces():
+    sentence = ('The <em>Deepwater Proteus</em> works in the <location>U.S</location>. Gulf and '
+                '<a>India</a>. Revenue is $<span>180</span>,<strong>000</strong>; '
+                'start <span>2026</span>-<span>10</span>-28; co<span>oper</span>ation continues.')
+    expected = ('The Deepwater Proteus works in the U.S. Gulf and India. Revenue is $180,000; '
+                'start 2026-10-28; cooperation continues.')
+    pages = materials.extract_document_pages(f'<article><p>{sentence}</p></article>'.encode(), 'text/html', kind='official-news')
+    assert pages[0]['text'] == expected
+
+
+def test_block_dom_boundaries_separate_words_without_splitting_inline_text():
+    tail = 'Complete publisher body text remains available to the reader. ' * 3
+    body = f'<article><h2>Heading</h2><div>First<p>Second<br/>Third</p>Fourth</div><ul><li>Fifth</li><li>Sixth</li></ul><p>{tail}</p></article>'
+    pages = materials.extract_document_pages(body.encode(), 'text/html', kind='official-news')
+    assert pages[0]['text'] == 'Heading First Second Third Fourth Fifth Sixth ' + tail.strip()
+
+
+def test_table_cells_remain_separate_and_inline_currency_tokens_remain_joined():
+    tail = 'Full publisher disclosure text follows this complete table. ' * 3
+    body = ('<article><table><thead><tr><th>Vessel</th><th>Rate</th></tr></thead><tbody><tr>'
+            '<td><em>Deepwater</em> Titan</td><td>$<span>480</span>,<span>000</span></td>'
+            f'</tr></tbody></table><p>{tail}</p></article>')
+    pages = materials.extract_document_pages(body.encode(), 'text/html', kind='official-news')
+    assert pages[0]['text'] == 'Vessel Rate Deepwater Titan $480,000 ' + tail.strip()
+
+
+def test_pdf_whitespace_normalization_keeps_every_page_and_original_image(monkeypatch):
+    class PDF:
+        pages = [SimpleNamespace(extract_text=lambda: '  The\nDeepwater\tProteus\r\nworks in the U.S. Gulf.  '),
+                 SimpleNamespace(extract_text=lambda: ' Client\nName\t$180,000\n2026-10-28. ')]
+        def __enter__(self): return self
+        def __exit__(self, *args): pass
+    monkeypatch.setattr(materials.pdfplumber, 'open', lambda _: PDF())
+    expected_images = [materials.render_page_image(page, locator=f'page:{i}') for i, page in enumerate(PDF.pages, 1)]
+    pages = materials.extract_document_pages(b'%PDF-original', 'application/pdf', kind='fleet-report')
+    assert [page['locator'] for page in pages] == ['page:1', 'page:2']
+    assert [page['text'] for page in pages] == ['The Deepwater Proteus works in the U.S. Gulf.', 'Client Name $180,000 2026-10-28.']
+    assert [page['image'] for page in pages] == expected_images
+
+
+def test_ocr_whitespace_is_normalized_by_the_same_page_boundary(monkeypatch):
+    class PDF:
+        pages = [SimpleNamespace(extract_text=lambda: '')]
+        def __enter__(self): return self
+        def __exit__(self, *args): pass
+    class OCR:
+        def extract(self, page, *, locator): return '  Mechanically\nrecognized\timage text.  '
+    monkeypatch.setattr(materials.pdfplumber, 'open', lambda _: PDF())
+    pages = materials.extract_document_pages(b'%PDF-original', 'application/pdf', kind='fleet-report', page_ocr=OCR())
+    assert pages[0]['text'] == 'Mechanically recognized image text.'
+    assert pages[0]['image']
+
+
+def test_dom_flow_extraction_changes_the_reader_policy_identity():
+    from automation.fleet_sync.reading_contracts import policy_sha256
+    from automation.fleet_sync.reading_service import build_reader_policy
+    old_version = 'official-materials-v3-pdf-image144-ocr-tsv'
+    assert materials.EXTRACTION_VERSION != old_version
+    assert policy_sha256(build_reader_policy(extraction_version=materials.EXTRACTION_VERSION)) != policy_sha256(build_reader_policy(extraction_version=old_version))
