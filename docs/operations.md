@@ -72,7 +72,7 @@ launchctl print gui/$(id -u)/com.contiloop.drillship-news-worker  # 상태
 
 | 이름 | 종류·범위 | 뜻 |
 |---|---|---|
-| `FLEET_READER_V2_ENABLED` | GitHub 저장소 Actions 변수 | `true`일 때만 서버 감지 워크플로(6시간마다, 수동 실행 포함)가 돈다. Mac 실행기가 설치·동작 중일 때만 켠다. 설정: `gh variable set FLEET_READER_V2_ENABLED --body true --repo contiloop/drillship_status` |
+| `FLEET_READER_V2_ENABLED` | GitHub 저장소 Actions 변수 | `true`일 때만 서버 감지 워크플로(12시간마다, 수동 실행 포함)가 돈다. Mac 실행기가 설치·동작 중일 때만 켠다. 설정: `gh variable set FLEET_READER_V2_ENABLED --body true --repo contiloop/drillship_status` |
 | `SEC_USER_AGENT` | 프로세스 환경변수(선택) | SEC 등 출처 요청의 User-Agent. 기본값은 공개 noreply 주소. 워크플로가 같은 값을 넣는다 |
 | `OPENAI_API_KEY`, `CODEX_API_KEY`, `OPENAI_BASE_URL` | 설정하지 않는다 | 있어도 Codex 실행 전에 제거된다 |
 | launchd `PATH` | 설치 시 고정 | `codex`·`node`·`npm`·`git`의 디렉터리와 기본 경로 |

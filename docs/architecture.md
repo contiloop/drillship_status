@@ -10,7 +10,7 @@
       ▼
 ┌─────────────────────────┐   push(public/data, data/provenance)   ┌──────────────┐
 │ 서버: GitHub Actions     │ ─────────────────────────────────────▶ │ GitHub main  │
-│ 6시간마다, 모델 호출 없음 │                                         │              │
+│12시간마다, 모델 호출 없음│                                         │              │
 └─────────────────────────┘                                         └──────┬───────┘
                                                                            │ Vercel 배포
 ┌─────────────────────────┐   GET manifest.json(newsQueue)          ┌──────▼───────┐
@@ -55,7 +55,7 @@ Python 패키지 `automation/fleet_sync`가 핵심이고, `automation/*.py`는 �
 
 ## 대표 흐름
 
-### 서버 감지 (6시간마다, 매시 17분)
+### 서버 감지 (12시간마다, 00:17·12:17 UTC)
 
 1. `main`의 정확한 revision을 자격 증명 없이 checkout하고, lockfile로 Python 3.12·Node 22 의존성과 `tesseract-ocr`를 설치한다.
 2. `pytest` → `python -m automation.fleet_sync --write --mode server` → `npm run test:ui` → `npm run build`.

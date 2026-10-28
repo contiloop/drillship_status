@@ -219,7 +219,7 @@ export default function App() {
         <div className="pt-8 border-t border-slate-800 opacity-50">
           <div className="hidden md:block p-4 bg-slate-800/30 rounded-2xl">
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Auto Sync</p>
-            <p className="text-[10px] text-slate-400">6시간마다 공식 자료 확인 · 변경 시 자동 반영</p>
+            <p className="text-[10px] text-slate-400">12시간마다 공식 자료 확인 · 변경 시 자동 반영</p>
           </div>
         </div>
       </div>
@@ -518,7 +518,7 @@ export default function App() {
                 <ul className="text-sm text-slate-400 space-y-3 leading-relaxed">
                   <li className="flex gap-2">
                     <span className="text-amber-500">•</span>
-                    공식 FSR/IR/SEC 소스는 GitHub Actions가 6시간마다 확인하고, 검증을 모두 통과한 경우에만 공개 JSON을 갱신합니다.
+                    공식 FSR/IR/SEC 소스는 GitHub Actions가 12시간마다 확인하고, 검증을 모두 통과한 경우에만 공개 JSON을 갱신합니다.
                   </li>
                   <li className="flex gap-2">
                     <span className="text-amber-500">•</span>

@@ -9,7 +9,7 @@ Codex는 운영자 ChatGPT 로그인으로만 쓰며, 그 인증을 서버로 �
 
 ## 결정
 
-GitHub Actions가 6시간마다 수집·지문 비교를 하고 읽을 작업을 공개 manifest의 대기열로 게시한다(모델 호출 없음). Mac의 launchd 실행기가 5분마다 그 대기열만 보고, 작업이 있을 때만 `main`의 임시 clone에서 Codex로 읽고 검증·게시한다. 계약 데이터를 바꾸는 것은 Mac 쪽 하나다.
+GitHub Actions가 12시간마다 수집·지문 비교를 하고 읽을 작업을 공개 manifest의 대기열로 게시한다(모델 호출 없음). Mac의 launchd 실행기가 5분마다 그 대기열만 보고, 작업이 있을 때만 `main`의 임시 clone에서 Codex로 읽고 검증·게시한다. 계약 데이터를 바꾸는 것은 Mac 쪽 하나다.
 
 ## 대안
 
