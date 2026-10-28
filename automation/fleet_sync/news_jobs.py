@@ -40,7 +40,7 @@ def job_id(source_id: str, document_sha256: str) -> str:
     return "job-" + hashlib.sha256(f"{source_id}\n{document_sha256}".encode()).hexdigest()[:32]
 
 
-def new_contract_id(vessel_id: str, source_id: str, document_sha256: str, index: int) -> str:
+def new_contract_id(vessel_id: str, source_id: str, document_sha256: str, index: int | str) -> str:
     """Deterministic id for a contract created by decision ``index`` of one document."""
     return f"{vessel_id}-r{content_hash([source_id, document_sha256, index], length=12)}"
 

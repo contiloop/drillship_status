@@ -8,7 +8,7 @@ Transocean, Valaris, Noble, Seadrill의 공식 fleet status report와 공식 IR/
 
 1. 서버(GitHub Actions, 12시간마다): 공식 보고서 PDF·SEC HTML·뉴스를 수집하고 문서 내용 지문(`documentSha256`: PDF는 파일 바이트, 기사 HTML은 본문 글자)을 기록과 비교합니다. 기사 주변의 주가 표시처럼 본문 밖이 바뀌어도 같은 문서로 봅니다. 새 보고서 revision은 `fleet-report`, 새 기사는 `official-news` 작업으로 `manifest.newsQueue`(schemaVersion 2)에 올립니다. 서버는 모델을 호출하지 않고 계약 데이터를 바꾸지 않습니다. 접근 실패는 HTTP 상태와 마지막 성공 시각을 남기고 기존 데이터를 유지합니다.
 2. Mac 실행기(launchd, 5분마다): 프로덕션 큐에 대기 작업이 있을 때만 임시 clone에서 로컬 실행을 시작합니다.
-3. 로컬 실행: 새 기사 제목을 한 번의 Codex 호출로 분류(title triage)하고, 선택되지 않은 기사는 본문을 읽지 않고 제목+링크로만 남깁니다. 선택된 기사와 보고서는 ChatGPT 로그인 Codex CLI(`gpt-6-luna`, medium)로 하나씩 읽고, 코드는 화면 안전성(등록 선박·기존 계약 ID·날짜·숫자·상태값)과 전체 데이터 무결성만 검사한 뒤 통과 항목만 적용합니다.
+3. 로컬 실행: 새 기사 제목을 한 번의 Codex 호출로 분류(title triage)하고, 선택되지 않은 기사는 본문을 읽지 않고 제목+링크로만 남깁니다. 선택된 기사와 보고서는 ChatGPT 로그인 Codex CLI(`gpt-6-luna`, 보고서는 reasoning high, 기사는 medium)로 하나씩 읽고, 코드는 화면 안전성(등록 선박·기존 계약 ID·날짜·숫자·상태값)과 전체 데이터 무결성만 검사한 뒤 통과 항목만 적용합니다.
 4. 같은 문서(같은 sourceId·같은 원본 해시)는 다시 읽지 않습니다. 프롬프트나 baseline이 바뀌어도 재큐하지 않습니다.
 5. 테스트·빌드를 통과한 JSON만 비강제 push하고, main 경합 시 새 clone에서 재시도하며, Vercel 배포 내용이 일치해야 완료로 봅니다. Codex 사용량 한도에 걸리면 실패로 세지 않고 재설정 시각까지 기다립니다.
 

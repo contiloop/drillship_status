@@ -21,7 +21,8 @@ from typing import Any
 from .reading_contracts import READER_RESPONSE_SCHEMA, TITLE_TRIAGE_SCHEMA, ReadingInput, validate_reading_input
 from .reading_service import (
     CORRECTION_PROMPT, DUPLICATE_CHECK_PROMPT, MODEL, REASONING_EFFORT, SERVICE_TIER, TRIAGE_PROMPT,
-    ReaderConfigurationError, ReaderOutputError, ReaderUsageLimited, prompt_for_reading, target_vessel_ids,
+    ReaderConfigurationError, ReaderOutputError, ReaderUsageLimited, prompt_for_reading, reasoning_effort_for,
+    target_vessel_ids,
 )
 
 CLI_CONFIG = (
@@ -80,9 +81,9 @@ class CodexReader:
         if manifest:
             prompt += "\nPAGE_IMAGE_ATTACHMENTS_JSON:\n" + json.dumps(manifest, ensure_ascii=False, allow_nan=False)
         prompt += "\nINPUT_JSON:\n" + json.dumps(supplied, ensure_ascii=False, allow_nan=False)
-        return self._exec(prompt, schema, images=images)
+        return self._exec(prompt, schema, images=images, effort=reasoning_effort_for(request))
 
-    def _exec(self, prompt: str, schema: dict, *, images: list[bytes]) -> Any:
+    def _exec(self, prompt: str, schema: dict, *, images: list[bytes], effort: str = REASONING_EFFORT) -> Any:
         executable = shutil.which("codex")
         if not executable:
             raise RuntimeError("Install Codex CLI and run codex login with ChatGPT")
@@ -94,7 +95,8 @@ class CodexReader:
             command = [executable, "exec", "--ignore-user-config", "--ignore-rules", "--ephemeral",
                        "--skip-git-repo-check", "--cd", temp, "--model", MODEL]
             for config in CLI_CONFIG:
-                command.extend(["-c", config])
+                command.extend(["-c", config.replace(f'"{REASONING_EFFORT}"', f'"{effort}"')
+                                if config.startswith("model_reasoning_effort=") else config])
             for index, data in enumerate(images, 1):
                 image_path = path / f"page-{index:06d}.png"
                 image_path.write_bytes(data)

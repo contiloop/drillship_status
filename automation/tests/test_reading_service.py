@@ -249,7 +249,7 @@ def test_codex_cli_arguments_isolation_and_chatgpt_login(monkeypatch):
         assert flag in command
     assert command[command.index("--model") + 1] == "gpt-6-luna"
     assert command[command.index("--sandbox") + 1] == "read-only"
-    for config in ('model_reasoning_effort="medium"', 'service_tier="default"', 'web_search="disabled"',
+    for config in ('model_reasoning_effort="high"', 'service_tier="default"', 'web_search="disabled"',
                    'features.shell_tool=false', 'features.plugins=false', 'features.apps=false'):
         assert config in command
     assert command[-1] == "-"
@@ -434,7 +434,7 @@ def test_format_retry_during_the_re_ask_keeps_the_overlaps():
 
 def test_codex_recheck_correction_prompt_carries_both(monkeypatch):
     captured = {}
-    monkeypatch.setattr(CodexReader, "_exec", lambda self, prompt, schema, images: captured.setdefault("prompt", prompt))
+    monkeypatch.setattr(CodexReader, "_exec", lambda self, prompt, schema, images, **kw: captured.setdefault("prompt", prompt))
     CodexReader().read_rechecked(request(), recheck={"previousOutput": {}, "overlaps": [{"vesselId": "a"}]},
                                  correction={"error": "decisions missing", "rejectedOutput": {"bad": 1}})
     assert "RECHECK_JSON" in captured["prompt"] and "CORRECTION_JSON" in captured["prompt"]
@@ -443,7 +443,7 @@ def test_codex_recheck_correction_prompt_carries_both(monkeypatch):
 
 def test_codex_recheck_prompt_carries_the_earlier_output_and_overlaps(monkeypatch):
     captured = {}
-    monkeypatch.setattr(CodexReader, "_exec", lambda self, prompt, schema, images: captured.setdefault("prompt", prompt))
+    monkeypatch.setattr(CodexReader, "_exec", lambda self, prompt, schema, images, **kw: captured.setdefault("prompt", prompt))
     CodexReader().read_rechecked(request(), recheck={"previousOutput": {"decisions": []}, "overlaps": [{"vesselId": "a"}]})
     assert "same award" in captured["prompt"] and "do not overlap" in captured["prompt"] and "RECHECK_JSON" in captured["prompt"]
     assert '"overlaps": [{"vesselId": "a"}]' in captured["prompt"]
@@ -467,3 +467,20 @@ def test_rows_replacing_or_withdrawing_the_overlapped_contract_are_not_asked_abo
                               {"vesselId": "a", "contractId": "dup-a", "action": "withdraw", "row": None}]))
     ReadingService(reader).read(req)
     assert len(reader.calls) == 1
+
+
+@pytest.mark.parametrize("kind,stored,effort", [("fleet-report", False, "high"), ("official-news", False, "medium"),
+                                                ("fleet-report", True, "medium")])
+def test_reasoning_effort_is_high_only_for_a_fetched_fleet_report(monkeypatch, kind, stored, effort):
+    req = request(kind)
+    if stored:
+        req.update(inputMode="stored-result", pages=[stored_review_page({"facts": {}})])
+    calls = fake_cli(monkeypatch, [response()])
+    CodexReader().read(req)
+    assert f'model_reasoning_effort="{effort}"' in calls[1]["command"]
+
+
+def test_title_triage_stays_at_medium_effort(monkeypatch):
+    calls = fake_cli(monkeypatch, [{"selected": [], "categories": [{"id": "n1", "category": "기타"}]}])
+    CodexReader().triage([{"id": "n1", "title": "t", "url": "u", "publishedAt": None}])
+    assert 'model_reasoning_effort="medium"' in calls[1]["command"]

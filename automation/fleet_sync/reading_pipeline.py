@@ -161,7 +161,14 @@ def apply_reading(fleet: list[dict], request: dict, record: dict, response: dict
         ship = ships[decision["vesselId"]]
         action, contract_id = decision["action"], decision["contractId"]
         if action == "upsert":
-            contract_id = contract_id or new_contract_id(ship["id"], record["sourceId"], record["documentSha256"], index)
+            if contract_id is None:
+                # A new contract never replaces an existing row, even when the same
+                # document revision is read again and decision indexes repeat.
+                taken, salt = {row["id"] for row in ship["contracts"]}, 0
+                contract_id = new_contract_id(ship["id"], record["sourceId"], record["documentSha256"], index)
+                while contract_id in taken:
+                    salt += 1
+                    contract_id = new_contract_id(ship["id"], record["sourceId"], record["documentSha256"], f"{index}.{salt}")
             old = next((row for row in ship["contracts"] if row["id"] == contract_id), None)
             row = _contract_row(old, decision["row"], contract_id, ship["id"], request)
             if old is None:

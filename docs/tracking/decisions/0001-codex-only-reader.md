@@ -9,7 +9,7 @@
 
 ## 결정
 
-해석은 Codex CLI(`codex exec`)가 ChatGPT 로그인으로, 모델 `gpt-6-luna`, reasoning `medium`, Fast off, 읽기 전용 sandbox, 출력 스키마 강제로 한다. API 키·다른 모델·대체 경로는 두지 않는다. 사용 한도에 걸리면 해제 시각까지 기다린다.
+해석은 Codex CLI(`codex exec`)가 ChatGPT 로그인으로, 모델 `gpt-6-luna`, reasoning은 Fleet Status 보고서 `high`, 기사·저장 결과·제목 선별 `medium`, Fast off, 읽기 전용 sandbox, 출력 스키마 강제로 한다. API 키·다른 모델·대체 경로는 두지 않는다. 사용 한도에 걸리면 해제 시각까지 기다린다.
 
 ## 대안
 

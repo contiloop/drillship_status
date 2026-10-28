@@ -17,13 +17,13 @@ Cold-Stacked: Fleet Status Report나 10-K에서 'Stacked'로 명시된 경우.
 필터링: 매각된 선박(예: Discoverer Luanda)이나 시추선이 아닌 기종(Semisubmersible)은 리스트에서 완전히 제외하여 데이터 순도를 유지합니다.
 
 3. 계약(Contract) 데이터 기준
-계약 ID: 선박ID-순번 조합으로 생성하여 데이터 추적을 용이하게 합니다. (예: deepwater-atlas-1)
+계약 ID: 선박ID 뒤에 고유 식별자를 붙여 만듭니다. (예: deepwater-atlas-a618ef8cd3) 한 번 정한 ID는 바뀌지 않고, 같은 계약의 수정은 그 ID로 합니다.
 
 vesselId 포함: 각 계약 객체에 부모 선박의 ID를 중복 포함하여, 계약 데이터만 별도로 추출(Flatten)했을 때도 소속을 알 수 있게 합니다.
 
 날짜 형식: 리포트의 'Apr-25' 같은 형식을 표준 ISO 날짜 형식인 YYYY-MM-DD로 변환하여 기록합니다.
 
-일일 용선료 (DayRate): 숫자(Number) 형식으로 기록하며, 미공개(Not Disclosed)인 경우 0으로 처리하거나 추정치를 넣습니다.
+일일 용선료 (DayRate): 숫자(Number) 형식으로, 공시된 일당만 기록합니다. 미공개(Not Disclosed)이면 0으로 두고 추정치는 넣지 않습니다. 계약 금액과 기간이 공시된 경우의 환산 일당(금액÷일수)은 dayRate가 아니라 별도 값으로 프로그램이 계산합니다.
 
 4. 옵션 및 특수 상황 처리 로직
 상황	처리 방법

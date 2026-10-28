@@ -11,3 +11,4 @@
 | [0007](0007-overlap-reask-not-block.md) | 같은 고객 계약과 크게 겹치면 막지 않고 한 번 더 묻는다 | 2026-10-28 | 채택 |
 | [0008](0008-server-detect-mac-read.md) | 감지는 서버가, 읽기와 반영은 Mac 실행기가 한다 | 2026-10-28 | 채택 |
 | [0009](0009-approximate-dates-placed.md) | 대략 날짜는 구체 날짜로 배치하고 통계에서 빼지 않는다 | 2026-10-28 | 채택 |
+| [0010](0010-report-reasoning-high.md) | Fleet Status 보고서만 reasoning high로 읽는다 | 2026-10-28 | 채택 |

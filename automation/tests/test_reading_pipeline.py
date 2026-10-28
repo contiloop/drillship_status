@@ -563,3 +563,17 @@ def test_triage_category_outside_the_tag_set_becomes_other():
     from automation.fleet_sync.reading_contracts import triage_categories
     response = {'selected': [], 'categories': [{'id': 'a', 'category': 'Weird'}, {'id': 'b', 'category': '일정'}]}
     assert triage_categories(response, ['a', 'b', 'c']) == {'a': '기타', 'b': '일정', 'c': '기타'}
+
+
+def test_forced_re_read_of_the_same_revision_adds_new_contracts_without_overwriting(root):
+    reader = FakeReader(lambda request: [decision()])
+    run(root, reader, collector(material('award')))
+    first = [c for c in contracts(published(root)[1]) if '-r' in c['id']]
+    assert len(first) == 1
+    records = load_json(root / 'data/provenance/readings.json')
+    records['documents'] = {}
+    dump_json(root / 'data/provenance/readings.json', records)
+    reader.decide = lambda request: [decision(row=row(startDate='2028-01-01', endDate='2028-12-31'))]
+    run(root, reader, collector(material('award')), now=NOW + 60)
+    second = [c for c in contracts(published(root)[1]) if '-r' in c['id']]
+    assert len(second) == 2 and first[0] in second
