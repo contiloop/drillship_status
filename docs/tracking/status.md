@@ -40,7 +40,7 @@
 2. `main` 병합과 Vercel 배포 확인(전환 전 `main` 기준 revision `4d82ab6`).
 3. 새 실행기 설치(`python -m automation.install_news_worker`, 설치 checkout을 `main`으로).
 4. GitHub Actions 변수 `FLEET_READER_V2_ENABLED=true` 설정 후 서버 감지 실행.
-5. 복구 데이터 게시(`python -m automation.update_news --stored-results`).
+5. 복구 데이터 확인(`python -m automation.update_news --stored-results`). 복구 결과는 브랜치에 이미 커밋되어 있어(`c2a2ad6`) 이 커밋째로 병합하면 병합과 함께 게시되고, 이 실행은 확인만 한다. 데이터 커밋을 포함해 병합할지(포함하지 않으면 이 실행이 복구를 새로 하며 Codex 호출이 다시 든다)는 전환 때 정한다.
 6. 프로덕션 확인: 대기열 v2·manifest·payload 반영, 재실행 시 모델 호출 0, 화면 네 영역 정상.
 
 새 회사·선박 등록, 세대 재분류, 관리·승인 화면, 과거 전체 수주 데이터 수집, 화면 디자인 변경은 계획에 없다.

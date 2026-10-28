@@ -18,6 +18,7 @@
 - **대응**: 개선은 다음 새 판(다음 분기 보고서, 새 기사)부터 적용된다. 특정 문서를 꼭 다시 읽어야 하면 로컬 checkout에서 `data/provenance/readings.json`의 그 문서 기록(같은 `sourceId`의 기록 전부)을 지우고 게시기를 돌린다. 이때 두 가지에 주의한다.
   - 그 URL이 `data/news/reviews.json`에 있거나, `sourceId` 없는 예전 이벤트에 있으면, 처음 보는 문서로 취급되어 다시 읽지 않고 `migrated`로 완료된다.
   - `.cache/reading-responses.json`에 그 작업의 응답이 남아 있으면 Codex를 부르지 않고 그 응답을 다시 쓴다. 새 답이 필요하면 그 키도 지운다.
+  - 같은 판을 다시 읽으면 새 계약 ID도 첫 읽기와 같게 다시 만들어진다. ID(`new_contract_id`)는 선박 ID, `sourceId`, 문서 지문, 응답의 `decisions` 안 순번으로 정해진다. 그래서 두 번째 답에서 계약 ID 없이 추가한 계약이 첫 답의 같은 선박·같은 순번 계약과 같은 ID가 되면, 새로 추가되지 않고 첫 읽기가 만든 row를 덮어쓴다. 순서가 달라졌다면 다른 계약을 덮어쓰거나, 덮이지 않은 첫 읽기 row가 남아 중복이 생길 수 있다. 다시 읽은 뒤 그 문서의 `changes`와 해당 선박의 `<선박 ID>-r…` 계약을 확인한다.
   - 확인: 실행 결과의 `modelCalls`가 1 이상이고 그 문서 기록이 `completed`로 바뀌었는지 본다.
 
 ## Codex 결과의 변동
@@ -30,7 +31,7 @@
 
 - **증상**: 이미 있는 수주에 새 bar가 하나 더 생긴다(실제 사례: Noble Venturer–Planet One, VALARIS DS-12, Deepwater Conqueror/Proteus). 연장한 계약 기간이 뒤따르는 옵션 구간과 겹친다.
 - **원인**: Codex가 기존 계약 ID를 쓰지 않고 새 계약(`contractId: null`)으로 답하거나, 기간을 늘리면서 다음 구간을 옮기지 않는다.
-- **대응**: 서비스가 같은 선박·같은 고객 계약과 31일 넘게 겹치는 row를 찾아 Codex에게 한 번 더 묻는다(`suspected_duplicates`, `DUPLICATE_CHECK_PROMPT`). 막지 않고 두 번째 답을 쓴다. 31일 여유는 인접 구간이 경계 달을 공유하는 배치 관행 때문이니 줄이지 않는다. 같은 고객 판정은 고객명 첫 단어 비교라서 "Shell"과 "Shell Brasil"은 같고 "Petrobras"와 "Petróleo Brasileiro"는 다르다. 다시 물어도 남은 중복은 다음 보고서 읽기에서 Codex가 정리하도록 요청문이 요구한다(하나 수정, 나머지 철회).
+- **대응**: 서비스가 같은 선박·같은 고객 계약과 31일 넘게 겹치는 row를 찾아 Codex에게 한 번 더 묻는다(`suspected_duplicates`, `DUPLICATE_CHECK_PROMPT`). 막지 않고 두 번째 답을 쓴다. 두 번째 답이 형식 재요청 끝에도 깨지면 첫 답을 쓰며, 이 때문에 문서가 실패하지 않는다. 31일 여유는 인접 구간이 경계 달을 공유하는 배치 관행 때문이니 줄이지 않는다. 같은 고객 판정은 고객명 첫 단어 비교라서 "Shell"과 "Shell Brasil"은 같고 "Petrobras"와 "Petróleo Brasileiro"는 다르다. 다시 물어도 남은 중복은 다음 보고서 읽기에서 Codex가 정리하도록 요청문이 요구한다(하나 수정, 나머지 철회).
 
 ## 실행기와 게시기
 
@@ -39,13 +40,8 @@
 - **원인**: launchd는 설치한 checkout(`--root`)의 `news_worker`·`update_news`를 실행한다. 그러나 실제 수집·읽기(`review_news`, `fleet_sync`)는 게시기가 만든 **`main`의 임시 clone**에서 돈다. Python 인터프리터는 설치 checkout의 `.venv`다.
 - **대응**: 실행기를 설치한 checkout은 `main`에 두고 `main`이 바뀌면 pull한다. `main`에서 `automation/requirements.lock`이 바뀌면 설치 checkout의 `.venv`에 다시 설치한다. 그러지 않으면 clone 안의 pytest가 import 오류로 실패해 게시가 멈춘다. 확인: `.cache/news-worker-state.json`의 `lastError`.
 
-### 전환 전 실행기가 "news queue must be schemaVersion 2"로 실패한다
-- **증상**: 설치된 실행기(`com.contiloop.drillship-news-worker`, 이 checkout의 코드)가 5분마다 이 오류로 실패하고 백오프한다.
-- **원인**: 프로덕션(`main`)이 아직 schemaVersion 1 대기열을 게시한다. 새 실행기는 v1을 읽지 않는다.
-- **대응**: 해롭지 않다. 모델을 부르지 않고 아무것도 게시하지 않는다. 운영 전환으로 `main`이 v2를 게시하면 사라진다. 전환 후에도 계속되면 프로덕션 manifest의 `newsQueue.schemaVersion`을 확인한다.
-
 ### 응답 캐시
-- `.cache/reading-responses.json`은 임시 clone이 버려져도 남아, `main` 경합으로 처음부터 다시 할 때 Codex를 다시 부르지 않게 한다. 기록에서 완료된 작업과 기록에 없는 작업의 항목은 다음 실행에서 지워진다. 전체 무결성 검사에 실패한 문서의 응답도 지워져 다음 시도에서 새로 묻는다.
+- `.cache/reading-responses.json`은 임시 clone이 버려져도 남아, `main` 경합으로 처음부터 다시 할 때 Codex를 다시 부르지 않게 한다. 기록에서 완료된 작업과 기록에 없는 작업의 항목은 다음 실행에서 지워진다. 받은 응답을 반영하다 실패한 문서(전체 무결성 실패 포함)의 응답은 바로 지워져 다음 시도에서 새로 묻는다. 같은 응답을 되풀이해 같은 방식으로 계속 실패하지 않게 하기 위해서다.
 - 캐시된 응답이 현재 기준으로 형식이 깨졌으면 무시하고 새로 묻는다. 그러나 형식만 맞으면 오래된 응답도 그대로 쓴다. 대기 중인 작업을 새로 읽히고 싶으면 그 `jobId` 키를 지운다.
 
 ### 개발 checkout에서 로컬 읽기를 돌리면 생성 데이터가 바뀐다

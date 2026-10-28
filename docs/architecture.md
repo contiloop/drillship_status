@@ -59,7 +59,7 @@ Python 패키지 `automation/fleet_sync`가 핵심이고, `automation/*.py`는 �
 
 1. `main`의 정확한 revision을 자격 증명 없이 checkout하고, lockfile로 Python 3.12·Node 22 의존성과 `tesseract-ocr`를 설치한다.
 2. `pytest` → `python -m automation.fleet_sync --write --mode server` → `npm run test:ui` → `npm run build`.
-3. 서버 모드는 4개 회사의 최신 보고서와 기사 목록(회사별 최대 20건)을 수집해 각 문서의 지문을 계산하고, 기록에 없는 (문서, 지문) 쌍을 `pending` 작업으로 등록한다. 예전 파이프라인이 이미 처리한 문서는 처음 볼 때 `completed/migrated`로 옮긴다.
+3. 서버 모드는 4개 회사의 최신 보고서와 기사 목록(회사별 최대 20건)을 수집해 각 문서의 지문을 계산하고, 기록에 없는 (문서, 지문) 쌍을 `pending` 작업으로 등록한다. 예전 파이프라인이 이미 처리한 문서는 처음 볼 때 `completed/migrated`로 옮긴다. 판별은 보고서면 예전 기록의 원본 바이트 해시(HTML 보고서도 지문이 아니라 받은 바이트의 해시로 비교), 기사면 URL이나 예전 방식의 본문 해시다.
 4. `public/data`와 `data/provenance`만 artifact로 묶어, 쓰기 권한이 있는 별도 job이 경로 허용 목록과 checksum을 다시 확인한 뒤 커밋·push한다. 그동안 `main`이 움직였으면 게시를 거부하고 다음 주기를 기다린다.
 5. Vercel이 새 `dataHash`·`stateFingerprint`·파일 이름을 내보낼 때까지 최대 4분 확인한다.
 

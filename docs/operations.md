@@ -91,7 +91,7 @@ launchctl print gui/$(id -u)/com.contiloop.drillship-news-worker  # 상태
 2. **`main` 병합과 배포 확인**: 브랜치 `codex/llm-fleet-updates`를 `main`에 병합해 push한다(force 금지). 그 전에 `main`에 옛 서버 워크플로가 만든 데이터 커밋이 새로 생겼는지 `git log origin/main -- public/data`로 확인한다. 생겼다면 `public/data`·`data/provenance` 충돌을 해결해야 한다. Vercel 배포 후 프로덕션 화면이 새 코드(뉴스·공시 탭의 종류 태그)인지 확인한다.
 3. **새 실행기 설치**: 설치 checkout을 `main`으로 바꾸고 pull한 뒤 `.venv/bin/python -m automation.install_news_worker`. 확인: `.cache/news-worker-state.json`의 `status`가 `idle` 또는 `processed`.
 4. **서버 감지 켜기**: `FLEET_READER_V2_ENABLED=true` 설정 후 워크플로를 한 번 수동 실행한다. 확인: 실행 성공, 프로덕션 manifest의 `newsQueue.schemaVersion`이 2.
-5. **복구 데이터 게시**: `.venv/bin/python -m automation.update_news --stored-results`. 확인: 결과 `ok: true`, `deploymentVerified: true`.
+5. **복구 데이터 확인**: 복구 결과(`public/data`, `data/provenance/readings.json`)는 이미 브랜치에 커밋되어 있다(`c2a2ad6`). 이 커밋째로 병합하면 2단계에서 함께 게시되고, 여기서 `.venv/bin/python -m automation.update_news --stored-results`를 돌려도 저장 결과 작업이 이미 완료라 일반 실행만 한다. 즉 이 단계는 확인용이다. 확인: 결과 `ok: true`, `deploymentVerified: true`. 데이터 커밋을 빼고 병합했다면 같은 명령이 복구를 새로 실행해 게시한다(Codex 호출이 다시 든다). 어느 쪽으로 병합할지는 전환 때 정한다.
 6. **프로덕션 확인**: 무변경 상태에서 실행기를 다시 돌려 `modelCalls: 0`, 화면의 Fleet Status bar·상세·Dayrates·뉴스·공시 탭 정상. 확인하지 못한 항목은 미완료로 남긴다.
 
 되돌리기: 변수를 끄고(`gh variable set FLEET_READER_V2_ENABLED --body false ...`), 새 실행기를 제거하고, 병합 커밋을 `git revert -m 1 <병합 커밋>`으로 되돌려 push한다(force 금지). 되돌린 뒤 `main`의 옛 서버 워크플로는 변수와 무관하게 다시 돈다.

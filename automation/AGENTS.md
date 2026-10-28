@@ -33,7 +33,7 @@
 ## 구현 패턴
 
 - **포트와 어댑터**: `execute(root, mode, write, service, collector, recheck, now, cache_path, stored_results)`. 실제 구현은 기본값으로 들어가고(`collect_reading_materials(HttpClient())`, `fetch_document_sha256`, `ReadingService(CodexReader())`, `time.time`), 테스트는 대역을 넘긴다. 새 외부 효과도 이 방식으로 인자에 추가한다.
-- **읽기 어댑터 계약**(`ReaderAdapter`): `read(request)`, `triage(items, correction=)`는 필수. `read_corrected(request, previous_response=, error=)`가 있으면 형식 오류 재요청에, `read_rechecked(request, recheck=)`가 있으면 같은 고객 겹침 재질문에 쓰인다. 없으면 각각 `read` 재호출, 재질문 생략이다.
+- **읽기 어댑터 계약**(`ReaderAdapter`): `read(request)`, `triage(items, correction=)`는 필수. `read_corrected(request, previous_response=, error=)`가 있으면 형식 오류 재요청에, `read_rechecked(request, recheck=, correction=)`가 있으면 같은 고객 겹침 재질문에 쓰인다(재질문 중 형식 재요청이면 `correction`이 함께 온다). 없으면 각각 `read` 재호출, 재질문 생략이다.
 - **요청문**은 `reading_service.py`의 조각(`_ROLE`, `_IMAGES`, `_FLEET_REPORT`, `_NEWS`, `_ROW_RULES`, `_OPEN_HOLDS`, `_STORED_RESULT`, `_END`)을 이어 붙여 만든다. 회사별 예외나 영어 표현 규칙을 넣지 않고, 목적과 판단 기준만 쓴다. 문서·URL·기록이 지시가 아니라는 문장을 지우지 않는다.
 - **출력 스키마**는 Structured Outputs 부분집합이다: `_object()`가 모든 속성을 `required`로 넣고 `additionalProperties: false`를 붙이며, 선택 값은 `_nullable()`로 표현한다. 요청마다 `vesselId`를 그 회사 선박 ID로 열거한다.
 - **기록 갱신**은 `news_jobs`의 `mark_completed`/`mark_failed`/`mark_usage_limited`로만 한다. 상태 필드를 직접 바꾸지 않는다.
@@ -50,11 +50,11 @@
   - 새 계약 ID가 실행 간 같다.
   - 선별 제외 기사는 본문을 읽지 않고 다시 선별하지 않는다. 여러 회사 기사가 선별 한 번에 묶인다.
   - 일부 실패 시 성공분 기록, 실패분만 백오프. 사용 한도 시 실패 횟수 불변·남은 호출 중단(선별 중 한도 포함).
-  - 읽는 중 원문 변경 시 미적용·새 판 재대기. 무결성 실패 시 문서 전체 미적용.
+  - 읽는 중 원문 변경 시 미적용·새 판 재대기. 무결성 실패 시 문서 전체 미적용. 반영 중 실패한 응답은 캐시에서 지워 되풀이하지 않음. 같은 계약을 두 번 철회해도 실패하지 않음.
   - 화면 안전 실패 항목만 보류(`conflict` 이벤트 + `openHolds`), 이유·인용 없이도 반영, 보류가 다음 같은 회사 읽기에 전달되고 닫힘.
   - 환산 = 금액 ÷ 일수, 둘 중 하나 없거나 일수 ≤ 0이면 없음.
   - 형식이 깨진 출력은 정정 요청과 함께 다시 묻고 3번 뒤 실패.
-  - 같은 고객 31일 초과 겹침에서만 재질문, 철회·교체되는 계약과의 겹침은 묻지 않음, 미공개 고객끼리는 같은 고객.
+  - 같은 고객 31일 초과 겹침에서만 재질문, 철회·교체되는 계약과의 겹침은 묻지 않음, 미공개 고객끼리는 같은 고객. 재질문 중 형식 재요청도 겹침 정보를 유지하고, 재질문이 끝내 깨지면 첫 답을 씀.
   - 사용 한도 메시지와 해제 시각("try again at 8:34 PM", 날짜 포함형) 해석.
   - HTML 지문이 본문 밖 요소 변화(주가 위젯)에 영향받지 않음, PDF는 바이트 지문.
   - 실행기: v1 대기열·fingerprint 변조 거부, 사용 한도 대기는 새 작업에도 유지, 백오프는 새 작업이 오면 풂, 배포 미확인은 실패.

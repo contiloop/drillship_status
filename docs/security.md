@@ -66,7 +66,7 @@
 | 사용 한도 대기 시각 | 공개 manifest의 `readingStatus.usageLimitedUntil`, 실행기 상태 파일 |
 | 실행기 확인 결과·오류 | Mac `.cache/news-worker-state.json`, `.cache/news-worker*.log`(저장소에 넣지 않음) |
 
-**남기지 않는 것**: 모델 응답 원문 전체(Mac의 `.cache/reading-responses.json`에 재시도용으로만 있고 문서 완료 시 지워진다), 요청 맥락 해시, 인증값.
+**남기지 않는 것**: 모델 응답 원문 전체(Mac의 `.cache/reading-responses.json`에 재시도용으로만 있다. 완료된 작업과 기록에 없는 작업의 응답은 다음 로컬 실행을 시작할 때 지워진다), 요청 맥락 해시, 인증값.
 
 ## 자격 증명 관리
 

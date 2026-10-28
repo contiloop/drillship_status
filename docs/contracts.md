@@ -154,6 +154,8 @@
 
 `retryAfter`는 다음 시도가 의미 있는 epoch 초다(사용 한도 해제 시각, 또는 모든 대기 작업이 백오프 중일 때 가장 이른 재시도 시각, 아니면 0).
 
+`modelCalls`는 그 실행에서 Codex에 보낸 요청 수다. 문서 읽기는 형식 오류 재요청과 겹침 재질문까지 실제로 보낸 만큼 세고, 3번 요청해도 형식이 깨져 실패한 읽기도 그 요청 수를 센다. 제목 선별과 태그 붙이기는 호출마다 1이다. 캐시된 응답만 쓰거나 모든 작업이 완료된 실행은 0이다.
+
 ## 기록 파일 `data/provenance/readings.json`
 
 저장소에 공개되지만 화면은 읽지 않는다. 운영자와 파이프라인용이다. `schemaVersion: 3`, `lastCollectedAt`, `lastReadAt`, `lastAppliedAt`, `collectionErrors[]`, `documents{ jobId: 기록 }`. 기록: `jobId`, `sourceId`, `company`, `kind`, `url`, `title`, `publishedAt`, `documentSha256`, `status`(`pending`/`failed`/`completed`), `outcome`(`applied`/`no-change`/`held`/`excluded`/`migrated`/`stored-result`), `lastReadAt`, `lastError`, `failureCount`, `nextAttemptAfter`(epoch 초), `openHolds[]`, `changes[]`(`contractId` 또는 `vesselId`, `before`, 선택 `reasonKo`·`quote`), 선택 `lastSuccessAt`, `reportDate`, `selected`, `newsCategory`, `inputMode`. 예전 schemaVersion 2 기록은 완료된 지문만 옮겨 읽고, 그 밖의 형식은 거부한다.
