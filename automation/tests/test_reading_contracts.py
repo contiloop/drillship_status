@@ -1,714 +1,355 @@
 from __future__ import annotations
 
+import base64
 from copy import deepcopy
+import json
 import math
 
 import pytest
 
 from automation.fleet_sync.reading_contracts import (
-    DocumentValidationError, READER_RESPONSE_SCHEMA, context_sha256, policy_sha256,
-    source_sha256, validate_reading_input, validate_reading_response, validate_news_queue,
+    DocumentValidationError, MalformedResponseError, READER_RESPONSE_SCHEMA, TITLE_TRIAGE_SCHEMA,
+    derived_usd_per_day, duration_days, normalize_interpretation, parse_reading_response,
+    select_triage_ids, stored_review_page, validate_news_queue, validate_reading_input,
+    validate_reading_response,
 )
 
-
-def interpretation():
-    return dict(sourceStartText="Mid 2027", sourceEndText="2028", startPrecision="approximate",
-                endPrecision="year", dateBasis="placement", placementBasis="공시와 기존 계약을 연결한 배치",
-                awardType="signed-contract", termText="1년", optionText=None, valueText="$182.5m",
-                rateBasis="backlog-derived", reportedUsdPerDay=None, derivedUsdPerDay=500000,
-                valueUsd=182500000, baseDurationDays=365, durationAssumption="1 year = 365 days; 1 month = 365/12 days",
-                maximumTerm=False, includes=[], excludes=[])
+PNG = b"\x89PNG\r\n\x1a\n" + b"\x00" * 32
 
 
-def request(kind="fleet-report"):
-    pages = [{"locator": "page:1", "text": "Mid 2027 through 2028; one year contract value $182.5m."},
-             {"locator": "page:2", "text": "Rig A is Active as of 2026-10-01."}]
-    baseline = [{"id": "rig-a", "company": "Seadrill", "name": "Rig A", "contracts": [
-        {"id": "old-a", "vesselId": "rig-a", "client": "Client", "region": "Angola", "startDate": "2027-07-01",
-         "endDate": "2028-06-30", "dayRate": 0, "status": "Firm"}]},
-        {"id": "rig-b", "company": "Seadrill", "name": "Rig B", "contracts": []}]
-    return dict(sourceId="s1", sourceSha256=source_sha256(pages), company="Seadrill", kind=kind,
-                url="https://example.com/report", publishedAt="2026-10-01", pages=pages,
-                baseline=baseline, priorEvidence=[], contextSha256=context_sha256(baseline, []),
-                readerPolicySha256=policy_sha256("policy"))
+def request(kind="fleet-report", **extra):
+    baseline = [
+        {"id": "rig-a", "company": "Seadrill", "name": "Rig A", "contracts": [
+            {"id": "old-a", "vesselId": "rig-a", "client": "Client", "region": "Angola",
+             "startDate": "2027-07-01", "endDate": "2028-06-30", "dayRate": 0, "status": "Firm"}]},
+        {"id": "rig-b", "company": "Seadrill", "name": "Rig B", "contracts": []},
+        {"id": "rig-x", "company": "Valaris", "name": "Rig X", "contracts": [
+            {"id": "foreign", "vesselId": "rig-x", "client": "C", "region": "R",
+             "startDate": "2027-01-01", "endDate": "2027-12-31", "dayRate": 1, "status": "Firm"}]},
+    ]
+    value = dict(sourceId="s1", company="Seadrill", kind=kind, url="https://example.com/report",
+                 publishedAt="2026-10-01", baseline=baseline,
+                 pages=[{"locator": "page:1", "text": "One year contract value $182.5m."}])
+    value.update(extra)
+    return value
 
 
-def evidence(fields):
-    return [dict(fields=fields, sourceId="s1", locator="page:1", quote="Mid 2027 through 2028; one year contract value $182.5m.")]
+def row(**patch):
+    value = dict(startDate="2027-07-01", endDate="2028-06-30", dayRate=0, client="New client",
+                 region="Angola", status="Firm", interpretation=dict(
+                     sourceStartText="Mid 2027", sourceEndText=None, placementBasis="배치 근거",
+                     awardType="signed-contract", termText="1년", optionText=None, valueText="$182.5m",
+                     valueUsd=182_500_000, baseDurationDays=365, includes=[], excludes=[]))
+    value.update(patch)
+    return value
 
 
-def decision():
-    return dict(vesselId="rig-a", contractId="old-a", action="upsert", row={
-        "id": "old-a", "vesselId": "rig-a", "startDate": "2027-07-01", "endDate": "2028-06-30", "dayRate": 0,
-        "client": "New client", "region": "Angola", "status": "Firm", "interpretation": interpretation()},
-        facts={"client": "New client", "region": "Angola", "interpretation": interpretation()},
-        reasonKo="공시 근거를 반영", evidence=evidence(["client", "region", "interpretation"]))
+def decision(**patch):
+    value = dict(vesselId="rig-a", contractId="old-a", action="upsert", row=row(),
+                 reasonKo="공시 근거를 반영", quote="One year contract value $182.5m.", locator="page:1")
+    value.update(patch)
+    return value
 
 
-def response(req=None):
-    req = req or request()
-    return dict(schemaVersion=2, sourceId=req["sourceId"], sourceSha256=req["sourceSha256"], company=req["company"],
-                reportDate="2026-10-01", readLocators=["page:1", "page:2"],
-                coverage=[{"vesselId": "rig-a", "state": "included"}, {"vesselId": "rig-b", "state": "not-mentioned"}],
-                vesselUpdates=[], decisions=[decision()])
+def update(**patch):
+    value = dict(vesselId="rig-b", status="Idle", statusAsOf="2026-10-01")
+    value.update(patch)
+    return value
 
 
-def test_valid_contract_preserves_raw_dates_and_derived_rate():
-    req = request()
-    validate_reading_input(req, reader_policy="policy")
-    result = validate_reading_response(response(req), req)
-    assert result.decisions[0]["row"]["dayRate"] == 0
-    assert result.decisions[0]["row"]["interpretation"]["derivedUsdPerDay"] == 500000
+def response(decisions=None, updates=None):
+    return dict(reportDate="2026-10-01", vesselUpdates=updates if updates is not None else [update()],
+                decisions=decisions if decisions is not None else [decision()])
+
+
+# --- valid responses -------------------------------------------------------
+
+def test_valid_response_passes_and_carries_derived_rate():
+    result = validate_reading_response(response(), request())
     assert result.issues == []
-    assert READER_RESPONSE_SCHEMA["properties"]["schemaVersion"]["const"] == 2
-
-
-@pytest.mark.parametrize("field", ["sourceSha256", "contextSha256", "readerPolicySha256"])
-def test_invalid_input_hashes(field):
-    req = request()
-    req[field] = "0" * 64
-    with pytest.raises(DocumentValidationError, match=field):
-        validate_reading_input(req, reader_policy="policy")
-
-
-def test_source_hash_covers_page_locations_and_all_text():
-    req = request()
-    changed = deepcopy(req["pages"])
-    changed[0]["locator"] = "page:3"
-    assert source_sha256(changed) != req["sourceSha256"]
-    req["pages"][1]["text"] += " missing input"
-    with pytest.raises(DocumentValidationError):
-        validate_reading_response(response(req), req)
-
-
-@pytest.mark.parametrize("mutate", [
-    lambda r: r.update(sourceSha256="0" * 64),
-    lambda r: r.update(readLocators=["page:1"]),
-    lambda r: r.update(coverage=r["coverage"][:1]),
-    lambda r: r["coverage"].append(r["coverage"][0]),
-    lambda r: r.update(reportDate="2026-02-30"),
-])
-def test_envelope_failures_fail_document(mutate):
-    req = request()
-    result = response(req)
-    mutate(result)
-    with pytest.raises(DocumentValidationError):
-        validate_reading_response(result, req)
-
-
-@pytest.mark.parametrize("mutate", [
-    lambda d: d.update(vesselId="unknown"),
-    lambda d: d.update(contractId="unknown"),
-    lambda d: d["row"].update(endDate="2026-01-01"),
-    lambda d: d["row"].update(dayRate=-1),
-    lambda d: d["row"].update(dayRate=math.inf),
-    lambda d: d["row"].pop("dayRate"),
-    lambda d: d["evidence"][0].update(quote="fabricated"),
-    lambda d: d["evidence"][0].update(locator="page:100"),
-    lambda d: d["evidence"][0].update(sourceId="other"),
-    lambda d: d["evidence"][0].update(fields=["region"]),
-    lambda d: d["row"]["interpretation"].update(derivedUsdPerDay=600000),
-    lambda d: d["row"]["interpretation"].update(maximumTerm=True),
-    lambda d: d["row"]["interpretation"].update(dateBasis="unresolved"),
-    lambda d: d["row"].update(id="other"),
-    lambda d: d["row"].update(sourceUrl="https://fabricated.example/report"),
-    lambda d: d.update(action="withdraw", contractId=None, row=None),
-])
-def test_individual_invalid_decisions_do_not_block_independent_ones(mutate):
-    req = request()
-    invalid = decision()
-    mutate(invalid)
-    valid = decision()
-    valid.update(vesselId="rig-b", contractId=None)
-    valid["row"].update(id=None, vesselId="rig-b")
-    valid["evidence"] = evidence(["startDate", "endDate", "dayRate", "client", "region", "status", "interpretation"])
-    out = response(req)
-    out["decisions"] = [invalid, valid]
-    result = validate_reading_response(out, req)
-    assert result.decisions == [valid]
-    assert len(result.issues) == 1
-    assert result.issues[0].index == 0
-
-
-def test_foreign_company_and_wrong_vessel_contract_refs_are_rejected():
-    req = request()
-    req["baseline"].append({"id": "foreign", "company": "Valaris", "contracts": [{"id": "foreign-contract", "vesselId": "foreign"}]})
-    req["contextSha256"] = context_sha256(req["baseline"], [])
-    out = response(req)
-    out["decisions"][0]["contractId"] = "foreign-contract"
-    assert len(validate_reading_response(out, req).issues) == 1
-    req["baseline"][0]["contracts"][0]["vesselId"] = "rig-b"
-    req["contextSha256"] = context_sha256(req["baseline"], [])
-    with pytest.raises(DocumentValidationError):
-        validate_reading_input(req)
-
-
-def test_hold_with_unresolved_facts_and_no_absence_quote_is_valid():
-    req = request("official-news")
-    out = response(req)
-    out["coverage"] = []
-    d = decision()
-    d.update(action="hold", row=None, evidence=[])
-    d["facts"] = {"client": None, "region": None, "interpretation": interpretation()}
-    d["facts"]["interpretation"].update(dateBasis="unresolved", sourceStartText=None, sourceEndText=None,
-        placementBasis=None, startPrecision="unknown", endPrecision="unknown", termText=None, valueText=None, rateBasis="undisclosed", derivedUsdPerDay=None,
-        valueUsd=None, baseDurationDays=None, durationAssumption=None, awardType="unreported")
-    d["reasonKo"] = "전체 본문에 계약 정보가 없어 보류"
-    out["decisions"] = [d]
-    assert validate_reading_response(out, req).issues == []
-    out["decisions"] = []
-    assert validate_reading_response(out, req).decisions == []
-
-
-def test_duplicate_contract_decisions_are_isolated():
-    req = request()
-    out = response(req)
-    out["decisions"].append(deepcopy(out["decisions"][0]))
-    result = validate_reading_response(out, req)
-    assert not result.decisions
-    assert len(result.issues) == 2
-
-
-def test_status_changes_require_field_evidence_and_valid_as_of():
-    req = request()
-    out = response(req)
-    update = dict(vesselId="rig-a", status="Active", statusAsOf="2026-10-01", reasonKo="상태 공시",
-                  evidence=[dict(fields=["status", "statusAsOf"], sourceId="s1", locator="page:2", quote="Rig A is Active as of 2026-10-01.")])
-    out["vesselUpdates"] = [update]
-    assert validate_reading_response(out, req).vessel_updates == [update]
-    update["evidence"][0]["fields"] = ["status"]
-    assert len(validate_reading_response(out, req).issues) == 1
-
-
-def test_news_queue_identity_and_hash_integrity():
-    job = dict(jobId="job-1", kind="official-news", company="Seadrill", url="https://example.com/news",
-               sourceSha256="a" * 64, contextSha256="b" * 64, readerPolicySha256="c" * 64)
-    queue = dict(schemaVersion=2, pendingCount=1, fingerprint="d" * 64, jobs=[job])
-    validate_news_queue(queue)
-    queue["jobs"].append(job)
-    queue["pendingCount"] = 2
-    with pytest.raises(DocumentValidationError):
-        validate_news_queue(queue)
-
-
-@pytest.mark.parametrize("field,value", [("valueUsd", None), ("baseDurationDays", None),
-    ("baseDurationDays", 0), ("derivedUsdPerDay", None), ("reportedUsdPerDay", math.nan)])
-def test_incomplete_or_nonfinite_rate_metadata_is_isolated(field, value):
-    req = request()
-    out = response(req)
-    out["decisions"][0]["row"]["interpretation"][field] = value
-    result = validate_reading_response(out, req)
-    assert not result.decisions
-    assert len(result.issues) == 1
-
-
-def test_existing_source_metadata_is_retained_without_new_required_fields():
-    from automation.fleet_sync.model import SourceDocument
-    req = request("official-news")
-    out = response(req)
-    row = out["decisions"][0]["row"]
-    row.update(sourceUrl=req["url"], sourcePublishedAt="2026-10-01", newsReviewed=True,
-               datePrecision={"start": "approximate", "end": "year"})
-    assert validate_reading_response(out, req).decisions[0]["row"] == row
-    document = SourceDocument("Seadrill", "index", "doc", "2026-10-01", "abc", 1, "today", "v1", "test", "text/html")
-    assert document.document_sha256 == document.sha256 == "abc"
-
-
-@pytest.mark.parametrize("award", ["letter-of-award", "binding-letter-of-award"])
-def test_loa_enum_cannot_be_promoted_to_firm(award):
-    req = request()
-    out = response(req)
-    out["decisions"][0]["row"]["interpretation"]["awardType"] = award
-    assert len(validate_reading_response(out, req).issues) == 1
-
-
-def test_withdrawal_requires_existing_reference_and_action_evidence():
-    req = request()
-    out = response(req)
-    d = out["decisions"][0]
-    d.update(action="withdraw", row=None)
-    d["evidence"] = evidence(["client", "region", "interpretation", "action"])
-    assert validate_reading_response(out, req).decisions == [d]
-    d["evidence"] = []
-    assert len(validate_reading_response(out, req).issues) == 1
-
-
-def test_malformed_items_and_missing_arrays_are_not_silently_accepted():
-    req = request()
-    out = response(req)
-    out["decisions"] = [None, {"contractId": []}]
-    result = validate_reading_response(out, req)
-    assert len(result.issues) == 2
-    out.pop("decisions")
-    with pytest.raises(DocumentValidationError):
-        validate_reading_response(out, req)
-
-
-def test_numeric_duration_conversion_uses_declared_assumptions():
-    from automation.fleet_sync.reading_contracts import duration_days
-    assert duration_days(years=1) == 365
-    assert duration_days(months=12) == 365
-    assert duration_days(years=1, months=6, days=2) == 549.5
-    with pytest.raises(ValueError):
-        duration_days(months=math.inf)
-
-
-def test_every_decoder_object_has_fixed_required_and_no_extra_properties():
-    from jsonschema import Draft202012Validator
-    Draft202012Validator.check_schema(READER_RESPONSE_SCHEMA)
-
-    def check(node):
-        if isinstance(node, dict):
-            if node.get("type") == "object":
-                assert set(node["required"]) == set(node["properties"])
-                assert node["additionalProperties"] is False
-            for value in node.values():
-                check(value)
-        elif isinstance(node, list):
-            for value in node:
-                check(value)
-    check(READER_RESPONSE_SCHEMA)
-    req = request()
-    out = response(req)
-    out["decisions"][0]["row"].update(newsReviewed=None, sourceUrl=None, sourcePublishedAt=None, datePrecision=None)
-    assert validate_reading_response(out, req).issues == []
-
-
-@pytest.mark.parametrize("timestamp,valid", [("2026-10-01T12:30:00Z", True),
-    ("2026-10-01T12:30:00+09:00", True), ("2026-10-01", True),
-    ("not-an-iso-date", False), ("2026-02-30T12:30:00Z", False)])
-def test_input_published_at_requires_real_iso_date_or_timestamp(timestamp, valid):
-    req = request()
-    req["publishedAt"] = timestamp
-    if valid:
-        validate_reading_input(req)
-    else:
-        with pytest.raises(DocumentValidationError):
-            validate_reading_input(req)
-
-
-@pytest.mark.parametrize("metadata", [
-    {"sourceUrl": "https://untrusted.example/fabricated"},
-    {"sourcePublishedAt": "2000-01-01"},
-    {"datePrecision": {"start": "day", "end": "day"}},
-    {"newsReviewed": True},
-])
-def test_model_cannot_invent_source_metadata_even_with_an_existing_quote(metadata):
-    req = request()
-    out = response(req)
-    out["decisions"][0]["row"].update(metadata)
-    result = validate_reading_response(out, req)
-    assert result.decisions == []
-    assert len(result.issues) == 1
-
-
-@pytest.mark.parametrize("fields", [
-    ["client.nonexistent", "region.nonexistent", "interpretation.sourceStartText"],
-    ["client", "region", "interpretation.sourceStartText"],
-    ["client", "region", "interpretation.nonexistent"],
-    ["client", "region", "row"],
-])
-def test_evidence_does_not_expand_partial_or_nonexistent_paths(fields):
-    req = request()
-    out = response(req)
-    out["decisions"][0]["evidence"] = evidence(fields)
-    result = validate_reading_response(out, req)
-    assert result.decisions == []
-    assert len(result.issues) == 1
-
-
-def test_all_exact_interpretation_leaf_paths_can_support_their_own_changes():
-    req = request()
-    out = response(req)
-    interp = out["decisions"][0]["facts"]["interpretation"]
-    fields = ["client", "region"] + ["interpretation." + key for key, value in interp.items()
-                                    if value is not None and value is not False and value != []]
-    out["decisions"][0]["evidence"] = evidence(fields)
-    assert validate_reading_response(out, req).issues == []
-
-
-def test_fact_citation_cannot_support_a_different_row_claim():
-    req = request()
-    out = response(req)
-    d = out["decisions"][0]
-    d["row"]["client"] = "Different row client"
-    d["evidence"] = evidence(["facts.client", "region", "interpretation"])
-    assert len(validate_reading_response(out, req).issues) == 1
-    d["evidence"][0]["fields"].append("row.client")
-    assert validate_reading_response(out, req).issues == []
-
-
-def test_nullable_and_verified_metadata_need_no_fabricated_metadata_quotes():
-    req = request("official-news")
-    out = response(req)
-    row = out["decisions"][0]["row"]
-    row.update(sourceUrl=req["url"], sourcePublishedAt=req["publishedAt"], newsReviewed=True,
-               datePrecision={"start": row["interpretation"]["startPrecision"], "end": row["interpretation"]["endPrecision"]})
-    assert validate_reading_response(out, req).issues == []
-    row.update(sourceUrl=None, sourcePublishedAt=None, newsReviewed=None, datePrecision=None)
-    assert validate_reading_response(out, req).issues == []
-
-
-def test_original_source_metadata_can_be_preserved_from_the_baseline():
-    req = request()
-    metadata = dict(sourceUrl="https://example.com/prior-report", sourcePublishedAt="2025-01-01",
-                    newsReviewed=True, datePrecision={"start": "month", "end": "month"})
-    req["baseline"][0]["contracts"][0].update(metadata)
-    req["contextSha256"] = context_sha256(req["baseline"], req["priorEvidence"])
-    out = response(req)
-    out["decisions"][0]["row"].update(metadata)
-    assert validate_reading_response(out, req).issues == []
-
-
-def test_missing_interpretation_leaf_citation_does_not_borrow_its_sibling_quote():
-    req = request()
-    out = response(req)
-    interp = out["decisions"][0]["facts"]["interpretation"]
-    fields = ["client", "region"] + ["interpretation." + key for key, value in interp.items()
-                                    if value is not None and value is not False and value != []]
-    fields.remove("interpretation.valueUsd")
-    out["decisions"][0]["evidence"] = evidence(fields)
-    result = validate_reading_response(out, req)
-    assert len(result.issues) == 1
-    assert "interpretation.valueUsd" in result.issues[0].message
-
-
-def test_bare_field_alias_is_rejected_when_facts_and_row_values_differ():
-    req = request()
-    out = response(req)
-    out["decisions"][0]["row"]["client"] = "Different row client"
-    result = validate_reading_response(out, req)
-    assert len(result.issues) == 1
-    assert "ambiguous evidence field" in result.issues[0].message
-
-
-def test_undisclosed_public_zero_needs_no_absence_quote():
-    req = request()
-    req["baseline"][0]["contracts"][0]["dayRate"] = 500000
-    req["contextSha256"] = context_sha256(req["baseline"], req["priorEvidence"])
-    out = response(req)
-    d = out["decisions"][0]
-    for interp in (d["facts"]["interpretation"], d["row"]["interpretation"]):
-        interp.update(rateBasis="undisclosed", reportedUsdPerDay=None, derivedUsdPerDay=None,
-                      valueUsd=None, baseDurationDays=None, durationAssumption=None)
-    assert "dayRate" not in d["evidence"][0]["fields"]
-    assert validate_reading_response(out, req).issues == []
-
-
-def png_image(size=(2, 2)):
-    import base64
-    import hashlib
-    from io import BytesIO
-    from PIL import Image
-
-    output = BytesIO()
-    Image.new("RGB", size, "white").save(output, format="PNG")
-    content = output.getvalue()
-    return {"mimeType": "image/png", "sha256": hashlib.sha256(content).hexdigest(),
-            "dataBase64": base64.b64encode(content).decode("ascii")}
-
-
-def image_request(*, text="", image=None):
-    req = request("official-news")
-    req["pages"][0] = {"locator": "page:1", "text": text, "image": png_image() if image is None else image}
-    req["sourceSha256"] = source_sha256(req["pages"])
-    return req
-
-
-def test_image_only_page_is_valid_and_needs_no_decoration_quote():
-    req = image_request()
-    validate_reading_input(req)
-    out = response(req)
-    out.update(decisions=[], coverage=[])
-    assert validate_reading_response(out, req).issues == []
-    out["readLocators"] = ["page:2"]
-    with pytest.raises(DocumentValidationError, match="readLocators"):
-        validate_reading_response(out, req)
-
-
-@pytest.mark.parametrize("text", ["", "  \n\t"])
-def test_empty_page_cannot_claim_reading_without_attached_image(text):
-    req = request()
-    req["pages"][0]["text"] = text
-    req["sourceSha256"] = source_sha256(req["pages"])
-    with pytest.raises(DocumentValidationError, match="text|image"):
-        validate_reading_input(req)
-
-
-def test_image_content_and_metadata_are_part_of_the_source_hash():
-    req = image_request()
-    original = req["sourceSha256"]
-    changed = deepcopy(req["pages"])
-    changed[0]["image"] = png_image((3, 3))
-    assert source_sha256(changed) != original
-    req["pages"] = changed
-    with pytest.raises(DocumentValidationError, match="sourceSha256"):
-        validate_reading_input(req)
-
-
-@pytest.mark.parametrize("change", [
-    lambda image: image.update(dataBase64="not base64!"),
-    lambda image: image.update(dataBase64=image["dataBase64"] + "\n"),
-    lambda image: image.update(dataBase64="data:image/png;base64," + image["dataBase64"]),
-    lambda image: image.update(sha256="0" * 64),
-    lambda image: image.update(mimeType="image/jpeg"),
-])
-def test_invalid_image_transport_or_digest_fails_document(change):
-    image = png_image()
-    change(image)
-    with pytest.raises(DocumentValidationError):
-        validate_reading_input(image_request(image=image))
-
-
-@pytest.mark.parametrize("content", [b"not a PNG", b"\x89PNG\r\n\x1a\n", b"\x89PNG\r\n\x1a\ntruncated"])
-def test_self_consistent_hash_does_not_make_broken_png_valid(content):
-    import base64
-    import hashlib
-    image = {"mimeType": "image/png", "sha256": hashlib.sha256(content).hexdigest(),
-             "dataBase64": base64.b64encode(content).decode("ascii")}
-    with pytest.raises(DocumentValidationError):
-        validate_reading_input(image_request(image=image))
-
-
-def test_per_page_encoded_image_limit_precedes_decode(monkeypatch):
-    from automation.fleet_sync import reading_contracts as contracts
-    monkeypatch.setattr(contracts, "MAX_PAGE_IMAGE_BYTES", 1)
-    with pytest.raises(DocumentValidationError, match="limit"):
-        validate_reading_input(image_request())
-
-
-def test_document_total_image_limit_counts_every_attached_page(monkeypatch):
-    import base64
-    from automation.fleet_sync import reading_contracts as contracts
-    image = png_image()
-    image_size = len(base64.b64decode(image["dataBase64"]))
-    monkeypatch.setattr(contracts, "MAX_DOCUMENT_IMAGE_BYTES", image_size * 2 - 1)
-    req = image_request(image=image)
-    req["pages"][1]["image"] = deepcopy(image)
-    req["sourceSha256"] = source_sha256(req["pages"])
-    with pytest.raises(DocumentValidationError, match="document.*limit"):
-        validate_reading_input(req)
-
-
-def test_png_pixel_limit_precedes_full_pixel_decode(monkeypatch):
-    from automation.fleet_sync import reading_contracts as contracts
-    monkeypatch.setattr(contracts, "MAX_PAGE_IMAGE_PIXELS", 3)
-    with pytest.raises(DocumentValidationError, match="pixel.*limit"):
-        validate_reading_input(image_request(image=png_image((2, 2))))
-
-
-def test_ocr_text_keeps_exact_quote_boundary_with_attached_image():
-    req = image_request(text=request()["pages"][0]["text"])
-    assert validate_reading_response(response(req), req).issues == []
-    req["pages"][0]["text"] = ""
-    req["sourceSha256"] = source_sha256(req["pages"])
-    out = response(req)
-    assert len(validate_reading_response(out, req).issues) == 1
-
-
-@pytest.mark.parametrize("damage", ["missing-iend-crc", "altered-iend-crc", "trailing-after-iend", "nonempty-iend"])
-def test_png_end_integrity_is_required_even_after_all_hashes_are_recomputed(damage):
-    import base64
-    import binascii
-    import hashlib
-
-    image = png_image()
-    content = base64.b64decode(image["dataBase64"])
-    assert content[-12:] == b"\x00\x00\x00\x00IEND\xaeB`\x82"
-    if damage == "missing-iend-crc":
-        content = content[:-4]
-    elif damage == "altered-iend-crc":
-        content = content[:-1] + bytes([content[-1] ^ 1])
-    elif damage == "trailing-after-iend":
-        content += b"trailing bytes"
-    else:
-        payload = b"IENDx"
-        content = content[:-12] + (1).to_bytes(4, "big") + payload + binascii.crc32(payload).to_bytes(4, "big")
-    image.update(dataBase64=base64.b64encode(content).decode("ascii"), sha256=hashlib.sha256(content).hexdigest())
-    # image_request recomputes sourceSha256 too: the rejection must come from
-    # PNG integrity, not a stale transport/content digest.
-    with pytest.raises(DocumentValidationError, match="PNG"):
-        validate_reading_input(image_request(image=image))
-
-
-def stored_record():
-    return {"version": "legacy-v1", "company": "Seadrill", "url": "https://example.com/report",
-            "publishedAt": "2026-10-01", "sourceSha256": "a" * 64,
-            "reader": {"engine": "codex-cli", "model": "old-model", "reviewedAt": "2026-10-02T12:00:00Z"},
-            "result": {"vessels": [{"vessel": "Rig A", "facts": {"expectedStart": "Mid 2027",
-                "expectedEnd": "2028", "counterparty": "New client", "location": "Angola",
-                "announcedValueUsdApprox": 182500000, "termText": "1 year"}}]},
-            "unrecognizedLegacyField": {"keep": ["every", "original", "value"]}}
-
-
-def stored_request(record=None):
-    import hashlib
-    import json
-    record = stored_record() if record is None else record
-    text = json.dumps(record, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False)
-    record_hash = hashlib.sha256(text.encode("utf-8")).hexdigest()
-    req = request("official-news")
-    req.update(sourceId="stored-reading-" + record_hash, inputMode="stored-result",
-               pages=[{"locator": "stored-review:" + record_hash, "text": text}],
-               storedReading={"legacyLedger": "data/news/reviews.json", "recordSha256": record_hash,
-                              "originalSourceSha256": record.get("sourceSha256"),
-                              "reviewedAt": record.get("reader", {}).get("reviewedAt")})
-    req["sourceSha256"] = source_sha256(req["pages"])
-    return req
-
-
-def stored_response(req):
-    out = response(req)
-    out["readLocators"] = [req["pages"][0]["locator"]]
-    out["decisions"][0]["evidence"] = [{"fields": ["client", "region", "interpretation"],
-        "sourceId": req["sourceId"], "locator": req["pages"][0]["locator"], "quote": req["pages"][0]["text"]}]
-    return out
-
-
-def test_stored_result_is_a_separate_valid_input_without_an_original_body():
-    req = stored_request()
-    validate_reading_input(req, reader_policy="policy")
-    result = validate_reading_response(stored_response(req), req)
+    assert result.report_date == "2026-10-01"
+    assert len(result.vessel_updates) == 1
+    validated = result.decisions[0]
+    assert validated["row"]["interpretation"]["derivedUsdPerDay"] == 500_000
+    assert validated["reasonKo"] == "공시 근거를 반영"
+
+
+def test_missing_reason_quote_locator_and_interpretation_still_pass():
+    item = decision(row=row(interpretation=None))
+    for key in ("reasonKo", "quote", "locator"):
+        item.pop(key)
+    no_interp = row()
+    no_interp.pop("interpretation")
+    other = decision(contractId=None, row=no_interp)
+    for key in ("reasonKo", "quote", "locator"):
+        other.pop(key)
+    result = validate_reading_response(response([item, other], [update()]), request())
     assert result.issues == []
+    assert len(result.decisions) == 2
+    assert result.decisions[0]["row"]["interpretation"]["derivedUsdPerDay"] is None
+
+
+def test_mismatched_quote_and_unknown_locator_do_not_hold():
+    item = decision(quote="text that is nowhere in the source", locator="page:99")
+    result = validate_reading_response(response([item]), request())
+    assert result.issues == []
+    assert result.decisions[0]["quote"] == "text that is nowhere in the source"
+
+
+def test_envelope_fields_are_tolerated_but_not_required():
+    value = response()
+    value.update(schemaVersion=2, sourceId="other", sourceSha256="0" * 64, company="Seadrill",
+                 readLocators=[], coverage=[])
+    assert validate_reading_response(value, request()).issues == []
+    value = response()
+    value.pop("reportDate")
+    assert validate_reading_response(value, request()).report_date is None
+
+
+def test_non_upsert_actions_and_nullable_contract_id():
+    items = [decision(action="no-change", row=None), decision(action="hold", row=None, contractId=None),
+             decision(action="withdraw", row=None), decision(action="no-change", row=row())]
+    result = validate_reading_response(response(items), request())
+    assert result.issues == []
+    assert [item["action"] for item in result.decisions] == ["no-change", "hold", "withdraw", "no-change"]
+    assert result.decisions[3]["row"] is None
+
+
+# --- per-item holds --------------------------------------------------------
+
+BAD_DECISIONS = {
+    "unregistered vessel": decision(vesselId="rig-zz"),
+    "other company vessel": decision(vesselId="rig-x", contractId=None),
+    "foreign contractId": decision(contractId="foreign"),
+    "unknown contractId": decision(contractId="nope"),
+    "withdraw without id": decision(action="withdraw", contractId=None, row=None),
+    "upsert without row": decision(row=None),
+    "bad action": decision(action="delete"),
+    "reversed dates": decision(row=row(startDate="2028-07-01", endDate="2028-06-30")),
+    "impossible date": decision(row=row(startDate="2027-02-30")),
+    "date format": decision(row=row(startDate="2027/07/01")),
+    "date with time": decision(row=row(endDate="2028-06-30T00:00:00")),
+    "negative rate": decision(row=row(dayRate=-1)),
+    "infinite rate": decision(row=row(dayRate=math.inf)),
+    "nan rate": decision(row=row(dayRate=math.nan)),
+    "bool rate": decision(row=row(dayRate=True)),
+    "string rate": decision(row=row(dayRate="100")),
+    "negative value": decision(row=row(interpretation={"valueUsd": -5})),
+    "zero days": decision(row=row(interpretation={"baseDurationDays": 0})),
+    "infinite days": decision(row=row(interpretation={"baseDurationDays": math.inf})),
+    "bad award": decision(row=row(interpretation={"awardType": "handshake"})),
+    "bad status": decision(row=row(status="Probable")),
+    "empty client": decision(row=row(client=" ")),
+    "missing region": decision(row={k: v for k, v in row().items() if k != "region"}),
+    "not object": "upsert rig-a",
+}
+
+
+@pytest.mark.parametrize("name", sorted(BAD_DECISIONS))
+def test_bad_decision_is_held_alone(name):
+    good = decision(action="no-change", row=None)
+    result = validate_reading_response(response([good, BAD_DECISIONS[name]], [update()]), request())
+    assert [item["action"] for item in result.decisions] == ["no-change"]
+    assert len(result.vessel_updates) == 1
+    assert [(issue.collection, issue.index) for issue in result.issues] == [("decisions", 1)]
+    assert result.issues[0].message
+    assert result.issues[0].item == BAD_DECISIONS[name]
+
+
+BAD_UPDATES = {
+    "unregistered vessel": update(vesselId="rig-zz"),
+    "other company": update(vesselId="rig-x"),
+    "bad status": update(status="Sold"),
+    "bad date": update(statusAsOf="2026-13-01"),
+    "missing date": {"vesselId": "rig-b", "status": "Idle"},
+}
+
+
+@pytest.mark.parametrize("name", sorted(BAD_UPDATES))
+def test_bad_vessel_update_is_held_alone(name):
+    result = validate_reading_response(response(None, [BAD_UPDATES[name], update(vesselId="rig-a")]), request())
+    assert [item["vesselId"] for item in result.vessel_updates] == ["rig-a"]
     assert len(result.decisions) == 1
-    assert req["sourceSha256"] != req["storedReading"]["originalSourceSha256"]
+    assert [(issue.collection, issue.index) for issue in result.issues] == [("vesselUpdates", 0)]
 
 
-def test_stored_record_helpers_preserve_every_unknown_legacy_field():
-    from automation.fleet_sync.reading_contracts import stored_record_sha256, stored_review_page
-    record = stored_record()
-    before = deepcopy(record)
-    req = stored_request(record)
-    assert stored_review_page(record) == req["pages"][0]
-    assert stored_record_sha256(record) == req["storedReading"]["recordSha256"]
-    del record["unrecognizedLegacyField"]
-    assert stored_record_sha256(record) != stored_record_sha256(before)
-    assert before == stored_record()
+def test_invalid_report_date_is_dropped_without_holding_items():
+    value = response()
+    value["reportDate"] = "2026-02-31"
+    result = validate_reading_response(value, request())
+    assert result.report_date is None
+    assert len(result.decisions) == 1 and len(result.vessel_updates) == 1
+    assert [issue.collection for issue in result.issues] == ["reportDate"]
 
 
-def test_explicit_document_mode_keeps_existing_document_contract():
-    req = request()
-    req["inputMode"] = "document"
-    validate_reading_input(req)
-    assert validate_reading_response(response(req), req).issues == []
+# --- malformed responses ---------------------------------------------------
+
+@pytest.mark.parametrize("value", [None, [], "text", {"decisions": []}, {"vesselUpdates": []},
+                                   {"decisions": {}, "vesselUpdates": []}])
+def test_malformed_response_requires_rerequest(value):
+    with pytest.raises(MalformedResponseError):
+        validate_reading_response(value, request())
+    assert issubclass(MalformedResponseError, DocumentValidationError)
 
 
-@pytest.mark.parametrize("mutate", [
-    lambda req: req.pop("storedReading"),
-    lambda req: req["storedReading"].update(recordSha256="0" * 64),
-    lambda req: req["storedReading"].update(originalSourceSha256="0" * 64),
-    lambda req: req["storedReading"].update(originalSourceSha256=None),
-    lambda req: req["storedReading"].update(reviewedAt="2026-10-03T12:00:00Z"),
-    lambda req: req["storedReading"].update(reviewedAt=None),
-    lambda req: req["storedReading"].update(legacyLedger=""),
-    lambda req: req["pages"][0].update(locator="page:1"),
-    lambda req: req["pages"][0].update(image=png_image()),
-    lambda req: req["pages"].append({"locator": "page:2", "text": "Original body must not be appended"}),
-    lambda req: req.update(company="Noble"),
-    lambda req: req.update(url="https://example.com/another-original"),
-    lambda req: req.update(publishedAt="2025-01-01"),
+def test_parse_reading_response_rejects_non_json():
+    with pytest.raises(MalformedResponseError):
+        parse_reading_response("not json {")
+    with pytest.raises(MalformedResponseError):
+        parse_reading_response('{"decisions": [], "vesselUpdates": [], "x": NaN}')
+    assert parse_reading_response(json.dumps(response()))["decisions"]
+
+
+# --- derived rate ----------------------------------------------------------
+
+def test_model_supplied_derived_rate_is_replaced():
+    interp = dict(row()["interpretation"], derivedUsdPerDay=1)
+    result = validate_reading_response(response([decision(row=row(interpretation=interp))]), request())
+    assert result.decisions[0]["row"]["interpretation"]["derivedUsdPerDay"] == 500_000
+
+
+@pytest.mark.parametrize("amount,days", [(None, 365), (182_500_000, None), (None, None)])
+def test_missing_amount_or_days_gives_no_derived_rate(amount, days):
+    interp = dict(row()["interpretation"], valueUsd=amount, baseDurationDays=days, derivedUsdPerDay=123)
+    result = validate_reading_response(response([decision(row=row(interpretation=interp))]), request())
+    assert result.decisions[0]["row"]["interpretation"]["derivedUsdPerDay"] is None
+    assert derived_usd_per_day(amount, days) is None
+
+
+def test_derived_rate_and_duration_helpers():
+    assert derived_usd_per_day(182_500_000, 365) == 500_000
+    assert derived_usd_per_day(1, 0) is None
+    assert duration_days(years=1) == 365
+    assert duration_days(months=6) == pytest.approx(182.5)
+    with pytest.raises(ValueError):
+        duration_days(years=-1)
+
+
+def test_legacy_public_interpretation_is_accepted():
+    legacy = dict(sourceStartText="Q4 2026", sourceEndText=None, startPrecision="quarter", endPrecision="unknown",
+                  dateBasis="placement", placementBasis="배치", awardType="binding-letter-of-award", termText=None,
+                  optionText=None, valueText="$100m", rateBasis="backlog-derived", reportedUsdPerDay=None,
+                  derivedUsdPerDay=250_000, valueUsd=100_000_000, baseDurationDays=400,
+                  durationAssumption="1 year = 365 days", maximumTerm=False, includes=[], excludes=[])
+    value = normalize_interpretation(deepcopy(legacy))
+    assert value["dateBasis"] == "placement" and value["rateBasis"] == "backlog-derived"
+    assert value["derivedUsdPerDay"] == 250_000
+    assert normalize_interpretation(None)["derivedUsdPerDay"] is None
+
+
+# --- wire schemas ----------------------------------------------------------
+
+def _walk(node, path="$"):
+    if isinstance(node, dict):
+        yield path, node
+        for key, value in node.items():
+            yield from _walk(value, f"{path}.{key}")
+    elif isinstance(node, list):
+        for index, value in enumerate(node):
+            yield from _walk(value, f"{path}[{index}]")
+
+
+@pytest.mark.parametrize("schema", [READER_RESPONSE_SCHEMA, TITLE_TRIAGE_SCHEMA])
+def test_wire_schema_uses_structured_output_subset(schema):
+    for path, node in _walk(schema):
+        assert not {"uniqueItems", "minLength", "maxLength", "const", "$schema"} & set(node), path
+        if node.get("type") == "object" or (isinstance(node.get("type"), list) and "object" in node["type"]):
+            assert node["additionalProperties"] is False, path
+            assert sorted(node["required"]) == sorted(node["properties"]), path
+
+
+def test_wire_schema_shape():
+    props = READER_RESPONSE_SCHEMA["properties"]
+    assert set(props) == {"reportDate", "vesselUpdates", "decisions"}
+    decision_props = props["decisions"]["items"]["properties"]
+    assert set(decision_props) == {"vesselId", "contractId", "action", "row", "reasonKo", "quote", "locator"}
+    for key in ("reasonKo", "quote", "locator", "contractId"):
+        assert "null" in decision_props[key]["type"]
+    row_schema = decision_props["row"]["anyOf"][0]
+    interp = row_schema["properties"]["interpretation"]
+    assert "derivedUsdPerDay" not in interp["properties"]
+    assert "null" in interp["properties"]["awardType"]["type"]
+
+
+def test_wire_schema_is_accepted_by_reading_service_translator():
+    from automation.fleet_sync.reading_service import structured_output_schema
+    assert structured_output_schema(READER_RESPONSE_SCHEMA) == READER_RESPONSE_SCHEMA
+
+
+def test_triage_returns_only_known_ids_in_input_order():
+    assert select_triage_ids({"selected": ["b", "zzz", "a", "b", 3]}, ["a", "b", "c"]) == ["a", "b"]
+    assert select_triage_ids({"selected": []}, ["a"]) == []
+    with pytest.raises(MalformedResponseError):
+        select_triage_ids({"chosen": ["a"]}, ["a"])
+    with pytest.raises(MalformedResponseError):
+        select_triage_ids(["a"], ["a"])
+
+
+# --- reading input ---------------------------------------------------------
+
+def test_reading_input_basic_shape_and_no_hashes_required():
+    validate_reading_input(request())
+    validate_reading_input(request(openHolds=[{"contractId": "old-a"}], inputMode="document"),
+                           reader_policy="ignored")
+    # Old hash envelope fields may still be present and are not verified.
+    validate_reading_input(request(sourceSha256="0" * 64, contextSha256="1" * 64, readerPolicySha256="x"))
+
+
+@pytest.mark.parametrize("patch", [
+    {"company": "Other"}, {"kind": "blog"}, {"sourceId": ""}, {"url": ""}, {"pages": []},
+    {"pages": [{"locator": "p", "text": "a"}, {"locator": "p", "text": "b"}]},
+    {"pages": [{"locator": "", "text": "a"}]}, {"baseline": {}}, {"inputMode": "other"},
+    {"openHolds": "none"}, {"publishedAt": 3},
 ])
-def test_stored_result_requires_consistent_provenance_and_only_its_record_page(mutate):
-    req = stored_request()
-    mutate(req)
-    req["sourceSha256"] = source_sha256(req["pages"])
+def test_reading_input_rejects_bad_shape(patch):
     with pytest.raises(DocumentValidationError):
-        validate_reading_input(req)
+        validate_reading_input(dict(request(), **patch))
 
 
-@pytest.mark.parametrize("mode", [None, "document"])
-def test_document_mode_cannot_masquerade_stored_pages_or_provenance_as_original_reading(mode):
-    req = stored_request()
-    if mode is None:
-        req.pop("inputMode")
-    else:
-        req["inputMode"] = mode
-    with pytest.raises(DocumentValidationError):
-        validate_reading_input(req)
-    req.pop("storedReading")
-    with pytest.raises(DocumentValidationError):
-        validate_reading_input(req)
+def test_page_images_need_base64_png_signature_and_size_cap():
+    good = {"mimeType": "image/png", "dataBase64": base64.b64encode(PNG).decode()}
+    validate_reading_input(request(pages=[{"locator": "page:1", "text": "", "image": good}]))
+    for image in ({"mimeType": "image/png", "dataBase64": "@@@"},
+                  {"mimeType": "image/png", "dataBase64": base64.b64encode(b"GIF89a....").decode()},
+                  {"mimeType": "image/jpeg", "dataBase64": good["dataBase64"]},
+                  {"mimeType": "image/png", "dataBase64": base64.b64encode(PNG + b"\x00" * (6 * 1024 * 1024)).decode()}):
+        with pytest.raises(DocumentValidationError):
+            validate_reading_input(request(pages=[{"locator": "page:1", "text": "", "image": image}]))
 
 
-@pytest.mark.parametrize("text", ["not JSON", "[]", '{"result":{}}', '{"same":1,"same":2}'])
-def test_stored_pages_cannot_substitute_summaries_or_non_record_json(text):
-    req = stored_request()
-    req["pages"][0]["text"] = text
-    req["sourceSha256"] = source_sha256(req["pages"])
-    with pytest.raises(DocumentValidationError):
-        validate_reading_input(req)
+def test_stored_result_mode_is_one_json_page_without_hash_binding():
+    record = {"company": "Seadrill", "url": "https://example.com/report", "result": {"decisions": []}}
+    page = stored_review_page(record)
+    assert json.loads(page["text"]) == record
+    validate_reading_input(request(inputMode="stored-result", pages=[page]))
+    for pages in ([page, dict(page, locator="other")], [{"locator": "x", "text": "not json"}],
+                  [dict(page, image={"mimeType": "image/png", "dataBase64": base64.b64encode(PNG).decode()})]):
+        with pytest.raises(DocumentValidationError):
+            validate_reading_input(request(inputMode="stored-result", pages=pages))
 
 
-def test_original_hash_and_review_date_nullability_follows_the_record():
-    record = stored_record()
-    record.pop("sourceSha256")
-    record["reader"].pop("reviewedAt")
-    req = stored_request(record)
-    validate_reading_input(req)
-    assert req["storedReading"]["originalSourceSha256"] is None
-    assert req["storedReading"]["reviewedAt"] is None
+# --- queue -----------------------------------------------------------------
+
+def job(job_id="j1", **patch):
+    value = dict(jobId=job_id, kind="official-news", company="Noble", url="https://example.com/n",
+                 documentSha256="a" * 64)
+    value.update(patch)
+    return value
 
 
-def test_stored_result_does_not_allow_fake_original_evidence_or_bypass_calculation():
-    req = stored_request()
-    out = stored_response(req)
-    out["decisions"][0]["evidence"][0].update(locator="page:1")
-    assert len(validate_reading_response(out, req).issues) == 1
-    out = stored_response(req)
-    out["decisions"][0]["evidence"][0].update(sourceId="original-document-id")
-    assert len(validate_reading_response(out, req).issues) == 1
-    out = stored_response(req)
-    out["decisions"][0]["evidence"][0].update(quote="Original words absent from this saved JSON")
-    assert len(validate_reading_response(out, req).issues) == 1
-    out = stored_response(req)
-    out["decisions"][0]["row"]["interpretation"]["derivedUsdPerDay"] = 600000
-    assert len(validate_reading_response(out, req).issues) == 1
-
-
-def test_stored_fleet_report_still_requires_registry_coverage_and_input_locator():
-    req = stored_request()
-    req["kind"] = "fleet-report"
-    out = stored_response(req)
-    out["coverage"] = []
-    with pytest.raises(DocumentValidationError, match="coverage"):
-        validate_reading_response(out, req)
-    out = stored_response(req)
-    out["readLocators"] = ["page:1"]
-    with pytest.raises(DocumentValidationError, match="readLocators"):
-        validate_reading_response(out, req)
-
-
-def test_stored_v2_output_wrapper_is_opaque_and_preserves_optional_audit_fields():
-    record = stored_record()
-    record["result"] = {"readingResponse": {"schemaVersion": 2, "futureField": [1, {"keep": True}]}}
-    record["originalDocumentSha256"] = "b" * 64
-    validate_reading_input(stored_request(record))
-
-
-def test_stored_page_is_exact_canonical_json_and_record_hash_covers_unknown_fields():
-    import json
-    req = stored_request()
-    req["pages"][0]["text"] = json.dumps(stored_record(), indent=2)
-    req["sourceSha256"] = source_sha256(req["pages"])
-    with pytest.raises(DocumentValidationError, match="canonical"):
-        validate_reading_input(req)
-    record = stored_record()
-    record.pop("unrecognizedLegacyField")
-    req["pages"][0]["text"] = json.dumps(record, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-    req["sourceSha256"] = source_sha256(req["pages"])
-    with pytest.raises(DocumentValidationError, match="recordSha256"):
-        validate_reading_input(req)
-
-
-@pytest.mark.parametrize("mutate", [
-    lambda decision: decision.update(contractId="unknown-contract"),
-    lambda decision: decision["row"].update(endDate="2020-01-01"),
-    lambda decision: decision["row"].update(dayRate=math.inf),
-])
-def test_stored_results_preserve_existing_reference_date_and_finite_number_checks(mutate):
-    req = stored_request()
-    out = stored_response(req)
-    mutate(out["decisions"][0])
-    result = validate_reading_response(out, req)
-    assert len(result.issues) == 1
-    assert not result.decisions
+def test_news_queue_validation():
+    validate_news_queue({"schemaVersion": 2, "pendingCount": 2, "fingerprint": "f" * 64,
+                         "jobs": [job("j1"), job("j2", status="pending")]})
+    bad = [
+        {"schemaVersion": 1, "pendingCount": 0, "jobs": []},
+        {"schemaVersion": 2, "pendingCount": 1, "jobs": []},
+        {"schemaVersion": 2, "pendingCount": 2, "jobs": [job("j1"), job("j1")]},
+        {"schemaVersion": 2, "pendingCount": 1, "jobs": [{k: v for k, v in job().items() if k != "documentSha256"}]},
+        {"schemaVersion": 2, "pendingCount": 1, "jobs": [job(company="Other")]},
+        {"schemaVersion": 2, "pendingCount": 1, "jobs": [job(kind="blog")]},
+        {"schemaVersion": 2, "pendingCount": 1, "jobs": [job(url="")]},
+        {"schemaVersion": 2, "pendingCount": 1, "jobs": [job(documentSha256="xyz")]},
+    ]
+    for queue in bad:
+        with pytest.raises(DocumentValidationError):
+            validate_news_queue(queue)

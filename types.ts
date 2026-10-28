@@ -6,11 +6,13 @@ export type VesselStatus = 'Active' | 'Idle' | 'Warm-Stacked' | 'Cold-Stacked';
 
 export type ReadingInputMode = 'document' | 'stored-result';
 
+// Stored-result rows record only when the saved review was originally read.
+// Legacy hash fields may still appear in old published data.
 export interface StoredReadingProvenance {
-  legacyLedger: string;
-  recordSha256: string;
-  originalSourceSha256: string | null;
-  reviewedAt: string | null;
+  reviewedAt?: string | null;
+  legacyLedger?: string;
+  recordSha256?: string;
+  originalSourceSha256?: string | null;
 }
 
 export interface Contract {
@@ -78,7 +80,7 @@ export interface FleetManifest {
 export interface OfficialEvent {
   inputMode?: ReadingInputMode;
   storedReading?: StoredReadingProvenance;
-  readingDecision?: ReadingDecision;
+  readingDecision?: EventReadingDecision;
   company: Company;
   title?: string;
   url?: string;
@@ -119,113 +121,130 @@ export interface OfficialEvent {
 }
 
 
-// Reader port v2. Existing published Contract rows remain compatible while new
-// proposals must carry interpretation and receive an ID only during application.
-export type DatePrecision = 'day' | 'month' | 'quarter' | 'half-year' | 'year' | 'approximate' | 'unknown';
-export type DateBasis = 'source' | 'placement' | 'unresolved';
-export type RateBasis = 'reported' | 'backlog-derived' | 'undisclosed';
-export type AwardType = 'signed-contract' | 'binding-letter-of-award' | 'letter-of-award' | 'option-exercised' | 'extension' | 'unreported';
+// Reader port. Code checks only screen safety; reasonKo/quote/locator are
+// optional display text. Legacy published fields stay optional so old data loads.
+export type AwardType = 'signed-contract' | 'letter-of-award' | 'option-exercised' | 'extension' | 'unreported'
+  | 'binding-letter-of-award'; // legacy
 export type ReadingKind = 'fleet-report' | 'official-news';
+export type ReadingAction = 'upsert' | 'withdraw' | 'no-change' | 'hold';
+/** @deprecated legacy interpretation enums, no longer produced by the reader */
+export type DatePrecision = 'day' | 'month' | 'quarter' | 'half-year' | 'year' | 'approximate' | 'unknown';
+/** @deprecated */
+export type DateBasis = 'source' | 'placement' | 'unresolved';
+/** @deprecated */
+export type RateBasis = 'reported' | 'backlog-derived' | 'undisclosed';
 
 export interface ContractInterpretation {
-  sourceStartText: string | null;
-  sourceEndText: string | null;
-  startPrecision: DatePrecision;
-  endPrecision: DatePrecision;
-  dateBasis: DateBasis;
-  placementBasis: string | null;
-  awardType: AwardType;
-  termText: string | null;
-  optionText: string | null;
-  valueText: string | null;
-  rateBasis: RateBasis;
-  reportedUsdPerDay: number | null;
-  derivedUsdPerDay: number | null;
-  valueUsd: number | null;
-  baseDurationDays: number | null;
-  durationAssumption: string | null;
-  maximumTerm: boolean;
-  includes: string[];
-  excludes: string[];
+  sourceStartText?: string | null;
+  sourceEndText?: string | null;
+  /** Korean explanation of how undated text was placed on the timeline. */
+  placementBasis?: string | null;
+  awardType?: AwardType | null;
+  termText?: string | null;
+  optionText?: string | null;
+  valueText?: string | null;
+  valueUsd?: number | null;
+  baseDurationDays?: number | null;
+  includes?: string[];
+  excludes?: string[];
+  /** Computed by code as valueUsd / baseDurationDays; never taken from the model. */
+  derivedUsdPerDay?: number | null;
+  // Legacy fields (read-only, old published rows).
+  dateBasis?: DateBasis;
+  startPrecision?: DatePrecision;
+  endPrecision?: DatePrecision;
+  rateBasis?: RateBasis;
+  reportedUsdPerDay?: number | null;
+  maximumTerm?: boolean;
+  durationAssumption?: string | null;
+  /** Never set; lets callers accept `Contract | ContractInterpretation` and read `.interpretation`. */
+  interpretation?: never;
 }
 
 export interface ReadingPage {
   locator: string;
   text: string;
-  image?: { mimeType: 'image/png'; sha256: string; dataBase64: string };
-}
-
-export interface ReadingEvidence {
-  fields: string[];
-  sourceId: string;
-  locator: string;
-  quote: string;
+  image?: { mimeType: 'image/png'; dataBase64: string; sha256?: string };
 }
 
 export interface ReadingInput {
-  inputMode?: ReadingInputMode;
-  storedReading?: StoredReadingProvenance;
   sourceId: string;
-  sourceSha256: string;
   company: Company;
   kind: ReadingKind;
   url: string;
   publishedAt: string | null;
   pages: ReadingPage[];
   baseline: Drillship[];
-  priorEvidence: Record<string, unknown>[];
-  contextSha256: string;
-  readerPolicySha256: string;
+  openHolds?: Record<string, unknown>[];
+  inputMode?: ReadingInputMode;
 }
 
-export interface ReadingFacts {
-  client: string | null;
-  region: string | null;
-  interpretation: ContractInterpretation;
-}
-
-export interface ReadingRow extends Omit<Contract, 'inputMode' | 'storedReading' | 'id' | 'interpretation' | 'newsReviewed' | 'sourceUrl' | 'sourcePublishedAt' | 'datePrecision'> {
-  id: string | null;
-  interpretation: ContractInterpretation;
-  newsReviewed?: boolean | null;
-  sourceUrl?: string | null;
-  sourcePublishedAt?: string | null;
-  datePrecision?: { start: string; end: string } | null;
+export interface ReadingRow {
+  startDate: string;
+  endDate: string;
+  dayRate: number;
+  client: string;
+  region: string;
+  status: ContractStatus;
+  interpretation?: ContractInterpretation;
 }
 
 export interface ReadingDecision {
   vesselId: string;
   contractId: string | null;
-  action: 'upsert' | 'withdraw' | 'no-change' | 'hold';
+  action: ReadingAction;
   row: ReadingRow | null;
-  facts: ReadingFacts;
-  reasonKo: string;
-  evidence: ReadingEvidence[];
+  reasonKo?: string | null;
+  quote?: string | null;
+  locator?: string | null;
+}
+
+/** @deprecated legacy evidence shape on old published events */
+export interface ReadingEvidence {
+  fields?: string[];
+  sourceId?: string;
+  locator?: string;
+  quote: string;
+}
+
+/** Legacy facts block on old published events. */
+export interface ReadingFacts {
+  client?: string | null;
+  region?: string | null;
+  interpretation?: ContractInterpretation;
+}
+
+/** Decision as stored on a published OfficialEvent. */
+export interface EventReadingDecision {
+  action: ReadingAction;
+  contractId: string | null;
+  row: ReadingRow | null;
+  vesselId?: string;
+  reasonKo?: string | null;
+  quote?: string | null;
+  locator?: string | null;
+  /** Why code held this item (screen-safety check), if it did. */
+  holdReason?: string;
+  facts?: ReadingFacts;
+  evidence?: ReadingEvidence[];
 }
 
 export interface VesselUpdate {
   vesselId: string;
   status: VesselStatus;
   statusAsOf: string;
-  reasonKo: string;
-  evidence: ReadingEvidence[];
-}
-
-export interface VesselCoverage {
-  vesselId: string;
-  state: 'included' | 'not-mentioned' | 'held';
+  reasonKo?: string | null;
+  quote?: string | null;
 }
 
 export interface ReadingResponse {
-  schemaVersion: 2;
-  sourceId: string;
-  sourceSha256: string;
-  company: Company;
   reportDate: string | null;
-  readLocators: string[];
-  coverage: VesselCoverage[];
   vesselUpdates: VesselUpdate[];
   decisions: ReadingDecision[];
+}
+
+export interface TitleTriageResponse {
+  selected: string[];
 }
 
 export interface NewsJob {
@@ -233,14 +252,12 @@ export interface NewsJob {
   kind: ReadingKind;
   company: Company;
   url: string;
-  sourceSha256: string;
-  contextSha256: string;
-  readerPolicySha256: string;
+  documentSha256: string;
 }
 
 export interface NewsQueue {
   schemaVersion: 2;
   pendingCount: number;
-  fingerprint: string;
+  fingerprint?: string;
   jobs: NewsJob[];
 }
