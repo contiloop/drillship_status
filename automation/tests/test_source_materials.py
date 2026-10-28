@@ -460,3 +460,17 @@ def test_legacy_report_discovery_tuple_keeps_compatibility_and_optional_http_dia
     assert sources.discover_document(object(), spec, diagnostics=diagnostics) == expected
     assert len(diagnostics) == 1 and diagnostics[0]['httpStatus'] == 403
     assert diagnostics[0]['url'] == spec.index_url
+
+
+def test_generic_preserved_materials_refetch_news_and_old_reports_with_official_validation(monkeypatch):
+    old_report = 'https://noblecorp.com/old-report.pdf'
+    old_news = 'https://noblecorp.com/old-news'
+    result = materials.collect_reading_materials(
+        Client({old_report: Response(old_report, article()), old_news: Response(old_news, article())}),
+        baseline=[], prior_evidence=[], reader_policy_sha256='a'*64, specs=(),
+        preserved_materials=[dict(company='Noble', kind='fleet-report', url=old_report),
+                             dict(company='Noble', kind='official-news', url=old_news),
+                             dict(company='Noble', kind='official-news', url='https://evil.example/body')])
+    assert {m['readingInput']['url'] for m in result['materials']} == {old_report, old_news}
+    assert result['errors'][0]['url'] == 'https://evil.example/body'
+    assert 'not allowlisted' in result['errors'][0]['error']

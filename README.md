@@ -64,11 +64,11 @@ launchctl print gui/$(id -u)/com.contiloop.drillship-news-worker
 
 - `reading_pipeline.py`: 서버 발견/큐와 로컬 읽기/적용 use case. `data/provenance/readings.json`의 작업 상태는 `pending`, `failed`, `completed`이며, completed는 적용·변경 없음·보류를 포함합니다. 같은 원문·정책·실질 비교 맥락이면 모델 호출과 계약 추가가 모두 0입니다. 적용 후의 자기 출력은 ack 맥락으로 기록하여 재큐 순환을 막습니다. 실제 `contextSha256`/`modelInputContextSha256`와 재큐 인과관계인 `comparisonEpochSha256`를 구분합니다.
 - 원장은 원본 `documentSha256`와 모델 입력 `sourceSha256`를 구분합니다. macOS/Ubuntu의 PNG·OCR 차이를 원문 수정으로 오인하지 않습니다. 정책 문자열과 해시, 입력 baseline/선행 근거, 입력 revision, 출력, 인용, 변경 전 값, 읽기·적용·실패 시각을 보존합니다. 공통 원문 근거와 baseline은 내용 해시 객체로 한 번 저장하고 각 context는 객체/선행 job 참조로 재구성·검산합니다. PDF 이미지 base64는 공개 원장에 복사하지 않습니다.
-- `source_materials.py`: 모든 PDF 페이지의 144 DPI PNG와 native/OCR 텍스트, 공식 SEC HTML 및 전체 뉴스 본문을 수집합니다. HTTP·본문 읽기 오류는 마지막 성공 시각과 분리하여 남기고 다음 수집에서 재시도합니다. 403은 실패로 보존하며 접근 가능한 같은 발행사의 공식 대체 자료를 별도로 수집합니다.
+- `source_materials.py`: 모든 PDF 페이지의 144 DPI PNG와 native/OCR 텍스트, 공식 SEC HTML 및 전체 뉴스 본문을 수집합니다. HTTP·본문 읽기 오류는 마지막 성공 시각과 분리하여 남기고 다음 수집에서 재시도합니다. 원장의 미완료·보류 자료는 최신 뉴스 목록에서 빠지거나 보고서 URL이 바뀌어도 원래 공식 URL로 재수집합니다. 과거 보고서 복구 자료는 공개된 4개 최신 보고서 요약을 덮지 않습니다. 403은 실패로 보존하며 접근 가능한 같은 발행사의 공식 대체 자료를 별도로 수집합니다.
 - `reading_service.py`/`codex_reader.py`: 실제 추출 버전을 포함하는 읽기 정책과 격리된 read-only Codex 어댑터. 형식 교정은 최대 3회입니다. 자료의 본문·URL·작업 ID는 명령이 될 수 없습니다.
 - `review_news.py`는 이름을 호환 유지하지만 보고서·SEC HTML·뉴스를 모두 처리합니다. `news_review.py`, 결정론적 보고서 파서와 `news_jobs.py`의 v1 helper는 과거 fixture 회귀 확인용입니다. 구 뉴스·관측 원장은 비교 근거로만 읽으며 운영 쓰기 경로에서 재해석하지 않습니다.
 - 성공 작업은 먼저 보존·게시하고 기술 실패만 5분~6시간 백오프로 재시도합니다. 처리 중 원본 bytes가 바뀌면 옛 결과를 적용하지 않고 새 버전을 대기시킵니다. 원문을 읽지 못했거나 reportDate를 확인하지 못하면 기존 값과 확인 불가 진단을 유지합니다.
-- `update_news.py`: 단일 실행 잠금, 임시 clone, 허용 JSON 경로·symlink 검사, 최신 main 재확인, force push 금지, 실제 배포 payload 검증을 담당합니다. `.cache/readings-recovery.json`은 중단·경합·배포 실패 후 모델 결과 재사용용 로컬 체크포인트이며 Git에 올리지 않습니다.
+- `update_news.py`: 단일 실행 잠금, 임시 clone, 허용 JSON 경로·symlink 검사, 최신 main 재확인, force push 금지, 실제 배포 manifest 전체 내용 및 payload 검증을 담당합니다. `.cache/readings-recovery.json`은 중단·경합·배포 실패 후 모델 결과 재사용용 로컬 체크포인트이며 Git에 올리지 않습니다. 재사용 키는 작업 ID와 분리된 실제 입력(원문/맥락/정책 해시·source ID·검증된 문서 메타데이터)이고 출력 해시도 재검사합니다. 모델 입력의 선행 근거에는 운영 작업 ID를 넣지 않으며, 정책을 검증할 수 없는 구 캐시는 재사용하지 않습니다.
 - `news_worker.py`: v1/v2 큐를 읽습니다. v2는 전체 큐 fingerprint로 완료를 추정하지 않고 배포 확인된 개별 job ID만 체크포인트에 기록합니다. 작업이 없으면 clone·수집·모델 호출 없이 종료합니다.
 
 실행기 상태·로그는 `.cache/news-worker-state.json`, `.cache/news-worker.log`, `.cache/news-worker-error.log`에 있습니다. 진단은 공개 `readingStatus`의 마지막 수집/읽기/적용 시각, collectionErrors/readingErrors와 원장의 job `lastError`·`nextAttemptAfter`를 비교합니다. Mac이 꺼지거나 로그인·네트워크가 없으면 큐가 남아 다음 정상 실행에서 이어집니다. 복구할 때 Git의 원장을 삭제하지 말고 인증·네트워크·OCR 설치 상태를 먼저 복구합니다. 인증 파일과 API 키를 GitHub/공개 데이터에 넣지 않습니다.

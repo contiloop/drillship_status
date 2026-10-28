@@ -20,7 +20,7 @@ from typing import Any
 from .core import content_hash, load_json
 from .reading_contracts import DocumentValidationError, context_sha256, policy_sha256, validate_reading_response, validate_news_queue
 from .reading_service import ReadingService, build_reader_policy
-from .source_materials import EXTRACTION_VERSION, collect_reading_materials, document_sha256, validate_official_source
+from .source_materials import EXTRACTION_VERSION, PRESERVED_MATERIAL_DISCOVERY, collect_reading_materials, document_sha256, validate_official_source
 from .sources import HttpClient
 
 LEDGER_PATH = Path('data/provenance/readings.json')
@@ -112,7 +112,7 @@ def _legacy_evidence(root: Path) -> list[dict]:
 
 def _prior_entry(job: dict, ledger: dict) -> dict:
     source = job.get('inputSource') or ledger['sources'].get(job['sourceId'], {})
-    return {'readingJobId': job['jobId'], 'sourceId': job['sourceId'], 'company': job['company'], 'kind': job['kind'],
+    return {'sourceId': job['sourceId'], 'company': job['company'], 'kind': job['kind'],
             'url': source.get('finalUrl') or source.get('url') or job['url'], 'publishedAt': source.get('publishedAt'),
             'documentSha256': job['documentSha256'], 'inputContextSha256': job['contextSha256'], 'result': job['output']}
 
@@ -130,10 +130,14 @@ def _save_context(ledger: dict, request: dict) -> None:
         return digest
     baseline = [{'vesselRef': intern({k: v for k, v in ship.items() if k != 'contracts'}),
                  'contractRefs': [intern(row) for row in ship['contracts']]} for ship in request['baseline']]
+    # Job identities stay in audit references, outside the model's evidence.
+    prior_jobs = {content_hash(_prior_entry(job, ledger), length=64): job['jobId']
+                  for job in ledger['jobs'] if job['status'] == 'completed' and 'output' in job}
     evidence_refs = []
     for item in request['priorEvidence']:
-        if item.get('readingJobId'):
-            evidence_refs.append({'readingJobId': item['readingJobId'], 'sha256': content_hash(item, length=64)})
+        digest = content_hash(item, length=64)
+        if digest in prior_jobs:
+            evidence_refs.append({'readingJobId': prior_jobs[digest], 'sha256': digest})
         else:
             evidence_refs.append({'objectRef': intern(item)})
     ledger.setdefault('contexts', {})[request['contextSha256']] = {
@@ -161,6 +165,30 @@ def reconstruct_context(ledger: dict, context_hash: str) -> dict:
     if context_sha256(baseline, evidence) != context_hash:
         raise ValueError('model context hash mismatch')
     return {'baseline': baseline, 'priorEvidence': evidence}
+
+
+def _preserved_materials(ledger: dict) -> list[dict]:
+    retained = {}
+    for job in ledger['jobs']:
+        if job['status'] == 'completed' and job.get('outcome') != 'held':
+            continue
+        source = ledger['sources'].get(job['sourceId'], {})
+        item = {'company': job['company'], 'kind': job['kind'], 'url': source.get('url') or job['url'],
+                'title': source.get('title') or job.get('title'),
+                'publishedAt': source.get('publishedAt') or job.get('inputSource', {}).get('publishedAt')}
+        retained[(item['company'], item['kind'], item['url'])] = item
+    for source in ledger['sources'].values():
+        if source.get('error') or not source.get('bodyRead', True):
+            item = {k: source.get(k) for k in ('company', 'kind', 'url', 'title', 'publishedAt')}
+            retained[(item['company'], item['kind'], item['url'])] = item
+    return list(retained.values())
+
+
+def _cache_identity(request: dict) -> dict:
+    # Operational epochs/job IDs do not identify model input. Envelope metadata
+    # is included because publication time or URL can change without new pages.
+    return {key: request[key] for key in ('sourceId', 'sourceSha256', 'contextSha256', 'readerPolicySha256',
+                                          'company', 'kind', 'url', 'publishedAt')}
 
 
 def _state(company: str, fleet: list, sources: dict, evidence: list, policy_hash: str) -> str:
@@ -216,12 +244,16 @@ def _apply(fleet: list[dict], request: dict, validation: Any, job: dict, events:
             # Null provenance means omitted, not a request to erase old metadata.
             row = {**(old or {}), **{k: v for k, v in proposed.items() if v is not None}}
             row['id'] = decision['contractId'] or proposed.get('id') or (
-                vessel['id'] + '-reading-' + content_hash({'job': job['jobId'], 'index': index}, length=20))
+                vessel['id'] + '-reading-' + content_hash({'modelInput': content_hash(_cache_identity(request), length=64), 'index': index}, length=20))
             row['vesselId'] = vessel['id']
             row['sourceUrl'] = request['url']
             row['sourceSha256'] = request['sourceSha256']
             if request.get('publishedAt'):
                 row['sourcePublishedAt'] = request['publishedAt']
+            elif not old or (old.get('sourceUrl'), old.get('sourceSha256')) != (request['url'], request['sourceSha256']):
+                # A new citation must not inherit the old citation's date. The
+                # old verified pair remains available in the before history.
+                row.pop('sourcePublishedAt', None)
             if request['kind'] == 'official-news':
                 row['newsReviewed'] = True
             row['datePrecision'] = {'start': row['interpretation']['startPrecision'], 'end': row['interpretation']['endPrecision']}
@@ -316,7 +348,8 @@ def _execute(root: Path, *, mode, write, service, collector, recheck, base_revis
     preserved = [{'company': e['company'], 'url': ledger['sources'].get(e.get('sourceId'), {}).get('url', e['url']), 'title': e.get('title'), 'publishedAt': e.get('publishedAt')}
                  for e in events if e.get('classification') == 'official-news-signal' and e.get('url')]
     collection = collector(HttpClient(), baseline=fleet, prior_evidence=evidence, reader_policy_sha256=policy_hash,
-                           previous_sources=ledger['sources'], preserved_news=preserved, news_limit=20)
+                           previous_sources=ledger['sources'], preserved_news=preserved,
+                           preserved_materials=_preserved_materials(ledger), news_limit=20)
     timestamp, at = stamp()
     sources = {**ledger['sources'], **{s['sourceId']: {**ledger['sources'].get(s['sourceId'], {}), **s} for s in collection['sources']}}
     initial_evidence = deepcopy(evidence)
@@ -340,10 +373,12 @@ def _execute(root: Path, *, mode, write, service, collector, recheck, base_revis
     ledger.setdefault('policies', {})[policy_hash] = json.loads(policy)
     try:
         cache = _read(recovery_path, {}) if recovery_path else {}
-        if not isinstance(cache, dict):
-            cache = {}
     except (ValueError, OSError):
         cache = {}
+    # v1 records omit source identity/policy and cannot be safely migrated.
+    if not isinstance(cache, dict) or cache.get('schemaVersion') != 2 or not isinstance(cache.get('entries'), dict):
+        cache = {'schemaVersion': 2, 'entries': {}}
+    cache_entries = cache['entries']
     model_calls, completed, failed = 0, [], []
     if base_revision is None:
         result = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=root, text=True, capture_output=True)
@@ -366,24 +401,32 @@ def _execute(root: Path, *, mode, write, service, collector, recheck, base_revis
                        modelInputContextSha256=request['contextSha256'])
             _save_context(ledger, request)
             try:
-                cached = cache.get(job['jobId'])
+                identity = _cache_identity(request)
+                job['modelInputSha256'] = content_hash(identity, length=64)
+                cache_key = 'input-' + job['modelInputSha256']
+                cached = cache_entries.get(cache_key)
                 reusable = False
-                if isinstance(cached, dict) and cached.get('sourceSha256') == request['sourceSha256'] and cached.get('contextSha256') == request['contextSha256']:
+                if isinstance(cached, dict) and cached.get('inputIdentity') == identity:
                     try:
                         response = cached['output']
+                        if content_hash(response, length=64) != cached['outputSha256']:
+                            raise ValueError('recovery output hash mismatch')
                         validation = validate_reading_response(response, request)
                         attempts = cached['attempts']
+                        if isinstance(attempts, bool) or not isinstance(attempts, int) or attempts < 1:
+                            raise ValueError('invalid recovery attempt count')
                         reusable = True
-                    except (DocumentValidationError, KeyError, TypeError):
-                        cache.pop(job['jobId'], None)
+                    except (DocumentValidationError, KeyError, TypeError, ValueError):
+                        cache_entries.pop(cache_key, None)
                 if not reusable:
                     model_calls += 1
                     outcome = service.read(request)
                     response, validation, attempts = outcome.response, outcome.validation, outcome.attempts
                     # Even injectable ports cannot bypass the validator.
                     validation = validate_reading_response(response, request)
-                    cache[job['jobId']] = {'sourceSha256': request['sourceSha256'], 'contextSha256': request['contextSha256'],
-                                           'output': _diagnostic_json(response), 'attempts': attempts}
+                    stored_output = _diagnostic_json(response)
+                    cache_entries[cache_key] = {'inputIdentity': identity, 'output': stored_output,
+                                                'outputSha256': content_hash(stored_output, length=64), 'attempts': attempts}
                     if recovery_path:
                         atomic_json(recovery_path, cache)
                 fresh_hash = recheck(material)
@@ -444,7 +487,7 @@ def _execute(root: Path, *, mode, write, service, collector, recheck, base_revis
     source_by_company = deepcopy(old_sources)
     health_by_company = {s['company']: deepcopy(s) for s in manifest.get('sourceHealth', [])}
     for collected in collection['sources']:
-        if collected.get('kind') != 'fleet-report':
+        if collected.get('kind') != 'fleet-report' or collected.get('discoveryMode') == PRESERVED_MATERIAL_DISCOVERY:
             continue
         s = sources[collected['sourceId']]
         previous = source_by_company.get(s['company'], {})
@@ -456,7 +499,7 @@ def _execute(root: Path, *, mode, write, service, collector, recheck, base_revis
             'health': 'degraded-preserved' if s.get('error') else 'healthy',
         }
     for company, source in source_by_company.items():
-        errors = [e for e in collection['errors'] if e.get('company') == company]
+        errors = [e for e in collection['errors'] if e.get('company') == company and e.get('discoveryMode') != PRESERVED_MATERIAL_DISCOVERY]
         health_by_company[company] = {
             **health_by_company.get(company, {}), 'company': company,
             'fleetReport': 'degraded-preserved' if any(e.get('kind') == 'fleet-report' for e in errors) else 'healthy',
@@ -467,7 +510,7 @@ def _execute(root: Path, *, mode, write, service, collector, recheck, base_revis
     warnings = [str(e.get('error', 'collection failed')) for e in collection['errors']]
     report_stages = []
     for company, source in source_by_company.items():
-        current_ids = {s['sourceId'] for s in collection['sources'] if s.get('company') == company and s.get('kind') == 'fleet-report'}
+        current_ids = {s['sourceId'] for s in collection['sources'] if s.get('company') == company and s.get('kind') == 'fleet-report' and s.get('discoveryMode') != PRESERVED_MATERIAL_DISCOVERY}
         report_job = next((j for j in active_jobs if j['kind'] == 'fleet-report' and j['sourceId'] in current_ids), None)
         status = 'pending'
         diagnostics = []
@@ -481,7 +524,7 @@ def _execute(root: Path, *, mode, write, service, collector, recheck, base_revis
             elif status == 'completed' and report_job.get('outcome') == 'held':
                 status = 'held'
             warnings.extend(company + ': ' + message for message in diagnostics)
-        collection_failed = any(e.get('company') == company and e.get('kind') == 'fleet-report' for e in collection['errors'])
+        collection_failed = any(e.get('company') == company and e.get('kind') == 'fleet-report' and e.get('discoveryMode') != PRESERVED_MATERIAL_DISCOVERY for e in collection['errors'])
         stages = {'company': company, 'url': source['documentUrl'],
                   'collectionStatus': 'failed' if collection_failed else 'collected', 'readingStatus': status,
                   'lastCollectedAt': ledger['lastCollectedAt'],

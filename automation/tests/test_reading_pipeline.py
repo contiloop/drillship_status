@@ -320,7 +320,10 @@ def test_context_references_reconstruct_full_evidence_without_quadratic_copies(t
     assert path.stat().st_size < 2_000_000
     context = reconstruct_context(ledger, ledger['jobs'][-1]['modelInputContextSha256'])
     assert context['priorEvidence'][0]['content']['reviews'][0]['fullEvidence'] == legacy_text
-    assert len([e for e in context['priorEvidence'] if 'readingJobId' in e]) == 39
+    assert len([e for e in context['priorEvidence'] if 'result' in e and 'sourceId' in e]) == 39
+    assert all('readingJobId' not in e for e in context['priorEvidence'])
+    refs = ledger['contexts'][ledger['jobs'][-1]['modelInputContextSha256']]['priorEvidenceRefs']
+    assert len([r for r in refs if 'readingJobId' in r]) == 39
     digest = ledger['contexts'][ledger['jobs'][-1]['modelInputContextSha256']]['baselineRef']
     ledger['objects'][digest].append({'tampered': True})
     with pytest.raises(ValueError, match='hash mismatch'):
@@ -353,3 +356,156 @@ def test_report_collection_reading_and_unknown_date_have_distinct_public_health(
     stages = manifest['readingStatus']['reports'][0]
     assert stages['readingStatus'] == ('failed' if failed else 'date-unverified')
     assert manifest['warningsCount'] > 0
+
+
+def test_pending_news_outside_latest_listing_is_recovered_from_journal(tmp_path):
+    root, service = setup_root(tmp_path), Service()
+    execute(root, mode='server', write=True, collector=collector_for('old-news'))
+    def listing_no_longer_contains_news(client, **kwargs):
+        retained = [item['url'].rsplit('/', 1)[-1] for item in kwargs.get('preserved_materials', [])]
+        return collector_for(*retained)(client, **kwargs)
+    result = run(root, service, listing_no_longer_contains_news)
+    assert service.calls == ['old-news']
+    assert result['manifest']['newsQueue']['pendingCount'] == 0
+
+
+def test_recovery_cache_reuses_actual_input_when_new_source_changes_job_epoch(tmp_path):
+    service, recovery = Service(), tmp_path / 'recovery.json'
+    run(setup_root(tmp_path / 'lost-checkout'), service, collector_for('a'), recovery_path=recovery)
+    result = run(setup_root(tmp_path / 'fresh-checkout'), service, collector_for('a', 'b'), recovery_path=recovery)
+    assert service.calls == ['a', 'b']
+    assert result['modelCalls'] == 1
+
+
+def test_pending_old_report_is_refetched_without_replacing_four_latest_summaries(tmp_path, monkeypatch):
+    from automation.fleet_sync import source_materials as material_module
+    from automation.fleet_sync.core import dump_json
+    from automation.fleet_sync.sources import SOURCE_SPECS
+    root = setup_root(tmp_path)
+    reports = [dict(company=c, documentUrl=f'https://example.com/{c}.pdf', reportDate='2026-08-01')
+               for c in ('Noble', 'Seadrill', 'Transocean', 'Valaris')]
+    dump_json(root / 'public/data/manifest.json', {'sources': reports, 'sourceCount': 4})
+    latest_url = ['https://noblecorp.com/old-report.pdf']
+    monkeypatch.setattr(material_module, 'discover_document', lambda *a, **k: (latest_url[0], 'official-index'))
+    monkeypatch.setattr(material_module, 'discover_official_news', lambda *a, **k: ([], None))
+    fetched = []
+    class Client:
+        def get(self, url):
+            fetched.append(url)
+            return SimpleNamespace(url=url, status_code=200, headers={'content-type': 'text/html'},
+                content=('<html><body><article><p>' + 'Complete official fleet document. '*12 + '</p></article></body></html>').encode())
+    def collect(client, **kwargs):
+        return material_module.collect_reading_materials(Client(), specs=(next(s for s in SOURCE_SPECS if s.company == 'Noble'),), **kwargs)
+    execute(root, mode='server', write=True, collector=collect)
+    latest_url[0] = 'https://noblecorp.com/new-report.pdf'
+    calls = []
+    class ReportService:
+        def read(self, request):
+            calls.append(request['url'])
+            response = dict(schemaVersion=2, sourceId=request['sourceId'], sourceSha256=request['sourceSha256'], company='Noble',
+                            reportDate='2026-10-01', readLocators=[p['locator'] for p in request['pages']], vesselUpdates=[], decisions=[],
+                            coverage=[dict(vesselId=v['id'], state='not-mentioned') for v in request['baseline'] if v['company'] == 'Noble'])
+            return SimpleNamespace(response=response, validation=None, attempts=1)
+    result = run(root, ReportService(), collect)
+    assert calls == ['https://noblecorp.com/new-report.pdf', 'https://noblecorp.com/old-report.pdf']
+    assert fetched.count('https://noblecorp.com/old-report.pdf') == 2
+    assert result['manifest']['newsQueue']['pendingCount'] == 0
+    assert result['manifest']['sourceCount'] == 4
+    noble = next(s for s in result['manifest']['sources'] if s['company'] == 'Noble')
+    assert noble['documentUrl'] == 'https://noblecorp.com/new-report.pdf'
+    stage = next(s for s in result['manifest']['readingStatus']['reports'] if s['company'] == 'Noble')
+    assert stage['url'] == noble['documentUrl'] and stage['readingStatus'] == 'completed'
+
+
+def test_held_material_is_retained_from_journal_without_an_event_dependency(tmp_path):
+    root, service = setup_root(tmp_path), DecisionService()
+    run(root, service, collector_for('held-news'))
+    seen = []
+    def collect(client, **kwargs):
+        seen.extend(kwargs['preserved_materials'])
+        return collector_for(*(i['url'].rsplit('/', 1)[-1] for i in kwargs['preserved_materials']))(client, **kwargs)
+    result = run(root, service, collect)
+    assert [i['url'] for i in seen] == ['https://noblecorp.com/held-news']
+    assert result['modelCalls'] == 0 and service.calls == ['held-news']
+
+
+def test_recovery_cache_never_reuses_a_different_policy(tmp_path, monkeypatch):
+    import automation.fleet_sync.reading_pipeline as pipeline
+    service, recovery = Service(), tmp_path / 'recovery.json'
+    run(setup_root(tmp_path / 'first'), service, collector_for('a'), recovery_path=recovery)
+    original = pipeline.build_reader_policy
+    monkeypatch.setattr(pipeline, 'build_reader_policy', lambda **kwargs: original(**kwargs) + ' ')
+    run(setup_root(tmp_path / 'new-policy'), service, collector_for('a'), recovery_path=recovery)
+    entries = list(load_json(recovery)['entries'].values())
+    assert service.calls == ['a', 'a']
+    assert len({e['inputIdentity']['readerPolicySha256'] for e in entries}) == 2
+
+
+def test_legacy_cache_without_policy_identity_is_safely_ignored(tmp_path):
+    from automation.fleet_sync.core import dump_json
+    service, recovery = Service(), tmp_path / 'recovery.json'
+    run(setup_root(tmp_path / 'first'), service, collector_for('a'), recovery_path=recovery)
+    entry = next(iter(load_json(recovery)['entries'].values()))
+    dump_json(recovery, {'old-job-id': {'sourceSha256': entry['inputIdentity']['sourceSha256'],
+        'contextSha256': entry['inputIdentity']['contextSha256'], 'output': entry['output'], 'attempts': 1}})
+    run(setup_root(tmp_path / 'fresh'), service, collector_for('a'), recovery_path=recovery)
+    assert service.calls == ['a', 'a']
+
+
+@pytest.mark.parametrize('applied', [False, True])
+def test_multi_job_recovery_excludes_operational_epochs_from_following_input(tmp_path, applied):
+    class ApplyFirst(DecisionService):
+        def read(self, request):
+            if request['sourceId'] == 'a':
+                return super().read(request)
+            return Service.read(self, request)
+    service = ApplyFirst(action='upsert') if applied else Service()
+    recovery = tmp_path / 'recovery.json'
+    first_root = setup_root(tmp_path / 'lost')
+    first = run(first_root, service, collector_for('a', 'b'), recovery_path=recovery)
+    fresh_root = setup_root(tmp_path / 'fresh')
+    second = run(fresh_root, service, collector_for('a', 'b', 'c'), recovery_path=recovery)
+    assert service.calls == ['a', 'b', 'c']
+    assert second['modelCalls'] == 1
+    if applied:
+        first_fleet = load_json(first_root / 'public/data' / first['manifest']['fleetFile'])
+        second_fleet = load_json(fresh_root / 'public/data' / second['manifest']['fleetFile'])
+        assert first_fleet[0]['contracts'][-1]['id'] == second_fleet[0]['contracts'][-1]['id']
+
+
+def test_replaced_source_url_never_keeps_a_different_sources_publication_date(tmp_path):
+    from automation.fleet_sync.core import dump_json
+    root = setup_root(tmp_path)
+    seed_path = root / 'data/data_as_of_26_01_07.json'
+    seed = load_json(seed_path)
+    original = seed[0]['contracts'][0]
+    original.update(sourceUrl='https://noblecorp.com/old-news', sourceSha256='f'*64, sourcePublishedAt='2026-01-02')
+    dump_json(seed_path, seed)
+    def collect(client, **kwargs):
+        result = collector_for('new-report')(client, **kwargs)
+        result['materials'][0]['readingInput'].update(kind='fleet-report', publishedAt=None)
+        result['sources'][0].update(kind='fleet-report', publishedAt=None)
+        return result
+    class ReplaceSource(Service):
+        def read(self, request):
+            row = deepcopy(request['baseline'][0]['contracts'][0])
+            for key in ('sourceUrl', 'sourceSha256', 'sourcePublishedAt'):
+                row.pop(key, None)
+            interpretation = empty_interpretation()
+            interpretation.update(dateBasis='source', startPrecision='day', endPrecision='day')
+            row['interpretation'] = deepcopy(interpretation)
+            response = dict(schemaVersion=2, sourceId=request['sourceId'], sourceSha256=request['sourceSha256'], company='Noble',
+                reportDate='2026-10-01', readLocators=[p['locator'] for p in request['pages']], vesselUpdates=[],
+                coverage=[dict(vesselId=v['id'], state='included') for v in request['baseline'] if v['company'] == 'Noble'],
+                decisions=[dict(vesselId=row['vesselId'], contractId=row['id'], action='upsert', row=row,
+                    facts=dict(client=None, region=None, interpretation=interpretation), reasonKo='새 공식 보고서의 근거 연결',
+                    evidence=[dict(sourceId=request['sourceId'], locator=request['pages'][0]['locator'], quote=request['pages'][0]['text'],
+                                   fields=['row.interpretation', 'facts.interpretation'])])])
+            return SimpleNamespace(response=response, validation=None, attempts=1)
+    result = run(root, ReplaceSource(), collect)
+    fleet = load_json(root / 'public/data' / result['manifest']['fleetFile'])
+    row = fleet[0]['contracts'][0]
+    assert row['sourceUrl'] == 'https://noblecorp.com/new-report'
+    assert row.get('sourcePublishedAt') is None
+    before = load_json(root / 'data/provenance/readings.json')['jobs'][0]['before'][0]['row']
+    assert before['sourcePublishedAt'] == '2026-01-02' and before['sourceUrl'] == 'https://noblecorp.com/old-news'

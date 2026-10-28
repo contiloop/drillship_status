@@ -29,6 +29,7 @@ from .sources import (
 # Bump when extraction/locator behavior changes; the reader policy owner includes
 # this in its policy text/hash so old completion records cannot hide new input.
 EXTRACTION_VERSION = "official-materials-v3-pdf-image144-ocr-tsv"
+PRESERVED_MATERIAL_DISCOVERY = "preserved-reading-material"
 PDF_IMAGE_DPI = 144
 MAX_PAGE_IMAGE_BYTES = 5 * 1024 * 1024
 MAX_DOCUMENT_IMAGE_BYTES = 40 * 1024 * 1024
@@ -195,7 +196,7 @@ def collect_reading_materials(
     reader_policy_sha256: str,
     previous_sources: Mapping[str, dict] | None = None,
     specs: Iterable[SourceSpec] = SOURCE_SPECS,
-    preserved_news: Iterable[dict] = (), news_limit: int = 20,
+    preserved_news: Iterable[dict] = (), preserved_materials: Iterable[dict] = (), news_limit: int = 20,
     page_ocr: PageOCR | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
     """Collect report/news inputs and a retryable, failure-isolated source ledger.
@@ -203,6 +204,8 @@ def collect_reading_materials(
     ``previous_sources`` maps stable sourceId to the prior ledger record.
     ``preserved_news`` carries company/url and optional title/publishedAt for any
     previously discovered article that must be revisited, outside listing limits.
+    ``preserved_materials`` additionally retains company/kind/url for unfinished
+    or held reports and news no longer present in current discovery indexes.
     ``materials`` entries contain readingInput + original-byte documentSha256.
     ``sources`` records separate HTTP status from bodyRead/error/lastSuccessAt;
     ``errors`` is the failing subset plus discovery failures. ``changed`` aliases
@@ -241,6 +244,7 @@ def collect_reading_materials(
             result["errors"].append({"company": spec.company, "kind": "official-news", "url": spec.news_url,
                                      "phase": "discovery", "error": type(error).__name__, "httpStatus": _http_status(error), "lastAttemptAt": now})
     candidates.extend({**item, "kind": "official-news", "discoveryMode": "preserved-official-news"} for item in preserved_news)
+    candidates.extend({**item, "discoveryMode": PRESERVED_MATERIAL_DISCOVERY} for item in preserved_materials)
     seen = set()
     for candidate in candidates:
         company, kind, url = candidate.get("company"), candidate.get("kind"), candidate.get("url")

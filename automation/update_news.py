@@ -43,7 +43,12 @@ def verify_deployment(checkout: Path, expected: dict, *, opener=urlopen) -> bool
     suffix = '?codex=' + expected['stateFingerprint']
     with opener(PRODUCTION + '/data/manifest.json' + suffix, timeout=20) as response:
         actual = json.load(response)
-    if actual.get('stateFingerprint') != expected['stateFingerprint']:
+    try:
+        # Compare the complete static manifest, including queue and diagnostics.
+        # A copied fingerprint cannot authenticate a modified manifest body.
+        if json.dumps(actual, sort_keys=True, allow_nan=False) != json.dumps(expected, sort_keys=True, allow_nan=False):
+            return False
+    except (TypeError, ValueError):
         return False
     for key, hash_key in (('fleetFile', 'dataHash'), ('eventsFile', 'eventsHash')):
         filename = actual.get(key)

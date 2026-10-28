@@ -115,3 +115,29 @@ def test_worker_backoff_starts_after_slow_publisher_fails(tmp_path, monkeypatch)
         raise RuntimeError('late deployment failure')
     check_once(tmp_path, fetch=lambda: queue('one'), publisher=fail)
     assert load_json(tmp_path / '.cache/news-worker-state.json')['jobs']['one']['nextAttemptAfter'] == 10300
+
+
+@pytest.mark.parametrize('changed', [{'sourceCount': 1}, {'newsQueue': {'pendingCount': 999}}])
+def test_deployment_rejects_modified_manifest_even_when_label_and_payloads_match(tmp_path, changed):
+    fleet, events = [{'id': 'rig'}], {'events': []}
+    expected = dict(stateFingerprint='fingerprint', fleetFile='fleet.json', eventsFile='events.json', sourceCount=4,
+                    newsQueue={'pendingCount': 0}, dataHash=content_hash(fleet, length=20), eventsHash=content_hash([], length=20))
+    dump_json(tmp_path / 'public/data/fleet.json', fleet)
+    dump_json(tmp_path / 'public/data/events.json', events)
+    values = [{**expected, **changed}, fleet, events]
+    assert not verify_deployment(tmp_path, expected, opener=lambda *a, **k: io.StringIO(json.dumps(values.pop(0))))
+
+
+def test_tampered_manifest_verification_blocks_worker_acknowledgement(tmp_path):
+    fleet, events = [{'id': 'rig'}], {'events': []}
+    expected = dict(stateFingerprint='fingerprint', fleetFile='fleet.json', eventsFile='events.json', sourceCount=4,
+                    dataHash=content_hash(fleet, length=20), eventsHash=content_hash([], length=20))
+    dump_json(tmp_path / 'public/data/fleet.json', fleet)
+    dump_json(tmp_path / 'public/data/events.json', events)
+    def publisher(_):
+        values = [{**expected, 'sourceCount': 1}, fleet, events]
+        if not verify_deployment(tmp_path, expected, opener=lambda *a, **k: io.StringIO(json.dumps(values.pop(0)))):
+            raise RuntimeError('production manifest verification failed')
+        return dict(ok=True, deploymentVerified=True, completedJobIds=['one'])
+    assert not check_once(tmp_path, fetch=lambda: queue('one'), publisher=publisher, now=100)['ok']
+    assert load_json(tmp_path / '.cache/news-worker-state.json')['jobs']['one']['status'] == 'failed'
