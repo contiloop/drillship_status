@@ -1,7 +1,7 @@
 """Document records and the job queue (pure domain logic; no I/O).
 
 A document is identified by ``sourceId`` (company + kind + URL) and its revision
-by ``documentSha256`` (hash of the raw response bytes). One record exists per
+by ``documentSha256`` (content fingerprint: PDF bytes, HTML article text). One record exists per
 (sourceId, documentSha256); ``jobId`` is derived from that pair. A revision
 whose record is completed (read, migrated or excluded by title triage) never
 produces another job or model call. Prompt or baseline changes do not affect

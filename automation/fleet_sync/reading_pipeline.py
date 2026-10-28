@@ -11,7 +11,7 @@ local (Mac): the same collection, then
   2. read selected news and fleet-report jobs one at a time, each with the
      current fleet (after earlier applies in this run) as baseline and the
      company's open holds;
-  3. re-fetch the source; if its bytes changed, do not apply and re-queue;
+  3. re-fetch the source; if its fingerprint changed, do not apply and re-queue;
   4. apply validated items, check whole-dataset integrity (failure -> nothing
      from that document is applied, the job fails), write one event per
      decision and the document record.
