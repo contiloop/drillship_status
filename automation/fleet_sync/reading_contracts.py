@@ -28,7 +28,7 @@ from typing import Any, Literal, NotRequired, Protocol, TypedDict
 from jsonschema import Draft202012Validator, FormatChecker
 from PIL import Image
 
-from .model import AwardType, Company, ContractStatus, DateBasis, DatePrecision, RateBasis, ReadingAction, ReadingKind, ShipStatus
+from .model import AwardType, Company, ContractStatus, DateBasis, DatePrecision, RateBasis, ReadingAction, ReadingInputMode, ReadingKind, ShipStatus
 
 
 class ReadingPageImage(TypedDict):
@@ -124,6 +124,20 @@ class VesselCoverage(TypedDict):
     state: Literal["included", "not-mentioned", "held"]
 
 
+class StoredReadingProvenance(TypedDict):
+    """A saved reading record, never a claim that its original body was read.
+
+    originalSourceSha256 preserves the old record's source digest verbatim;
+    it need not be a downloaded-document digest. The ledger adapter verifies
+    that the complete record actually exists at legacyLedger.
+    """
+
+    legacyLedger: str
+    recordSha256: str
+    originalSourceSha256: str | None
+    reviewedAt: str | None
+
+
 class ReadingInput(TypedDict):
     sourceId: str
     sourceSha256: str
@@ -136,6 +150,8 @@ class ReadingInput(TypedDict):
     priorEvidence: list[dict[str, Any]]
     contextSha256: str
     readerPolicySha256: str
+    inputMode: NotRequired[ReadingInputMode]
+    storedReading: NotRequired[StoredReadingProvenance]
 
 
 class ReadingResponse(TypedDict):
@@ -262,12 +278,26 @@ DECISION_SCHEMA = _object({"vesselId": ID, "contractId": {"type": ["string", "nu
 VESSEL_UPDATE_SCHEMA = _object({"vesselId": ID, "status": _enum("Active", "Idle", "Warm-Stacked", "Cold-Stacked"),
     "statusAsOf": DATE, "reasonKo": ID, "evidence": _array(EVIDENCE_SCHEMA)})
 COVERAGE_SCHEMA = _object({"vesselId": ID, "state": _enum("included", "not-mentioned", "held")})
+STORED_READING_SCHEMA = _object({"legacyLedger": ID, "recordSha256": HASH,
+    "originalSourceSha256": {"anyOf": [HASH, {"type": "null"}]}, "reviewedAt": ISO_TIMESTAMP})
+# The record is opaque except for provenance binding. Retain every unknown
+# field, including arbitrary legacy/v2 result objects and audit metadata.
+_STORED_REVIEW_RECORD_SCHEMA = {"type": "object", "required": ["company", "url", "result"],
+    "properties": {"company": _enum(*COMPANIES), "url": ID, "result": {"type": "object"},
+        "publishedAt": ISO_TIMESTAMP, "sourceSha256": {"anyOf": [HASH, {"type": "null"}]},
+        "reader": {"type": ["object", "null"], "properties": {"reviewedAt": ISO_TIMESTAMP}}}}
+_STORED_REVIEW_LOCATOR_PREFIX = "stored-review:"
 READING_INPUT_SCHEMA = _object({
     "sourceId": ID, "sourceSha256": HASH, "company": _enum(*COMPANIES),
     "kind": _enum("fleet-report", "official-news"), "url": ID, "publishedAt": ISO_TIMESTAMP,
     "pages": {**_array(PAGE_SCHEMA), "minItems": 1}, "baseline": _array({"type": "object"}),
     "priorEvidence": _array({"type": "object"}), "contextSha256": HASH, "readerPolicySha256": HASH,
-})
+}, {"inputMode": {**_enum("document", "stored-result"), "default": "document"}, "storedReading": STORED_READING_SCHEMA})
+READING_INPUT_SCHEMA["allOf"] = [{
+    "if": {"required": ["inputMode"], "properties": {"inputMode": {"const": "stored-result"}}},
+    "then": {"required": ["storedReading"]},
+    "else": {"not": {"required": ["storedReading"]}},
+}]
 _RESPONSE_SCHEMA = {"$schema": "https://json-schema.org/draft/2020-12/schema", **_object({
     "schemaVersion": {"type": "integer", "const": 2}, "sourceId": ID, "sourceSha256": HASH,
     "company": _enum(*COMPANIES), "reportDate": {"anyOf": [DATE, {"type": "null"}]},
@@ -338,9 +368,29 @@ def _finite_numbers(value: Any) -> None:
             _finite_numbers(item)
 
 
+def _canonical_json(value: Any) -> str:
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False)
+
+
 def _digest(value: Any) -> str:
-    encoded = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False).encode("utf-8")
-    return hashlib.sha256(encoded).hexdigest()
+    return hashlib.sha256(_canonical_json(value).encode("utf-8")).hexdigest()
+
+
+def stored_record_sha256(record: dict[str, Any]) -> str:
+    """Hash the whole saved record without selecting or rewriting its facts."""
+    return _digest(record)
+
+
+def stored_review_page(record: dict[str, Any]) -> ReadingPage:
+    """Supply the complete saved record as canonical JSON, not original prose.
+
+    Quotes must be exact substrings of this JSON representation. An embedded
+    old quote is still stored-result evidence, not a newly read original source.
+    Unknown fields are preserved. This helper neither reads a ledger nor fetches
+    the original document; the adapter authenticates the persisted record.
+    """
+    return {"locator": _STORED_REVIEW_LOCATOR_PREFIX + stored_record_sha256(record),
+            "text": _canonical_json(record)}
 
 
 def duration_days(*, years: float = 0, months: float = 0, days: float = 0) -> float:
@@ -481,14 +531,49 @@ def _validate_page_images(pages: list[ReadingPage]) -> None:
             raise ValueError(f"{page['locator']}: invalid PNG image: {error}") from error
 
 
+def _validate_input_mode(request: ReadingInput) -> None:
+    if request.get("inputMode", "document") == "document":
+        if any(page["locator"].startswith(_STORED_REVIEW_LOCATOR_PREFIX) for page in request["pages"]):
+            raise ValueError("stored-review locators require stored-result inputMode")
+        return
+    provenance = request["storedReading"]
+    if len(request["pages"]) != 1:
+        raise ValueError("stored-result requires exactly one complete stored review page")
+    page = request["pages"][0]
+    if "image" in page:
+        raise ValueError("stored-result contains saved JSON only, never original document images")
+    if page["locator"] != _STORED_REVIEW_LOCATOR_PREFIX + provenance["recordSha256"]:
+        raise ValueError("stored review locator does not match recordSha256")
+    try:
+        record = json.loads(page["text"])
+    except (ValueError, TypeError) as error:
+        raise ValueError("stored review page must contain the complete saved JSON record") from error
+    _validate_schema(record, _STORED_REVIEW_RECORD_SCHEMA)
+    if page["text"] != _canonical_json(record):
+        raise ValueError("stored review page must be the exact canonical JSON record")
+    if stored_record_sha256(record) != provenance["recordSha256"]:
+        raise ValueError("stored review recordSha256 does not match complete record")
+    for key in ("company", "url", "publishedAt"):
+        if request[key] != record.get(key):
+            raise ValueError(f"stored review {key} does not match input metadata")
+    if provenance["originalSourceSha256"] != record.get("sourceSha256"):
+        raise ValueError("stored review originalSourceSha256 does not match old sourceSha256")
+    if provenance["reviewedAt"] != (record.get("reader") or {}).get("reviewedAt"):
+        raise ValueError("stored review reviewedAt does not match saved reader metadata")
+
+
 def validate_reading_input(request: ReadingInput, *, reader_policy: str | None = None) -> None:
     """Raise DocumentValidationError on invalid input or stale input hashes.
 
     Provide reader_policy to verify its digest against actual policy text. When
-    omitted, only hash syntax can be checked at this boundary.
+    omitted, only hash syntax can be checked at this boundary. inputMode defaults
+    to document; its full text/PNG checks are unchanged. stored-result verifies
+    the entire saved JSON record and its provenance without reading an original
+    body. Actual ledger-record authenticity belongs to the storage adapter.
     """
     try:
         _validate_schema(request, READING_INPUT_SCHEMA)
+        _validate_input_mode(request)
         _validate_page_images(request["pages"])
         locators = [page["locator"] for page in request["pages"]]
         if len(set(locators)) != len(locators):
@@ -675,6 +760,8 @@ def validate_reading_response(response: ReadingResponse, request: ReadingInput) 
     Report coverage uses the fixed key ``state``. It must contain every registry
     vessel in request.company exactly once. News may have no relevant decisions.
     readLocators must cover every input locator, for either kind of source.
+    In stored-result mode that attests only to the saved JSON record, never to
+    reading original article/PDF locations. All output checks remain identical.
     """
     validate_reading_input(request)
     try:
