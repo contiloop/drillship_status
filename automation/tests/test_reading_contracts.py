@@ -504,3 +504,28 @@ def test_ocr_text_keeps_exact_quote_boundary_with_attached_image():
     req["sourceSha256"] = source_sha256(req["pages"])
     out = response(req)
     assert len(validate_reading_response(out, req).issues) == 1
+
+
+@pytest.mark.parametrize("damage", ["missing-iend-crc", "altered-iend-crc", "trailing-after-iend", "nonempty-iend"])
+def test_png_end_integrity_is_required_even_after_all_hashes_are_recomputed(damage):
+    import base64
+    import binascii
+    import hashlib
+
+    image = png_image()
+    content = base64.b64decode(image["dataBase64"])
+    assert content[-12:] == b"\x00\x00\x00\x00IEND\xaeB`\x82"
+    if damage == "missing-iend-crc":
+        content = content[:-4]
+    elif damage == "altered-iend-crc":
+        content = content[:-1] + bytes([content[-1] ^ 1])
+    elif damage == "trailing-after-iend":
+        content += b"trailing bytes"
+    else:
+        payload = b"IENDx"
+        content = content[:-12] + (1).to_bytes(4, "big") + payload + binascii.crc32(payload).to_bytes(4, "big")
+    image.update(dataBase64=base64.b64encode(content).decode("ascii"), sha256=hashlib.sha256(content).hexdigest())
+    # image_request recomputes sourceSha256 too: the rejection must come from
+    # PNG integrity, not a stale transport/content digest.
+    with pytest.raises(DocumentValidationError, match="PNG"):
+        validate_reading_input(image_request(image=image))

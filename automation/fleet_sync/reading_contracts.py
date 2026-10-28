@@ -390,6 +390,48 @@ def _registry(request: ReadingInput) -> tuple[dict[str, dict], dict[str, tuple[s
     return vessels, contracts
 
 
+def _validate_png_container(content: bytes) -> None:
+    """Check every chunk frame and CRC, including the decoder-tolerated IEND.
+
+    Pixel decoding remains Pillow's responsibility. No truncated final CRC,
+    bytes after IEND or claimed chunk length outside the file is acceptable at
+    this file-integrity boundary, even when content digests were recomputed.
+    """
+    view = memoryview(content)
+    offset = len(_PNG_SIGNATURE)
+    saw_header = False
+    saw_data = False
+    while offset < len(view):
+        if len(view) - offset < 12:
+            raise ValueError("PNG chunk header/data/CRC is truncated")
+        length = int.from_bytes(view[offset:offset + 4], "big")
+        kind = bytes(view[offset + 4:offset + 8])
+        payload_end = offset + 8 + length
+        chunk_end = payload_end + 4
+        if length > 0x7FFFFFFF or chunk_end > len(view):
+            raise ValueError("PNG chunk length exceeds file boundary")
+        if any(not (65 <= char <= 90 or 97 <= char <= 122) for char in kind) or kind[2] & 0x20:
+            raise ValueError("PNG chunk type is invalid")
+        if not saw_header and (kind != b"IHDR" or length != 13):
+            raise ValueError("PNG must begin with one complete IHDR chunk")
+        if kind == b"IHDR":
+            if saw_header:
+                raise ValueError("PNG has duplicate IHDR chunks")
+            saw_header = True
+        actual_crc = binascii.crc32(view[offset + 4:payload_end]) & 0xFFFFFFFF
+        stored_crc = int.from_bytes(view[payload_end:chunk_end], "big")
+        if actual_crc != stored_crc:
+            raise ValueError(f"PNG {kind.decode('ascii')} chunk CRC does not match")
+        if kind == b"IDAT":
+            saw_data = True
+        if kind == b"IEND":
+            if length != 0 or not saw_data or chunk_end != len(view):
+                raise ValueError("PNG must end exactly at one empty IEND after image data")
+            return
+        offset = chunk_end
+    raise ValueError("PNG is missing a complete IEND chunk")
+
+
 def _validate_page_images(pages: list[ReadingPage]) -> None:
     total_bytes = 0
     for page in pages:
@@ -419,8 +461,9 @@ def _validate_page_images(pages: list[ReadingPage]) -> None:
         if hashlib.sha256(content).hexdigest() != image["sha256"]:
             raise ValueError(f"{page['locator']}: image sha256 does not match PNG bytes")
         try:
-            # Reuse the pinned image decoder for chunk CRC, PNG structure and
-            # actual decompression. Check dimensions before pixel allocation.
+            _validate_png_container(content)
+            # Reuse the pinned image decoder for PNG interpretation and actual
+            # decompression. Check dimensions before pixel allocation.
             with warnings.catch_warnings():
                 warnings.simplefilter("error", Image.DecompressionBombWarning)
                 with Image.open(BytesIO(content)) as png:
