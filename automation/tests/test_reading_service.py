@@ -387,7 +387,7 @@ def test_new_row_overlapping_a_same_client_contract_is_asked_about_once():
     recheck = reader.calls[1]["recheck"]
     assert recheck["previousOutput"] == duplicate
     assert recheck["overlaps"] == [{"vesselId": "a",
-                                    "newRow": {"startDate": "2027-08-01", "endDate": "2028-05-31", "client": "Client Energy Ltd", "status": "Firm"},
+                                    "row": {"contractId": None, "startDate": "2027-08-01", "endDate": "2028-05-31", "client": "Client Energy Ltd", "status": "Firm"},
                                     "overlapsWith": {"contractId": "old-a", "startDate": "2027-07-01", "endDate": "2028-06-30",
                                                      "client": "Client", "status": "Firm", "dayRate": 0}}]
 
@@ -423,5 +423,25 @@ def test_codex_recheck_prompt_carries_the_earlier_output_and_overlaps(monkeypatc
     captured = {}
     monkeypatch.setattr(CodexReader, "_exec", lambda self, prompt, schema, images: captured.setdefault("prompt", prompt))
     CodexReader().read_rechecked(request(), recheck={"previousOutput": {"decisions": []}, "overlaps": [{"vesselId": "a"}]})
-    assert "same award" in captured["prompt"] and "RECHECK_JSON" in captured["prompt"]
+    assert "same award" in captured["prompt"] and "do not overlap" in captured["prompt"] and "RECHECK_JSON" in captured["prompt"]
     assert '"overlaps": [{"vesselId": "a"}]' in captured["prompt"]
+
+
+def test_extending_a_term_into_its_following_option_is_asked_about():
+    req = request()
+    req["baseline"][0]["contracts"].append({"id": "opt-a", "client": "Client", "region": "Angola", "startDate": "2028-07-01",
+                                            "endDate": "2029-06-30", "dayRate": 0, "status": "Option"})
+    extended = response([{"vesselId": "a", "contractId": "old-a", "action": "upsert", "row": row(endDate="2028-12-31")}])
+    reader = Reader(extended, extended)
+    ReadingService(reader).read(req)
+    assert [(p["row"]["contractId"], p["overlapsWith"]["contractId"]) for p in reader.calls[1]["recheck"]["overlaps"]] == [("old-a", "opt-a")]
+
+
+def test_rows_replacing_or_withdrawing_the_overlapped_contract_are_not_asked_about():
+    req = request()
+    req["baseline"][0]["contracts"].append({"id": "dup-a", "client": "Client", "region": "Angola", "startDate": "2027-07-01",
+                                            "endDate": "2028-06-30", "dayRate": 0, "status": "Firm"})
+    reader = Reader(response([{"vesselId": "a", "contractId": "old-a", "action": "upsert", "row": row()},
+                              {"vesselId": "a", "contractId": "dup-a", "action": "withdraw", "row": None}]))
+    ReadingService(reader).read(req)
+    assert len(reader.calls) == 1

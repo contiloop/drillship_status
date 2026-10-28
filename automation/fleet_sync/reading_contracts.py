@@ -459,22 +459,32 @@ def _overlap_days(a: dict, b: dict) -> int:
 
 
 def suspected_duplicates(validation: ReadingValidationResult, request: ReadingInput) -> list[dict]:
-    """New rows that overlap a same-client contract of the same vessel by more than a month.
+    """Upserted rows that overlap another same-client contract of the vessel by more than a month.
 
     Not a rejection: the service asks the reader once more whether each pair is
-    the same award. Compared against the baseline and the other new rows.
+    the same award (or adjacent periods that should not overlap). Each written
+    row is compared with the vessel's other baseline contracts and other rows
+    written in the same response.
     """
-    existing = {ship.get("id"): [dict(c, contractId=c.get("id")) for c in ship.get("contracts", [])]
-                for ship in request.get("baseline", [])}
-    new_rows = [(d["vesselId"], d["row"]) for d in validation.decisions
-                if d["action"] == "upsert" and d["contractId"] is None and d["row"] is not None]
-    pairs = []
-    for index, (vessel, row) in enumerate(new_rows):
-        others = existing.get(vessel, []) + [dict(other, contractId=None) for v, other in new_rows[index + 1:] if v == vessel]
+    contracts = {ship.get("id"): {c.get("id"): c for c in ship.get("contracts", [])}
+                 for ship in request.get("baseline", [])}
+    written = [d for d in validation.decisions if d["action"] == "upsert" and d["row"] is not None]
+    withdrawn = {d["contractId"] for d in validation.decisions if d["action"] == "withdraw"}
+    pairs, seen = [], set()
+    for index, decision in enumerate(written):
+        vessel, row, own = decision["vesselId"], decision["row"], decision["contractId"]
+        replaced = {d["contractId"] for d in written if d["vesselId"] == vessel and d["contractId"]}
+        others = [dict(c, contractId=cid) for cid, c in contracts.get(vessel, {}).items()
+                  if cid != own and cid not in withdrawn and cid not in replaced]
+        others += [dict(d["row"], contractId=d["contractId"]) for d in written[index + 1:] if d["vesselId"] == vessel]
         for other in others:
             if _same_client(row["client"], other.get("client")) and _overlap_days(row, other) > _DUPLICATE_OVERLAP_DAYS:
+                key = (vessel, own, row["startDate"], other.get("contractId"), other.get("startDate"))
+                if key in seen:
+                    continue
+                seen.add(key)
                 pairs.append({"vesselId": vessel,
-                              "newRow": {k: row[k] for k in ("startDate", "endDate", "client", "status")},
+                              "row": {"contractId": own, **{k: row[k] for k in ("startDate", "endDate", "client", "status")}},
                               "overlapsWith": {k: other.get(k) for k in ("contractId", "startDate", "endDate", "client", "status", "dayRate")}})
     return pairs
 
