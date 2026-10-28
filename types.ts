@@ -78,6 +78,8 @@ export interface FleetManifest {
 }
 
 export interface OfficialEvent {
+  /** News-list tag: 계약 · 실적 · 일정 · 자금·주주 · 경영·인사 · Fleet Status · 기타 */
+  newsCategory?: string;
   inputMode?: ReadingInputMode;
   storedReading?: StoredReadingProvenance;
   readingDecision?: EventReadingDecision;

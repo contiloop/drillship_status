@@ -38,7 +38,9 @@ from .news_jobs import (
     mark_usage_limited, new_contract_id, new_record, open_jobs, previous_sources, register_material,
 )
 from .pipeline import IntegrityError, _prune_obsolete_payloads, _semantic_changes, validate_fleet
-from .reading_contracts import MalformedResponseError, stored_review_page, validate_reading_response
+from .reading_contracts import DEFAULT_NEWS_CATEGORY, MalformedResponseError, stored_review_page, validate_reading_response
+
+REPORT_CATEGORY = "Fleet Status"
 from .reading_service import ReaderConfigurationError, ReaderUsageLimited, ReadingService
 from .source_materials import PRESERVED_MATERIAL_DISCOVERY, collect_reading_materials, fetch_document_sha256
 from .sources import SOURCE_SPECS, HttpClient
@@ -127,7 +129,8 @@ def _event(request: dict, record: dict, *, identity: str, ship: dict | None, dec
              "classification": "official-news-signal" if request["kind"] == "official-news" else "official-report-reading",
              "url": request["url"], "publishedAt": request.get("publishedAt"), "title": title,
              "sourceId": request["sourceId"], "autoApplied": status == "applied",
-             "pendingReview": status == "conflict", "reviewStatus": status, "readingDecision": decision}
+             "pendingReview": status == "conflict", "reviewStatus": status, "readingDecision": decision,
+             "newsCategory": REPORT_CATEGORY if request["kind"] == "fleet-report" else record.get("newsCategory") or "계약"}
     if request.get("inputMode") == "stored-result":
         event["inputMode"] = "stored-result"
         event["storedReading"] = deepcopy(request["storedReading"])
@@ -175,9 +178,10 @@ def apply_reading(fleet: list[dict], request: dict, record: dict, response: dict
             applied = True
         elif action == "hold":
             holds.append({"vesselId": ship["id"], "contractId": contract_id, "sourceId": record["sourceId"],
-                          "url": request["url"], **_texts(decision)})
+                          "url": request["url"], **_texts(decision), **_hold_reason(decision)})
         status = {"upsert": "applied", "withdraw": "applied", "no-change": "acknowledged", "hold": "conflict"}[action]
-        shown = {"action": action, "contractId": contract_id, "row": deepcopy(decision["row"]), **_texts(decision)}
+        shown = {"action": action, "contractId": contract_id, "row": deepcopy(decision["row"]), **_texts(decision),
+                 **(_hold_reason(decision) if action == "hold" else {})}
         events.append(_event(request, record, identity="reading-" + content_hash([record["jobId"], "decisions", index], 20),
                              ship=ship, decision=shown, status=status))
     for issue in validation.issues:
@@ -197,12 +201,18 @@ def apply_reading(fleet: list[dict], request: dict, record: dict, response: dict
     return {"changes": changes, "holds": holds, "events": events, "outcome": outcome}
 
 
+def _hold_reason(decision: dict) -> dict:
+    """A model hold shows its own Korean reason as the hold reason, when given."""
+    return {"holdReason": decision["reasonKo"]} if decision.get("reasonKo") else {}
+
+
 def _title_event(record: dict) -> dict:
     """Title + link listing for an article that produced no decision event."""
     return {"id": "news-" + content_hash(record["sourceId"], 20), "company": record["company"],
             "title": record.get("title") or record["url"], "url": record["url"], "publishedAt": record.get("publishedAt"),
             "vessels": [], "classification": "official-news-signal", "autoApplied": False,
-            "pendingReview": False, "reviewStatus": "acknowledged", "sourceId": record["sourceId"]}
+            "pendingReview": False, "reviewStatus": "acknowledged", "sourceId": record["sourceId"],
+            "newsCategory": record.get("newsCategory") or DEFAULT_NEWS_CATEGORY}
 
 
 def _merge_events(events: list[dict], new: list[dict]) -> list[dict]:
@@ -277,8 +287,10 @@ class _Run:
             cache = {}
         if not isinstance(cache, dict) or not isinstance(cache.get("responses"), dict) or not isinstance(cache.get("triage"), dict):
             cache = {"responses": {}, "triage": {}}
+        if not isinstance(cache.get("categories"), dict):
+            cache["categories"] = {}
         done = {key for key, record in self.records["documents"].items() if record["status"] == "completed"}
-        for section in ("responses", "triage"):
+        for section in ("responses", "triage", "categories"):
             for key in [key for key in cache[section] if key in done or key not in self.records["documents"]]:
                 del cache[section][key]
         return cache
@@ -335,9 +347,11 @@ class _Run:
                      for r in unknown]
             try:
                 self.model_calls += 1
-                chosen = set(self.service.triage(items))
+                selected, categories = self.service.triage_with_categories(items)
+                chosen = set(selected)
                 for r in unknown:
                     self.cache["triage"][r["jobId"]] = r["jobId"] in chosen
+                    self.cache["categories"][r["jobId"]] = categories.get(r["jobId"], DEFAULT_NEWS_CATEGORY)
                 self._save_cache()
             except ReaderUsageLimited as error:
                 self._usage_limited(unknown, error)
@@ -351,6 +365,7 @@ class _Run:
         for r in candidates:
             if r["jobId"] not in self.cache["triage"]:
                 continue
+            r["newsCategory"] = self.cache["categories"].get(r["jobId"], r.get("newsCategory") or DEFAULT_NEWS_CATEGORY)
             if self.cache["triage"][r["jobId"]]:
                 r["selected"] = True
             else:
@@ -359,6 +374,32 @@ class _Run:
                 if not any(e.get("url") == r["url"] and e.get("company") == r["company"] for e in self.events):
                     new_events.append(_title_event(r))
         self.events = _merge_events(self.events, new_events)
+
+    def _tag_events(self) -> None:
+        """Give every news-list event a category once, from its title only (R5)."""
+        for event in self.events:
+            if not event.get("newsCategory") and event.get("classification") == "official-report-reading":
+                event["newsCategory"] = REPORT_CATEGORY
+        untagged = [event for event in self.events if not event.get("newsCategory")]
+        if not untagged or self.stop:
+            return
+        keys = {}
+        for event in untagged:
+            keys.setdefault("event-" + content_hash([event.get("company"), event.get("url"), event.get("title")], 20), []).append(event)
+        items = [{"id": key, "title": group[0].get("title") or group[0].get("url") or "", "url": group[0].get("url") or "",
+                  "publishedAt": group[0].get("publishedAt")} for key, group in keys.items()]
+        try:
+            self.model_calls += 1
+            _, categories = self.service.triage_with_categories(items)
+        except ReaderUsageLimited as error:
+            self.usage_limited_until = max(self.usage_limited_until or 0, error.retry_at_epoch or 0)
+            self.stop = True
+            return
+        except Exception:
+            return  # untagged events still render (as 기타) and are retried next local run
+        for key, group in keys.items():
+            for event in group:
+                event["newsCategory"] = categories.get(key, DEFAULT_NEWS_CATEGORY)
 
     def _usage_limited(self, records: list[dict], error: ReaderUsageLimited) -> None:
         for record in records:
@@ -535,6 +576,7 @@ class _Run:
             self.cache = self._load_cache()
             self._triage()
             self._read_all()
+            self._tag_events()
         validate_fleet(self.fleet, self.registered)
         return self._publish(write=write, start_fleet=start_fleet)
 

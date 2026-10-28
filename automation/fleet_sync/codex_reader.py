@@ -64,6 +64,7 @@ class CodexReader:
         ids = [item["id"] for item in items]
         if ids:
             schema["properties"]["selected"]["items"]["enum"] = list(dict.fromkeys(ids))
+            schema["properties"]["categories"]["items"]["properties"]["id"]["enum"] = list(dict.fromkeys(ids))
         prompt = TRIAGE_PROMPT + _correction_text(correction)
         prompt += "\nINPUT_JSON:\n" + json.dumps({"items": items}, ensure_ascii=False, allow_nan=False)
         return self._exec(prompt, schema, images=[])

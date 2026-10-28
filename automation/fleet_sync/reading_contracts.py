@@ -242,7 +242,12 @@ READER_RESPONSE_SCHEMA = _object({
         "row": {"anyOf": [_WIRE_ROW, {"type": "null"}]},
         "reasonKo": _nullable("string"), "quote": _nullable("string"), "locator": _nullable("string")})},
 })
-TITLE_TRIAGE_SCHEMA = _object({"selected": {"type": "array", "items": {"type": "string"}}})
+NEWS_CATEGORIES = ("계약", "실적", "일정", "자금·주주", "경영·인사", "Fleet Status", "기타")
+DEFAULT_NEWS_CATEGORY = "기타"
+TITLE_TRIAGE_SCHEMA = _object({
+    "selected": {"type": "array", "items": {"type": "string"}},
+    "categories": {"type": "array", "items": _object({"id": {"type": "string"}, "category": _enum(NEWS_CATEGORIES)})},
+})
 
 
 # --- small checks ----------------------------------------------------------
@@ -434,6 +439,16 @@ def validate_reading_response(response: Any, request: ReadingInput) -> ReadingVa
         except (ValueError, TypeError) as error:
             result.issues.append(ValidationIssue("vesselUpdates", index, str(error), item))
     return result
+
+
+def triage_categories(response: Any, candidate_ids: list[str]) -> dict[str, str]:
+    """News tag per candidate id; missing, unknown or invalid categories become 기타."""
+    given = {}
+    if isinstance(response, dict) and isinstance(response.get("categories"), list):
+        for item in response["categories"]:
+            if isinstance(item, dict) and item.get("category") in NEWS_CATEGORIES:
+                given.setdefault(item.get("id"), item["category"])
+    return {item: given.get(item, DEFAULT_NEWS_CATEGORY) for item in dict.fromkeys(candidate_ids)}
 
 
 def select_triage_ids(response: Any, candidate_ids: list[str]) -> list[str]:

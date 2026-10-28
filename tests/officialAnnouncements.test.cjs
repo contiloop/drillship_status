@@ -17,7 +17,7 @@ require.extensions['.tsx'] = compile;
 require.extensions['.ts'] = compile;
 const { manifest, events, fleet } = require('./fixtures/legacy-fleet/load.cjs');
 const { default: Card, announcementDetails, decisionDetails } = require('../components/OfficialAnnouncementCard.tsx');
-const { default: Announcements, splitAnnouncements } = require('../components/Announcements.tsx');
+const { default: Announcements, orderedAnnouncements, newsCategory } = require('../components/Announcements.tsx');
 const { default: Gantt } = require('../components/FleetGantt.tsx');
 const { contractSpan, contractPeriod, quarterScrollOffset } = require('../utils/contractTimeline.ts');
 const kg2 = {
@@ -122,16 +122,12 @@ test('Codex-reviewed incomplete terms are distinct from unread articles', () => 
   assert.doesNotMatch(html, /<details[^>]*\sopen(?:\s|=|>)/);
 });
 
-test('applied announcements are archived and every detail stays collapsed', () => {
-  const grouped = splitAnnouncements(events);
-  assert.equal(grouped.applied.length, 2);
-  assert.equal(grouped.unresolved.length, 6);
-  assert.equal(grouped.applied.length + grouped.unresolved.length + grouped.others.length, events.length);
-  assert(grouped.unresolved.every(e => !e.autoApplied));
+test('every event is listed newest first in one list with a category tag and details stay collapsed', () => {
+  const ordered = orderedAnnouncements(events);
+  assert.equal(ordered.length, events.length);
   const html = renderToStaticMarkup(React.createElement(Announcements, {events, sources: manifest.sources}));
-  assert.match(html, /미확정 조건 6건/);
-  assert.match(html, /Fleet Status 반영 이력 2건/);
-  assert.match(html, new RegExp(`기타 발표 ${events.length - 8}건`));
+  assert.doesNotMatch(html, /미확정 조건|반영 이력|기타 발표 \d+건/);
+  assert.equal((html.match(/rounded border border-slate-700 px-1.5/g) || []).length, events.length);
   assert.doesNotMatch(html, /계약표/);
   assert.doesNotMatch(html, /<details[^>]*\sopen(?:\s|=|>)|Codex|gpt-6-luna/);
 });
@@ -185,20 +181,19 @@ test('stored-result announcement distinguishes original reading time and source 
   assert.doesNotMatch(render(kg2), /저장된 읽기 결과로 보완|원래 읽은 시각/);
 });
 
-test('every event is listed; non-contract items appear as title + link', () => {
-  const others = [
-    { company: 'Transocean', classification: 'official-news-signal', autoApplied: false, pendingReview: false, reviewStatus: 'not-contract-news', title: 'Quarterly results', url: 'https://example.com/q3', publishedAt: '2026-10-01' },
-    { company: 'Noble', classification: 'official-news-signal', autoApplied: false, pendingReview: false, title: 'Conference call', url: 'javascript:alert(1)' },
+test('non-contract items appear in date order as tagged title + link rows', () => {
+  const items = [
+    { company: 'Transocean', classification: 'official-news-signal', autoApplied: false, pendingReview: false, title: 'Quarterly results', url: 'https://example.com/q3', publishedAt: '2026-10-01', newsCategory: '실적' },
+    { company: 'Noble', classification: 'official-news-signal', autoApplied: false, pendingReview: false, title: 'Conference call', url: 'javascript:alert(1)', publishedAt: '2026-10-05' },
+    { company: 'Noble', classification: 'official-report-reading', autoApplied: false, title: 'Noble Fleet Status Report', url: 'https://example.com/fsr', publishedAt: '2026-09-01' },
   ];
-  const grouped = splitAnnouncements(others);
-  assert.equal(grouped.others.length, 2);
-  const html = renderToStaticMarkup(React.createElement(Announcements, { events: others, sources: [] }));
-  assert.match(html, /기타 발표 2건/);
-  assert.match(html, /href="https:\/\/example.com\/q3"[^>]*>Quarterly results ↗/);
-  assert.match(html, /Conference call/);
+  assert.deepEqual(orderedAnnouncements(items).map(e => e.title), ['Conference call', 'Quarterly results', 'Noble Fleet Status Report']);
+  assert.deepEqual(items.map(newsCategory), ['실적', '기타', 'Fleet Status']);
+  const html = renderToStaticMarkup(React.createElement(Announcements, { events: items, sources: [] }));
+  assert(html.indexOf('Conference call') < html.indexOf('Quarterly results'));
+  assert.match(html, />실적<\/span><a href="https:\/\/example.com\/q3"[^>]*>Quarterly results ↗/);
   assert.doesNotMatch(html, /javascript:|<dt /);
 });
-
 const newInterpretation = { sourceStartText: 'mid-2027', placementBasis: '앞선 계약 뒤에 배치', termText: '2 years',
   valueText: '$300 million', valueUsd: 300e6, baseDurationDays: 730, derivedUsdPerDay: 300e6 / 730 };
 

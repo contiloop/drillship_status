@@ -45,7 +45,8 @@ def make_root(path):
     fleet = load_json(ROOT / 'data/data_as_of_26_01_07.json')
     events = [{'company': 'Noble', 'title': 'Old award', 'url': OLD_ARTICLE_URL, 'publishedAt': '2026-08-01',
                'vessels': [], 'classification': 'official-news-signal', 'autoApplied': False,
-               'pendingReview': False, 'reviewStatus': 'acknowledged', 'articleSha256': OLD_ARTICLE_HASH}]
+               'pendingReview': False, 'reviewStatus': 'acknowledged', 'articleSha256': OLD_ARTICLE_HASH,
+               'newsCategory': '계약'}]
     fleet_hash, events_hash = content_hash(fleet, length=20), content_hash(events, length=20)
     manifest = {'schemaVersion': 1, 'fleetFile': f'fleet.{fleet_hash}.json', 'eventsFile': f'events.{events_hash}.json',
                 'dataHash': fleet_hash, 'eventsHash': events_hash, 'stateFingerprint': 'old',
@@ -109,9 +110,11 @@ class FakeReader:
 
     def triage(self, items, *, correction=None):
         self.triages.append(deepcopy(items))
+        categories = [{'id': item['id'], 'category': '실적' if 'Results' in item['title'] else '계약'} for item in items]
         if self.select is None:
-            return {'selected': [item['id'] for item in items]}
-        return {'selected': [item['id'] for item in items if any(word in item['title'] for word in self.select)]}
+            return {'selected': [item['id'] for item in items], 'categories': categories}
+        return {'selected': [item['id'] for item in items if any(word in item['title'] for word in self.select)],
+                'categories': categories}
 
 
 def run(root, reader, collect, *, mode='local', now=NOW, recheck=None, **kwargs):
@@ -464,3 +467,37 @@ def test_old_record_files_are_never_written(root):
     run(root, FakeReader(lambda request: [decision()]), collector(material('a')))
     assert [p.read_bytes() for p in paths] == before
     assert not (root / 'data/provenance/observations.json').exists()
+
+
+# --- news-list categories (R5) --------------------------------------------------------
+
+def test_events_carry_categories_and_untagged_old_events_are_tagged_once_from_titles(root):
+
+    manifest, fleet, events = published(root)
+    events.append({'company': 'Noble', 'title': 'Noble Reports Third Quarter Results', 'url': 'https://noblecorp.com/r3',
+                   'publishedAt': '2026-10-27', 'vessels': [], 'classification': 'official-news-signal',
+                   'autoApplied': False, 'pendingReview': False, 'reviewStatus': 'acknowledged'})
+    events.append({'company': 'Noble', 'title': 'Fleet report', 'url': 'https://noblecorp.com/fsr', 'publishedAt': None,
+                   'vessels': [], 'classification': 'official-report-reading', 'autoApplied': False,
+                   'pendingReview': False, 'reviewStatus': 'acknowledged'})
+    from automation.fleet_sync.core import content_hash, dump_json
+    events_hash = content_hash(events, length=20)
+    (root / 'public/data' / manifest['eventsFile']).unlink()
+    manifest.update(eventsFile=f'events.{events_hash}.json', eventsHash=events_hash)
+    dump_json(root / 'public/data' / manifest['eventsFile'], {'events': events})
+    dump_json(root / 'public/data/manifest.json', manifest)
+    reader = FakeReader()
+    run(root, reader, lambda **_: {'materials': [], 'sources': [], 'errors': []})
+    assert len(reader.triages) == 1 and [item['title'] for item in reader.triages[0]] == ['Noble Reports Third Quarter Results']
+    assert all('body' not in item and 'text' not in item for item in reader.triages[0])
+    tagged = {e['url']: e['newsCategory'] for e in published(root)[2]}
+    assert tagged['https://noblecorp.com/r3'] == '실적' and tagged['https://noblecorp.com/fsr'] == 'Fleet Status'
+    rerun = FakeReader()
+    assert run(root, rerun, lambda **_: {'materials': [], 'sources': [], 'errors': []})['modelCalls'] == 0
+    assert rerun.triages == []
+
+
+def test_triage_category_outside_the_tag_set_becomes_other():
+    from automation.fleet_sync.reading_contracts import triage_categories
+    response = {'selected': [], 'categories': [{'id': 'a', 'category': 'Weird'}, {'id': 'b', 'category': '일정'}]}
+    assert triage_categories(response, ['a', 'b', 'c']) == {'a': '기타', 'b': '일정', 'c': '기타'}

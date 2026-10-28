@@ -367,5 +367,6 @@ def test_codex_triage_sends_titles_only_with_triage_schema(monkeypatch):
     assert run["images"] == []
     expected = deepcopy(TITLE_TRIAGE_SCHEMA)
     expected["properties"]["selected"]["items"]["enum"] = ["n1", "n2"]
+    expected["properties"]["categories"]["items"]["properties"]["id"]["enum"] = ["n1", "n2"]
     assert run["schema"] == expected
     assert run["command"][run["command"].index("--model") + 1] == "gpt-6-luna"

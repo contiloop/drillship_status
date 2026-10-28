@@ -1,6 +1,7 @@
 import React from 'react';
 import type { FleetSource, OfficialEvent } from '../types';
 import { interpretationDetails, reportedRate, storedReadingDetails } from '../utils/contractTimeline';
+import { CategoryTag } from './Announcements';
 import { economicsDetails, backlogRateLabel, eventInterpretation, newsEconomics } from '../utils/newsEconomics';
 
 const UNKNOWN = '확인된 정보 없음';
@@ -104,7 +105,8 @@ export default function OfficialAnnouncementCard({ event, source }: { event: Off
   return (
     <details className="min-w-0 rounded-xl border border-slate-800 bg-slate-900/50 p-4">
       <summary className="cursor-pointer rounded text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400">
-        <span className="ml-2 font-bold">{vessel || event.title || `${event.company} 공식 발표`}</span>
+        <span className="ml-2"><CategoryTag event={event} /></span>
+        <span className="font-bold">{vessel || event.title || `${event.company} 공식 발표`}</span>
         <span className="ml-3 text-xs text-slate-400">{event.company} · {publishedAt}</span>
         <span className="ml-3 inline-block text-xs text-amber-200">{event.reviewStatus === 'conflict' ? '조건 충돌 · 확인 필요' : event.autoApplied ? 'Fleet Status 반영' : (event.llmReview || event.readingDecision) ? (event.needsDetails === false ? '확인 완료' : '상세 조건 미공개') : '확인 대기'}</span>
       </summary>
