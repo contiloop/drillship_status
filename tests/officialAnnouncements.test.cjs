@@ -166,3 +166,18 @@ test('generated feed renders separately without mutating fleet or announcement d
   }
   assert.equal(JSON.stringify({ fleet, events }), before);
 });
+
+test('stored-result announcement distinguishes original reading time and source only inside collapsed details', () => {
+  const stored = { ...kg2, inputMode: 'stored-result',
+    storedReading: { legacyLedger: 'legacy-review', recordSha256: 'b'.repeat(64), originalSourceSha256: 'c'.repeat(64), reviewedAt: '2026-08-20T09:10:00Z' },
+    llmReview: { reviewedAt: '2026-10-28T10:00:00Z' } };
+  const html = render(stored);
+  assert.match(html, /저장된 읽기 결과로 보완/);
+  assert.match(html, /원래 읽기 시각: 2026-08-20T09:10:00Z/);
+  assert.match(html, /원문 URL/);
+  assert.match(html, /href="https:\/\/investor.deepwater.com\/news-releases\/example"/);
+  assert.doesNotMatch(html.slice(0, html.indexOf('</summary>')), /저장된 읽기 결과로 보완|원래 읽기 시각/);
+  assert.doesNotMatch(html, /2026-10-28T10:00:00Z|<details[^>]*\sopen(?:\s|=|>)/);
+  assert.match(render({ ...stored, storedReading: { ...stored.storedReading, reviewedAt: null } }), /원래 읽기 시각: 확인되지 않음/);
+  assert.doesNotMatch(render(kg2), /저장된 읽기 결과로 보완|원래 읽기 시각/);
+});

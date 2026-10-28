@@ -2,7 +2,7 @@
 import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Drillship, OfficialEvent } from '../types';
 import { getComputedStatus } from '../utils/shipStatus';
-import { contractPeriod, contractSource, contractSpan, interpretationDetails, reportedRate, quarterScrollOffset } from '../utils/contractTimeline';
+import { contractPeriod, contractSource, contractSpan, interpretationDetails, reportedRate, storedReadingDetails, quarterScrollOffset } from '../utils/contractTimeline';
 import { economicsDetails, backlogRateLabel, timelineContracts, TimelineContract } from '../utils/newsEconomics';
 
 interface FleetGanttProps {
@@ -22,8 +22,9 @@ export function ContractDetails({ selected, shipName, onClose }: { selected: Tim
       <span>{selected.status} · {selected.client} · {selected.region}</span>
       <span>{periodLabel(selected)}{!selected.interpretation && (selected.datePrecision?.start !== 'day' || selected.datePrecision?.end !== 'day') ? ' (월 단위)' : ''}</span>
       <span>{rateLabel(selected)}</span>
-      {contractSource(selected.sourceUrl) && <a className="text-blue-300 underline" href={contractSource(selected.sourceUrl)} target="_blank" rel="noopener noreferrer">원문 ↗</a>}
+      {contractSource(selected.sourceUrl) && <a className="text-blue-300 underline" href={contractSource(selected.sourceUrl)} target="_blank" rel="noopener noreferrer">{selected.inputMode === 'stored-result' ? '원문 URL ↗' : '원문 ↗'}</a>}
       <button className="ml-auto rounded px-3 py-2 text-slate-400 hover:text-white" onClick={onClose} aria-label="계약 상세 닫기">닫기</button>
+      {storedReadingDetails(selected) && <p className="w-full text-slate-400">{storedReadingDetails(selected)}</p>}
       {selected.economics && <p className="w-full text-slate-400">{economicsDetails(selected.economics)}</p>}
       {selected.interpretation && <p className="w-full text-slate-400">{interpretationDetails(selected)}</p>}
     </div>

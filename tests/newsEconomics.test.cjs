@@ -136,3 +136,20 @@ test('invalid ISO dates and unresolved metadata never become bars or observation
     assert.equal(isStatisticalContract(invalid), false);
   }
 });
+
+test('stored-result provenance stays in selected details and preserves original time and URL', () => {
+  const storedReading = { legacyLedger: 'old-reviewed-news', recordSha256: 'a'.repeat(64), originalSourceSha256: null, reviewedAt: '2026-08-20T09:10:00Z' };
+  const canonical = row({ inputMode: 'stored-result', storedReading });
+  const displayed = timelineContracts(ship([canonical]), [])[0];
+  const html = renderToStaticMarkup(React.createElement(Gantt, { ships: [ship([canonical])] }));
+  assert.doesNotMatch(html, /저장된 읽기 결과로 보완|원래 읽기 시각/);
+  const detail = renderToStaticMarkup(React.createElement(ContractDetails, { selected: displayed, shipName: 'Ship', onClose() {} }));
+  assert.match(detail, /저장된 읽기 결과로 보완/);
+  assert.match(detail, /원래 읽기 시각: 2026-08-20T09:10:00Z/);
+  assert.match(detail, /원문 URL/);
+  assert.match(detail, /href="https:\/\/example.com\/award"/);
+  assert.equal(displayed.startDate, canonical.startDate);
+  assert.equal(displayed.economics.rates[0].usdPerDay, canonical.interpretation.derivedUsdPerDay);
+  const plain = renderToStaticMarkup(React.createElement(ContractDetails, { selected: row(), shipName: 'Ship', onClose() {} }));
+  assert.doesNotMatch(plain, /저장된 읽기 결과로 보완|원래 읽기 시각/);
+});

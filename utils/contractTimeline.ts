@@ -71,3 +71,9 @@ export function interpretationDetails(contract: Contract | ContractInterpretatio
     value.excludes.length ? `제외: ${value.excludes.join('·')}` : '',
   ].filter(Boolean).join(' · ');
 }
+
+/** Audit label only: do not replace the original review time with completion time. */
+export function storedReadingDetails(value: Pick<Contract, 'inputMode' | 'storedReading'>) {
+  if (value.inputMode !== 'stored-result') return '';
+  return `저장된 읽기 결과로 보완 · 원래 읽기 시각: ${value.storedReading?.reviewedAt || '확인되지 않음'}`;
+}
