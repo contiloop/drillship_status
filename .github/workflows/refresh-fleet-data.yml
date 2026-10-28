@@ -75,11 +75,11 @@ jobs:
           .venv/bin/python -m pip install --require-hashes --requirement automation/requirements.lock
           npm ci
 
-      - name: Run parser and unit tests
+      - name: Run unit tests
         run: .venv/bin/python -m pytest automation/tests -q
 
-      - name: Discover official sources and queue full-document readings
-        run: .venv/bin/python -m automation.fleet_sync --write
+      - name: Discover official sources and queue reading jobs (no model)
+        run: .venv/bin/python -m automation.fleet_sync --write --mode server
 
       - name: Test official announcement cards against generated data
         run: npm run test:ui
@@ -104,8 +104,7 @@ jobs:
 
           test -f "$artifact_root/payload/public/data/manifest.json"
           test -f "$artifact_root/payload/public/data/changes.json"
-          test -f "$artifact_root/payload/data/provenance/sources.json"
-          test -f "$artifact_root/payload/data/provenance/observations.json"
+          test -f "$artifact_root/payload/data/provenance/readings.json"
 
           while IFS= read -r -d '' entry; do
             relative="${entry#"$artifact_root"/}"
@@ -193,8 +192,7 @@ jobs:
 
           test -f "$ARTIFACT_ROOT/payload/public/data/manifest.json"
           test -f "$ARTIFACT_ROOT/payload/public/data/changes.json"
-          test -f "$ARTIFACT_ROOT/payload/data/provenance/sources.json"
-          test -f "$ARTIFACT_ROOT/payload/data/provenance/observations.json"
+          test -f "$ARTIFACT_ROOT/payload/data/provenance/readings.json"
           test -f "$ARTIFACT_ROOT/metadata/files.sha256"
 
           while IFS= read -r -d '' entry; do

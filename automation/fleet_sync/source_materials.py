@@ -1,9 +1,8 @@
-"""Official source acquisition and content-change detection, without interpretation.
+"""Official source acquisition and raw-byte change detection, without interpretation.
 
-No completion decisions or semantic parsers live here. Every successfully fetched
-material is returned, including unchanged material; scheduling owns job identity,
-context matching and completion. Failed sources retain their last successful
-hashes and timestamps and are retried on every call.
+Every successfully fetched material is returned, including unchanged material;
+the reading pipeline owns job identity and completion. Failed sources retain
+their last successful hash and time and are retried on every call.
 """
 from __future__ import annotations
 
@@ -21,15 +20,12 @@ import pdfplumber
 
 from .core import clean_text
 from .document_ocr import PageOCR, TesseractPageOCR
-from .reading_contracts import ReadingPage, context_sha256, source_sha256
+from .reading_contracts import ReadingPage
 from .sources import (
     HttpClient, SOURCE_SPECS, SourceSpec, discover_document,
     discover_official_news, publication_date, retrieved_at,
 )
 
-# Bump when extraction/locator behavior changes; the reader policy owner includes
-# this in its policy text/hash so old completion records cannot hide new input.
-EXTRACTION_VERSION = "official-materials-v4-dom-flow-whitespace-pdf-image144-ocr-tsv"
 PRESERVED_MATERIAL_DISCOVERY = "preserved-reading-material"
 PDF_IMAGE_DPI = 144
 MAX_PAGE_IMAGE_BYTES = 5 * 1024 * 1024
@@ -74,7 +70,7 @@ def _canonical_url(url: str) -> str:
 
 
 def source_id(company: str, kind: str, url: str) -> str:
-    """Stable document identity; sourceSha256 separately identifies body revision."""
+    """Stable document identity (company + kind + URL); documentSha256 is the revision."""
     value = json.dumps([company, kind, _canonical_url(url)], separators=(",", ":"))
     return "source-" + sha256(value.encode()).hexdigest()
 
@@ -134,8 +130,8 @@ def _legacy_article_sha256(html_text: str) -> str:
     """Reproduce sources.fetch_article's historical hash without another GET.
 
     This compatibility digest deliberately keeps the old text-node separators,
-    selector ordering and removed chrome. It is metadata only: the reader still
-    receives the complete corrected DOM text flow under sourceSha256.
+    selector ordering and removed chrome. It is used only to match articles
+    handled by the old pipeline; the reader receives the complete DOM text flow.
     """
     soup = BeautifulSoup(html_text, "lxml")
     for node in soup.select("script,style,nav,header,footer"):
@@ -241,35 +237,30 @@ def _http_status(error: Exception) -> int | None:
 
 
 def collect_reading_materials(
-    client: HttpClient, *, baseline: list[dict], prior_evidence: list[dict],
-    reader_policy_sha256: str,
+    client: HttpClient, *,
     previous_sources: Mapping[str, dict] | None = None,
     specs: Iterable[SourceSpec] = SOURCE_SPECS,
     preserved_news: Iterable[dict] = (), preserved_materials: Iterable[dict] = (), news_limit: int = 20,
     page_ocr: PageOCR | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
-    """Collect report/news inputs and a retryable, failure-isolated source ledger.
+    """Fetch official reports/news and return materials, source records and errors.
 
-    ``previous_sources`` maps stable sourceId to the prior ledger record.
-    ``preserved_news`` carries company/url and optional title/publishedAt for any
-    previously discovered article that must be revisited, outside listing limits.
-    ``preserved_materials`` additionally retains company/kind/url for unfinished
-    or held reports and news no longer present in current discovery indexes.
-    ``materials`` entries contain readingInput + original-byte documentSha256.
-    HTML news also supplies legacyArticleSha256 outside readingInput, computed
-    from the very same HTTP response using the historical article hash recipe.
-    ``sources`` records separate HTTP status from bodyRead/error/lastSuccessAt;
-    ``errors`` is the failing subset plus discovery failures. ``changed`` aliases
-    ``readingInputChanged``; ``documentChanged`` separately compares raw bytes.
-    Raster/OCR differences may change the former without changing the latter.
-    No files are written.
+    ``previous_sources`` maps sourceId to ``{lastSuccessAt, documentSha256,
+    title, publishedAt}`` from the record file; failed fetches keep those.
+    ``preserved_materials`` (company/kind/url/title/publishedAt) are refetched
+    even when they fell out of the discovery listings (e.g. pending jobs).
+
+    ``materials``: ``{sourceId, company, kind, url, finalUrl, title, publishedAt, pages,
+    documentSha256, legacyArticleSha256, retrievedAt, discoveryMode,
+    extractionWarnings}``. ``documentSha256`` hashes the raw response bytes;
+    ``legacyArticleSha256`` reproduces the old article text hash for HTML news
+    (migration matching only). ``sources`` has one record per candidate with
+    httpStatus/error/lastSuccessAt; ``errors`` is the failing subset plus
+    discovery failures. No files are written.
     """
-    if not isinstance(reader_policy_sha256, str) or re.fullmatch(r"[a-f0-9]{64}", reader_policy_sha256) is None:
-        raise ValueError("reader_policy_sha256 must be supplied by the reader policy owner")
     previous_sources = previous_sources or {}
     page_ocr = page_ocr if page_ocr is not None else TesseractPageOCR()
     now = retrieved_at()
-    context = context_sha256(baseline, prior_evidence)
     result: dict[str, list[dict[str, Any]]] = {"materials": [], "sources": [], "errors": []}
     candidates: list[dict] = []
     for spec in specs:
@@ -315,11 +306,8 @@ def collect_reading_materials(
             "publishedAt": publication_date(candidate.get("publishedAt")) or previous.get("publishedAt"),
             "discoveryMode": candidate.get("discoveryMode"), "lastAttemptAt": now,
             "lastSuccessAt": previous.get("lastSuccessAt"),
-            "documentSha256": previous.get("documentSha256"), "sourceSha256": previous.get("sourceSha256"),
-            "legacyArticleSha256": None,
-            "lastSuccessfulDocumentSha256": previous.get("lastSuccessfulDocumentSha256", previous.get("documentSha256")),
+            "documentSha256": previous.get("documentSha256"), "legacyArticleSha256": None,
             "bodyRead": False, "httpStatus": None, "error": None, "changed": None,
-            "documentChanged": None, "readingInputChanged": None, "extractionVersion": EXTRACTION_VERSION,
         }
         try:
             validate_official_source(company, url)
@@ -327,34 +315,33 @@ def collect_reading_materials(
             record["httpStatus"] = response.status_code
             record["finalUrl"] = response.url
             validate_official_source(company, response.url)
-            record["documentSha256"] = document_sha256(response.content)
-            record["documentChanged"] = record["lastSuccessfulDocumentSha256"] != record["documentSha256"]
+            digest = document_sha256(response.content)
             extraction_warnings: list[str] = []
             pages = extract_document_pages(response.content, response.headers.get("content-type", ""), kind=kind, page_ocr=page_ocr,
                                            extraction_warnings=extraction_warnings)
-            if kind == "official-news" and not response.content.lstrip().startswith(b"%PDF-"):
+            is_pdf = response.content.lstrip().startswith(b"%PDF-")
+            if kind == "official-news" and not is_pdf:
                 record["legacyArticleSha256"] = _legacy_article_sha256(response.text)
-            record["extractionWarnings"] = extraction_warnings
-            if record["publishedAt"] is None and not response.content.lstrip().startswith(b"%PDF-"):
+            if record["publishedAt"] is None and not is_pdf:
                 record["publishedAt"] = html_publication_date(response.content)
-            reading_hash = source_sha256(pages)
-            record.update({"bodyRead": True, "lastSuccessAt": now, "sourceSha256": reading_hash,
-                           "lastSuccessfulDocumentSha256": record["documentSha256"],
-                           "changed": previous.get("sourceSha256") != reading_hash,
-                           "readingInputChanged": previous.get("sourceSha256") != reading_hash})
-            request = {
-                "sourceId": identity, "sourceSha256": reading_hash, "company": company, "kind": kind,
-                "url": response.url, "publishedAt": record["publishedAt"], "pages": pages,
-                "baseline": deepcopy(baseline), "priorEvidence": deepcopy(prior_evidence),
-                "contextSha256": context, "readerPolicySha256": reader_policy_sha256,
-            }
-            result["materials"].append({"readingInput": request, "documentSha256": record["documentSha256"],
-                                        "legacyArticleSha256": record["legacyArticleSha256"],
-                                        "retrievedAt": now, "discoveryMode": record["discoveryMode"],
-                                        "extractionVersion": EXTRACTION_VERSION, "extractionWarnings": extraction_warnings})
+            record.update({"bodyRead": True, "lastSuccessAt": now, "changed": previous.get("documentSha256") != digest,
+                           "documentSha256": digest, "extractionWarnings": extraction_warnings})
+            result["materials"].append({
+                "sourceId": identity, "company": company, "kind": kind, "url": url, "finalUrl": response.url,
+                "title": record["title"], "publishedAt": record["publishedAt"], "pages": pages,
+                "documentSha256": digest, "legacyArticleSha256": record["legacyArticleSha256"],
+                "retrievedAt": now, "discoveryMode": record["discoveryMode"], "extractionWarnings": extraction_warnings})
         except Exception as error:
             record["error"] = f"{type(error).__name__}: {error}"
             record["httpStatus"] = _http_status(error) or record["httpStatus"]
             result["errors"].append(record)
         result["sources"].append(record)
     return result
+
+
+def fetch_document_sha256(company: str, url: str, client: HttpClient | None = None) -> str:
+    """Re-fetch one official document and return its raw byte hash (R21 check)."""
+    validate_official_source(company, url)
+    response = (client or HttpClient()).get(url)
+    validate_official_source(company, response.url)
+    return document_sha256(response.content)

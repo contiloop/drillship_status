@@ -7,7 +7,6 @@ import requests
 
 from automation.fleet_sync import source_materials as materials
 from automation.fleet_sync.sources import SOURCE_SPECS
-from automation.fleet_sync.reading_contracts import source_sha256
 
 REAL_RENDER_PAGE_IMAGE = materials.render_page_image
 
@@ -52,7 +51,7 @@ def collect(client, monkeypatch, *, specs=SOURCE_SPECS[:1], previous_sources=Non
     monkeypatch.setattr(materials, 'discover_document', lambda c, s, **kwargs: (s.fallback_document_url, 'official-index'))
     monkeypatch.setattr(materials, 'discover_official_news', lambda c, s, **kw: ([], None))
     return materials.collect_reading_materials(
-        client, baseline=[], prior_evidence=[], reader_policy_sha256='a' * 64,
+        client,
         specs=specs, previous_sources=previous_sources, preserved_news=preserved_news,
     )
 
@@ -66,7 +65,6 @@ def test_extracts_every_pdf_page_and_distinguishes_document_hash(monkeypatch):
     pages = materials.extract_document_pages(b'%PDF-original', 'application/pdf', kind='fleet-report')
     assert [{'locator': p['locator'], 'text': p['text']} for p in pages] == [{'locator': 'page:1', 'text': 'First page full text'}, {'locator': 'page:2', 'text': 'Second page full text'}]
     assert all(page['image']['mimeType'] == 'image/png' for page in pages)
-    assert source_sha256(pages) != materials.document_sha256(b'%PDF-original')
 
 
 def test_page_without_text_remains_present_as_original_image(monkeypatch):
@@ -84,14 +82,14 @@ def test_failure_isolated_and_prior_success_preserved(monkeypatch):
     transocean, valaris = SOURCE_SPECS[:2]
     error = requests.HTTPError('403 denied', response=SimpleNamespace(status_code=403))
     responses = {transocean.fallback_document_url: error, valaris.fallback_document_url: Response(valaris.fallback_document_url, article())}
-    previous = {materials.source_id(transocean.company, 'fleet-report', transocean.fallback_document_url): {'lastSuccessAt': '2026-10-01T00:00:00Z', 'sourceSha256': 'b' * 64}}
+    previous = {materials.source_id(transocean.company, 'fleet-report', transocean.fallback_document_url): {'lastSuccessAt': '2026-10-01T00:00:00Z', 'documentSha256': 'b' * 64}}
     result = collect(Client(responses), monkeypatch, specs=(transocean, valaris), previous_sources=previous)
     assert len(result['materials']) == 1
-    assert result['materials'][0]['readingInput']['company'] == 'Valaris'
+    assert result['materials'][0]['company'] == 'Valaris'
     failed = next(source for source in result['sources'] if source['company'] == 'Transocean')
     assert failed['httpStatus'] == 403 and failed['error']
     assert failed['lastSuccessAt'] == '2026-10-01T00:00:00Z'
-    assert failed['sourceSha256'] == 'b' * 64
+    assert failed['documentSha256'] == 'b' * 64
     assert len(result['errors']) == 1
 
 
@@ -102,23 +100,10 @@ def test_same_url_changed_body_creates_new_source_hash(monkeypatch):
     old = first['sources'][0]
     second = collect(Client({url: Response(url, article('Different company-wide announcement. ' * 20))}), monkeypatch, previous_sources={old['sourceId']: old})
     assert old['sourceId'] == second['sources'][0]['sourceId']
-    assert old['sourceSha256'] != second['sources'][0]['sourceSha256']
+    assert old['documentSha256'] != second['sources'][0]['documentSha256']
     assert second['sources'][0]['changed'] is True
     third = collect(Client({url: Response(url, article())}), monkeypatch, previous_sources={old['sourceId']: old})
     assert third['sources'][0]['changed'] is False
-
-
-def test_news_without_contract_keywords_is_read_and_parser_never_called(monkeypatch):
-    from automation.fleet_sync import parsers
-    for name in dir(parsers):
-        if name.startswith('parse_'):
-            monkeypatch.setattr(parsers, name, lambda *a, **kw: pytest.fail('collector invoked a semantic parser'))
-    spec = SOURCE_SPECS[0]
-    url = 'https://www.deepwater.com/news/detail?ID=99'
-    result = collect(Client({spec.fallback_document_url: Response(spec.fallback_document_url, article()), url: Response(url, article())}), monkeypatch, preserved_news=[{'company': spec.company, 'url': url, 'title': 'Annual meeting invitation'}])
-    news = [item for item in result['materials'] if item['readingInput']['kind'] == 'official-news']
-    assert len(news) == 1
-    assert 'shareholders' in news[0]['readingInput']['pages'][0]['text']
 
 
 @pytest.mark.parametrize('body', ['<article><h1>Announcement title only</h1></article>', '<main><h1>Access Denied</h1><p>' + 'Error ' * 100 + '</p></main>', '<html></html>'])
@@ -176,7 +161,7 @@ def test_html_publication_metadata_and_complete_tail_are_retained(monkeypatch):
     url = 'https://www.deepwater.com/news/detail?ID=2'
     html = article('Publication body. ' * 30 + 'This is the complete final paragraph.').replace('<head>', '<head><meta property="article:published_time" content="2026-10-20T09:00:00Z">')
     result = collect(Client({spec.fallback_document_url: Response(spec.fallback_document_url, article()), url: Response(url, html)}), monkeypatch, preserved_news=[{'company': spec.company, 'url': url}])
-    request = result['materials'][1]['readingInput']
+    request = result['materials'][1]
     assert request['publishedAt'] == '2026-10-20T09:00:00+00:00'
     assert request['pages'][0]['text'].endswith('This is the complete final paragraph.')
 
@@ -220,12 +205,6 @@ def test_empty_ocr_keeps_original_image_without_made_up_text(monkeypatch):
     monkeypatch.setattr(materials.pdfplumber, 'open', lambda _: PDF())
     pages = materials.extract_document_pages(b'%PDF-original', 'application/pdf', kind='fleet-report', page_ocr=OCR())
     assert len(pages) == 1 and pages[0]['text'] == '' and pages[0]['image']
-
-
-def test_original_images_affect_content_hash_even_with_identical_text():
-    first = [{'locator': 'page:1', 'text': 'same', 'image': {'mimeType': 'image/png', 'sha256': 'a' * 64, 'dataBase64': 'YQ=='}}]
-    second = [{'locator': 'page:1', 'text': 'same', 'image': {'mimeType': 'image/png', 'sha256': 'b' * 64, 'dataBase64': 'Yg=='}}]
-    assert source_sha256(first) != source_sha256(second)
 
 
 def test_render_failure_fails_whole_document_instead_of_dropping_a_page(monkeypatch):
@@ -381,7 +360,7 @@ def test_report_discovery_http_status_survives_successful_fallback(monkeypatch):
         spec.index_url: requests.HTTPError('Forbidden', response=SimpleNamespace(status_code=403)),
         spec.fallback_document_url: Response(spec.fallback_document_url, article()),
     })
-    result = materials.collect_reading_materials(client, baseline=[], prior_evidence=[], reader_policy_sha256='a' * 64, specs=(spec,))
+    result = materials.collect_reading_materials(client, specs=(spec,))
     assert len(result['materials']) == 1
     assert result['sources'][0]['bodyRead'] is True and result['sources'][0]['httpStatus'] == 200
     failures = [error for error in result['errors'] if error.get('phase') == 'discovery']
@@ -400,7 +379,7 @@ def test_noble_fallback_material_and_primary_403_diagnostic_coexist(monkeypatch)
         quarterly: Response(quarterly, f'<a href="{pdf}">Earnings Release</a>'),
         pdf: Response(pdf, article()),
     })
-    result = materials.collect_reading_materials(client, baseline=[], prior_evidence=[], reader_policy_sha256='a' * 64, specs=(spec,))
+    result = materials.collect_reading_materials(client, specs=(spec,))
     assert len(result['materials']) == 2
     successful = next(source for source in result['sources'] if source['url'] == pdf)
     assert successful['bodyRead'] is True and successful['httpStatus'] == 200
@@ -423,7 +402,7 @@ def test_q4_malformed_diagnostic_is_structured_and_good_bodies_are_collected(mon
                 ]})
             assert url in {spec.fallback_document_url, first, second}
             return Response(url, article())
-    result = materials.collect_reading_materials(Q4Client(), baseline=[], prior_evidence=[], reader_policy_sha256='a' * 64, specs=(spec,))
+    result = materials.collect_reading_materials(Q4Client(), specs=(spec,))
     assert len(result['materials']) == 3
     assert len(result['errors']) == 1
     assert result['errors'][0]['itemIndex'] == 1
@@ -439,7 +418,7 @@ def test_report_failed_index_and_failed_fallback_are_separate(monkeypatch):
         spec.index_url: requests.HTTPError('Forbidden', response=SimpleNamespace(status_code=403)),
         spec.fallback_document_url: requests.HTTPError('Unavailable', response=SimpleNamespace(status_code=503)),
     })
-    result = materials.collect_reading_materials(client, baseline=[], prior_evidence=[], reader_policy_sha256='a' * 64, specs=(spec,))
+    result = materials.collect_reading_materials(client, specs=(spec,))
     assert result['materials'] == []
     assert [failure['httpStatus'] for failure in result['errors']] == [403, 503]
     assert result['errors'][0]['url'] == spec.index_url
@@ -467,11 +446,11 @@ def test_generic_preserved_materials_refetch_news_and_old_reports_with_official_
     old_news = 'https://noblecorp.com/old-news'
     result = materials.collect_reading_materials(
         Client({old_report: Response(old_report, article()), old_news: Response(old_news, article())}),
-        baseline=[], prior_evidence=[], reader_policy_sha256='a'*64, specs=(),
+        specs=(),
         preserved_materials=[dict(company='Noble', kind='fleet-report', url=old_report),
                              dict(company='Noble', kind='official-news', url=old_news),
                              dict(company='Noble', kind='official-news', url='https://evil.example/body')])
-    assert {m['readingInput']['url'] for m in result['materials']} == {old_report, old_news}
+    assert {m['url'] for m in result['materials']} == {old_report, old_news}
     assert result['errors'][0]['url'] == 'https://evil.example/body'
     assert 'not allowlisted' in result['errors'][0]['error']
 
@@ -529,14 +508,6 @@ def test_ocr_whitespace_is_normalized_by_the_same_page_boundary(monkeypatch):
     assert pages[0]['image']
 
 
-def test_dom_flow_extraction_changes_the_reader_policy_identity():
-    from automation.fleet_sync.reading_contracts import policy_sha256
-    from automation.fleet_sync.reading_service import build_reader_policy
-    old_version = 'official-materials-v3-pdf-image144-ocr-tsv'
-    assert materials.EXTRACTION_VERSION != old_version
-    assert policy_sha256(build_reader_policy(extraction_version=materials.EXTRACTION_VERSION)) != policy_sha256(build_reader_policy(extraction_version=old_version))
-
-
 def test_legacy_article_hash_matches_old_reader_from_the_same_single_get():
     from automation.fleet_sync.sources import fetch_article
     url = 'https://www.deepwater.com/news/detail?ID=30626'
@@ -552,18 +523,15 @@ def test_legacy_article_hash_matches_old_reader_from_the_same_single_get():
             self.calls.append(requested)
             return response
     client = RecordingClient()
-    result = materials.collect_reading_materials(client, baseline=[], prior_evidence=[], reader_policy_sha256='a' * 64,
-                                                 specs=(), preserved_news=[{'company': 'Transocean', 'url': url}])
+    result = materials.collect_reading_materials(client, specs=(), preserved_news=[{'company': 'Transocean', 'url': url}])
     expected = fetch_article(Client({url: response}), url)[1]
     material, source = result['materials'][0], result['sources'][0]
     assert client.calls == [url]
     assert material['legacyArticleSha256'] == source['legacyArticleSha256'] == expected
-    assert 'legacyArticleSha256' not in material['readingInput']
     assert material['documentSha256'] == materials.document_sha256(response.content)
-    assert material['readingInput']['sourceSha256'] == source_sha256(material['readingInput']['pages'])
-    assert 'The Deepwater Proteus' in material['readingInput']['pages'][0]['text']
-    assert 'U.S. Gulf.' in material['readingInput']['pages'][0]['text']
-    assert 'discard legacy footer' in material['readingInput']['pages'][0]['text']
+    assert 'The Deepwater Proteus' in material['pages'][0]['text']
+    assert 'U.S. Gulf.' in material['pages'][0]['text']
+    assert 'discard legacy footer' in material['pages'][0]['text']
 
 
 def test_news_pdf_does_not_claim_a_legacy_html_article_hash(monkeypatch):
@@ -574,17 +542,15 @@ def test_news_pdf_does_not_claim_a_legacy_html_article_hash(monkeypatch):
     monkeypatch.setattr(materials.pdfplumber, 'open', lambda _: PDF())
     url = 'https://noblecorp.com/wp-content/uploads/2026/10/release.pdf'
     result = materials.collect_reading_materials(Client({url: Response(url, b'%PDF-document', 'application/pdf')}),
-                                                 baseline=[], prior_evidence=[], reader_policy_sha256='a' * 64,
                                                  specs=(), preserved_news=[{'company': 'Noble', 'url': url}])
     assert result['materials'][0]['legacyArticleSha256'] is None
     assert result['sources'][0]['legacyArticleSha256'] is None
-    assert result['materials'][0]['readingInput']['pages'][0]['image']
+    assert result['materials'][0]['pages'][0]['image']
 
 
 def test_unreadable_html_does_not_offer_a_legacy_hash_as_success():
     url = 'https://www.deepwater.com/news/detail?ID=404'
     result = materials.collect_reading_materials(Client({url: Response(url, '<article><h1>Title only</h1></article>')}),
-                                                 baseline=[], prior_evidence=[], reader_policy_sha256='a' * 64,
                                                  specs=(), preserved_news=[{'company': 'Transocean', 'url': url}])
     assert result['materials'] == []
     assert result['sources'][0]['legacyArticleSha256'] is None

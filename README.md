@@ -6,11 +6,11 @@ Transocean, Valaris, Noble, Seadrill의 공식 fleet status report와 공식 IR/
 
 ## 자동 갱신 흐름
 
-1. GitHub Actions가 6시간마다 공식 PDF·SEC HTML·뉴스 본문을 수집하고 원본 파일 해시 변경을 확인합니다. 서버는 계약을 해석하거나 수정하지 않습니다.
-2. `manifest.newsQueue` v2에 보고서와 기사별 읽기 작업을 등록하고 마지막 정상 fleet를 유지합니다. 뉴스 제목이나 보고서 날짜만으로 기사를 제외하지 않습니다.
-3. Mac 실행기는 5분마다 큐만 확인합니다. 대기 작업이 있을 때 ChatGPT 로그인된 Codex CLI의 `gpt-6-luna`, medium, Fast off로 전체 본문과 PDF 모든 페이지 PNG를 읽습니다.
-4. 모델이 기존 계약 식별·날짜 배치·경제 조건·변경·보류를 판단합니다. 코드는 구조·참조·날짜 순서·계산·원문 인용과 해시만 검증합니다. 유효한 독립 변경은 자동 적용하고 보류는 근거와 함께 완료 처리합니다.
-5. 임시 clone에서 테스트와 빌드를 통과한 JSON만 비강제 push합니다. 최신 main 경합은 새 clone에서 재시도합니다. 실제 Vercel manifest와 참조 payload의 내용·해시가 일치해야 워커가 작업을 완료 확인합니다.
+1. 서버(GitHub Actions, 6시간마다): 공식 보고서 PDF·SEC HTML·뉴스를 수집하고 원본 bytes 해시(`documentSha256`)를 기록과 비교합니다. 새 보고서 revision은 `fleet-report`, 새 기사는 `official-news` 작업으로 `manifest.newsQueue`(schemaVersion 2)에 올립니다. 서버는 모델을 호출하지 않고 계약 데이터를 바꾸지 않습니다. 접근 실패는 HTTP 상태와 마지막 성공 시각을 남기고 기존 데이터를 유지합니다.
+2. Mac 실행기(launchd, 5분마다): 프로덕션 큐에 대기 작업이 있을 때만 임시 clone에서 로컬 실행을 시작합니다.
+3. 로컬 실행: 새 기사 제목을 한 번의 Codex 호출로 분류(title triage)하고, 선택되지 않은 기사는 본문을 읽지 않고 제목+링크로만 남깁니다. 선택된 기사와 보고서는 ChatGPT 로그인 Codex CLI(`gpt-6-luna`, medium)로 하나씩 읽고, 코드는 화면 안전성(등록 선박·기존 계약 ID·날짜·숫자·상태값)과 전체 데이터 무결성만 검사한 뒤 통과 항목만 적용합니다.
+4. 같은 문서(같은 sourceId·같은 원본 해시)는 다시 읽지 않습니다. 프롬프트나 baseline이 바뀌어도 재큐하지 않습니다.
+5. 테스트·빌드를 통과한 JSON만 비강제 push하고, main 경합 시 새 clone에서 재시도하며, Vercel 배포 내용이 일치해야 완료로 봅니다. Codex 사용량 한도에 걸리면 실패로 세지 않고 재설정 시각까지 기다립니다.
 
 읽기 실패 자료의 기존 계약과 완료된 과거 계약을 보존합니다. 새 보고서의 누락만으로 계약을 삭제하지 않으며, 모델이 명시적 변경·취소 근거를 확인한 경우에만 수정·철회합니다. 미공개 공시 일당은 `0`, 백로그 환산액은 `interpretation`에 별도 보관합니다.
 
@@ -44,34 +44,44 @@ Transocean, Valaris, Noble, Seadrill의 공식 fleet status report와 공식 IR/
 - 음영은 인접 계약 구간의 LOESS 잔차에 대한 ±1 **표본 표준편차**입니다. 신뢰구간·예측구간이 아닙니다. 각 구간을 동일 가중치로 계산하고 계약 기간은 점 크기에만 반영합니다. [LOESS 방법 설명(NIST)](https://www.itl.nist.gov/div898/handbook/pmd/section1/pmd144.htm).
 - `tests/dayrateTrends.test.cjs`는 실제 데이터의 세대별 표본·출처·환산 근거, 제외 규칙, 소표본, 선형/상수/잡음 데이터의 통계 계산, 점 면적, 축 범위를 검증합니다.
 
-## Codex 원문 읽기와 실행기 복원
+## 운영: 복원·실행기·진단
 
-이 채팅을 깨우는 예약 작업은 사용하지 않습니다. macOS 로그인 사용자 세션·인터넷·ChatGPT로 인증된 Codex CLI가 필요합니다. API 키로 대체하지 않습니다. 다음 운영 명령은 실제 모델 호출·push·launchd 변경을 수행하므로 운영 전환 단계에서 실행합니다.
+복원(새 Mac 또는 재설치):
 
 ```bash
-codex login
-.venv/bin/python -m automation.install_news_worker
-.venv/bin/python -m automation.news_worker
-.venv/bin/python -m automation.update_news
+brew install python@3.12 node@22 tesseract
+python3.12 -m venv .venv
+.venv/bin/python -m pip install --require-hashes -r automation/requirements.lock
+npm ci
+codex login            # ChatGPT 로그인 (API 키 사용 안 함)
 ```
 
-전환 순서는 구 실행기 중지 → 호환 v1/v2 실행기 설치 및 `launchctl print` 확인 → 저장소 Actions 변수 `FLEET_READER_V2_ENABLED=true` → 서버 수집 → 마지막 정상 데이터 위의 복구 읽기 → 실제 배포 hash/payload 확인입니다. 변수 활성화 전에는 서버 workflow가 v2 수집을 실행하지 않습니다. 새 정책의 첫 수집에서는 같은 기존 보고서도 한 번 읽습니다.
+서버 workflow는 저장소 Actions 변수 `FLEET_READER_V2_ENABLED=true`일 때만 실행됩니다(실행기 설치 후 켭니다).
+
+실행기 설치/제거(launchd `com.contiloop.drillship-news-worker`, 5분 간격):
 
 ```bash
-launchctl bootout gui/$(id -u)/com.contiloop.drillship-news-worker
+.venv/bin/python -m automation.install_news_worker            # 설치
+.venv/bin/python -m automation.install_news_worker --uninstall
 launchctl print gui/$(id -u)/com.contiloop.drillship-news-worker
 ```
 
-- `reading_pipeline.py`: 서버 발견/큐와 로컬 읽기/적용 use case. `data/provenance/readings.json`의 작업 상태는 `pending`, `failed`, `completed`이며, completed는 적용·변경 없음·보류를 포함합니다. 같은 원문·정책·실질 비교 맥락이면 모델 호출과 계약 추가가 모두 0입니다. 적용 후의 자기 출력은 ack 맥락으로 기록하여 재큐 순환을 막습니다. 실제 `contextSha256`/`modelInputContextSha256`와 재큐 인과관계인 `comparisonEpochSha256`를 구분합니다.
-- 원장은 원본 `documentSha256`와 모델 입력 `sourceSha256`를 구분합니다. macOS/Ubuntu의 PNG·OCR 차이를 원문 수정으로 오인하지 않습니다. 정책 문자열과 해시, 입력 baseline/선행 근거, 입력 revision, 출력, 인용, 변경 전 값, 읽기·적용·실패 시각을 보존합니다. 공통 원문 근거와 baseline은 내용 해시 객체로 한 번 저장하고 각 context는 객체/선행 job 참조로 재구성·검산합니다. PDF 이미지 base64는 공개 원장에 복사하지 않습니다.
-- `source_materials.py`: 모든 PDF 페이지의 144 DPI PNG와 native/OCR 텍스트, 공식 SEC HTML 및 전체 뉴스 본문을 수집합니다. HTTP·본문 읽기 오류는 마지막 성공 시각과 분리하여 남기고 다음 수집에서 재시도합니다. 원장의 미완료·보류 자료는 최신 뉴스 목록에서 빠지거나 보고서 URL이 바뀌어도 원래 공식 URL로 재수집합니다. 과거 보고서 복구 자료는 공개된 4개 최신 보고서 요약을 덮지 않습니다. 403은 실패로 보존하며 접근 가능한 같은 발행사의 공식 대체 자료를 별도로 수집합니다.
-- `reading_service.py`/`codex_reader.py`: 실제 추출 버전을 포함하는 읽기 정책과 격리된 read-only Codex 어댑터. 형식 교정은 최대 3회입니다. 자료의 본문·URL·작업 ID는 명령이 될 수 없습니다.
-- `review_news.py`는 이름을 호환 유지하지만 보고서·SEC HTML·뉴스를 모두 처리합니다. `news_review.py`, 결정론적 보고서 파서와 `news_jobs.py`의 v1 helper는 과거 fixture 회귀 확인용입니다. 구 뉴스·관측 원장은 비교 근거로만 읽으며 운영 쓰기 경로에서 재해석하지 않습니다.
-- 성공 작업은 먼저 보존·게시하고 기술 실패만 5분~6시간 백오프로 재시도합니다. 처리 중 원본 bytes가 바뀌면 옛 결과를 적용하지 않고 새 버전을 대기시킵니다. 원문을 읽지 못했거나 reportDate를 확인하지 못하면 기존 값과 확인 불가 진단을 유지합니다.
-- `update_news.py`: 단일 실행 잠금, 임시 clone, 허용 JSON 경로·symlink 검사, 최신 main 재확인, force push 금지, 실제 배포 manifest 전체 내용 및 payload 검증을 담당합니다. `.cache/readings-recovery.json`은 중단·경합·배포 실패 후 모델 결과 재사용용 로컬 체크포인트이며 Git에 올리지 않습니다. 재사용 키는 작업 ID와 분리된 실제 입력(원문/맥락/정책 해시·source ID·검증된 문서 메타데이터)이고 출력 해시도 재검사합니다. 모델 입력의 선행 근거에는 운영 작업 ID를 넣지 않으며, 정책을 검증할 수 없는 구 캐시는 재사용하지 않습니다.
-- `news_worker.py`: v1/v2 큐를 읽습니다. v2는 전체 큐 fingerprint로 완료를 추정하지 않고 배포 확인된 개별 job ID만 체크포인트에 기록합니다. 작업이 없으면 clone·수집·모델 호출 없이 종료합니다.
+수동 실행(실제 수집·Codex 호출·push를 수행):
 
-실행기 상태·로그는 `.cache/news-worker-state.json`, `.cache/news-worker.log`, `.cache/news-worker-error.log`에 있습니다. 진단은 공개 `readingStatus`의 마지막 수집/읽기/적용 시각, collectionErrors/readingErrors와 원장의 job `lastError`·`nextAttemptAfter`를 비교합니다. Mac이 꺼지거나 로그인·네트워크가 없으면 큐가 남아 다음 정상 실행에서 이어집니다. 복구할 때 Git의 원장을 삭제하지 말고 인증·네트워크·OCR 설치 상태를 먼저 복구합니다. 인증 파일과 API 키를 GitHub/공개 데이터에 넣지 않습니다.
+```bash
+.venv/bin/python -m automation.news_worker                    # 큐 확인 후 필요할 때만 게시
+.venv/bin/python -m automation.update_news                    # 큐와 무관하게 로컬 읽기 + 게시
+.venv/bin/python -m automation.update_news --stored-results   # 1회 복구: data/news/reviews.json 저장 결과 반영
+```
+
+`--stored-results`는 저장된 리뷰마다 `stored:<url>` 작업을 한 번만 만들고(완료 기록이 재실행을 막음) 현재 fleet를 baseline으로 읽어 적용합니다. 반영된 행에는 `inputMode: "stored-result"`와 `storedReading.reviewedAt`이 붙습니다.
+
+진단:
+
+- `data/provenance/readings.json`: 문서별 기록(`status` pending/failed/completed, `outcome`, `lastError`, `failureCount`, `nextAttemptAfter`, `openHolds`, 변경 전 값 `changes`)과 최근 수집 오류.
+- 공개 `manifest.json`의 `readingStatus`(마지막 수집/읽기/적용 시각, `usageLimitedUntil`, collectionErrors, readingErrors)와 `sources`/`sourceHealth`.
+- 실행기: `.cache/news-worker-state.json`(대기 시각·오류), `.cache/news-worker.log`, `.cache/news-worker-error.log`. 응답 캐시 `.cache/reading-responses.json`은 재시도 시 모델 재호출을 막는 로컬 파일이며 Git에 올리지 않습니다.
+- 기술 실패는 5분부터 두 배씩 최대 6시간 백오프로 해당 작업만 재시도하고, 같은 실행의 성공 결과는 게시됩니다. 구 기록(`data/provenance/sources.json`, `observations.json`, `data/news/reviews.json`)은 최초 이전(migration)과 저장 결과 복구에만 읽고 다시 쓰지 않습니다.
 
 ## 공식 원천
 
@@ -85,31 +95,18 @@ launchctl print gui/$(id -u)/com.contiloop.drillship-news-worker
 ## 로컬 실행
 
 ```bash
-brew install python@3.12 node@22 tesseract
-python3.12 -m venv .venv
-.venv/bin/python -m pip install --require-hashes -r automation/requirements.lock
-npm ci
-npm run data:check
 npm run dev
-```
-
-서버 수집·큐 산출물을 만들고 로컬 검증하려면:
-
-```bash
-npm run data:sync
-npm run verify
+npm run data:check     # 서버 모드 수집만, 파일 쓰기 없음 (네트워크 사용)
+npm run verify         # .venv/bin/python 테스트 + UI 테스트 + 빌드
 ```
 
 ## 생성 산출물
 
-- `public/data/manifest.json`: 현재 데이터 해시, 보고서 기준일, 공식 출처
-- `public/data/fleet.<hash>.json`: 62척 canonical fleet data
-- `public/data/events.<hash>.json`: 자동 반영하지 않은 공식 뉴스/공시와 모델 판단 이력
-- `public/data/changes.json`: 직전 데이터와의 semantic diff 요약
-- `data/provenance/sources.json`: 문서 URL, 원본/추출 SHA-256, 수집 상태
-- `data/provenance/readings.json`: 작업 원장·정책·맥락·출력·변경 전 이력
-- `data/provenance/observations.json`: 과거 관측 evidence (비교용 보존)
-- `automation/tests/fixtures/reports/`: CI에서도 실행되는 현재 공식 보고서 golden fixtures
+- `public/data/manifest.json`: 데이터 해시, 보고서 기준일·출처 상태, `newsQueue`, `readingStatus`
+- `public/data/fleet.<hash>.json`: 62척 fleet data
+- `public/data/events.<hash>.json`: 공식 기사 목록(제목+링크)과 읽기 결정별 이벤트(`readingDecision`)
+- `public/data/changes.json`: 직전 데이터와의 변경 요약
+- `data/provenance/readings.json`: 문서 기록(위 진단 참고)
 
 ## 데이터 규칙
 
@@ -124,10 +121,10 @@ npm run verify
 ## 운영 명령
 
 ```bash
-.venv/bin/python -m automation.fleet_sync --check   # collect + queue, no publication
-.venv/bin/python -m automation.fleet_sync --write   # server metadata + last good fleet
+.venv/bin/python -m automation.fleet_sync --write --mode server   # 서버 수집 + 큐 게시 (Actions와 동일)
+.venv/bin/python -m automation.fleet_sync --write --mode local    # 이 checkout에서 로컬 읽기 (push 없음)
 .venv/bin/python -m pytest automation/tests -q
 npm run build
 ```
 
-`npm run build`는 TypeScript 검사와 프로덕션 번들 생성을 함께 수행합니다. 공통 스키마·참조 무결성 또는 빌드가 깨지면 게시를 중단하고 마지막 정상 사이트를 유지합니다. `npm run verify`도 프로젝트 `.venv/bin/python`을 사용합니다. Python 패키지는 hash 잠금 `automation/requirements.lock`, Node 패키지는 `package-lock.json`으로 복원합니다. Ubuntu에서는 `tesseract-ocr tesseract-ocr-eng`가 필요하며 workflow가 설치합니다.
+보고서 기준일을 확인하지 못하면 마지막으로 확인된 날짜를 유지하며 수집 시각으로 대체하지 않습니다. 통합 무결성 검사에 실패한 문서는 전체를 적용하지 않고 해당 작업만 실패 처리합니다. Ubuntu에서는 `tesseract-ocr tesseract-ocr-eng`가 필요하며 workflow가 설치합니다.
