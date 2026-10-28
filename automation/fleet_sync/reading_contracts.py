@@ -1,40 +1,139 @@
-"""Version 2 data contracts at the model-reader port.
+"""Contracts at the model-reader port: wire schemas plus a screen-safety validator.
 
-This module validates structure and mechanically checkable claims, never prose
-semantics or reconciliation priorities. Adapters supply the registry as the
-complete baseline (all vessels, including those with no contracts).
+The reader (Codex CLI) returns JSON decisions about one document. Code checks
+only what keeps the screen safe; everything about meaning (reasons, quotes,
+page coverage, arithmetic) is the model's job and never blocks application.
 
-Hash format: UTF-8 JSON with ensure_ascii=False, sort_keys=True, separators=(",",
-":") and allow_nan=False. sourceSha256 covers the ordered pages array, including
-locators, all input text and attached image payloads. contextSha256 covers {baseline, priorEvidence}.
-The source document's original bytes remain a separate documentSha256 ledger
-concern; neither of these hashes claims to be a document-byte digest.
+Reading response (``READER_RESPONSE_SCHEMA`` for ``codex --output-schema``)::
+
+    {"reportDate": "YYYY-MM-DD" | null,
+     "vesselUpdates": [{"vesselId", "status", "statusAsOf", "reasonKo"?, "quote"?}],
+     "decisions": [{"vesselId", "contractId": str | null,
+                    "action": "upsert" | "withdraw" | "no-change" | "hold",
+                    "row": {startDate, endDate, dayRate, client, region, status,
+                            interpretation} | null,          # upsert only
+                    "reasonKo"?, "quote"?, "locator"?}]}
+
+The wire schema follows the Structured Outputs subset (all properties listed in
+``required``; optional values are nullable). Locally, optional fields may be
+missing, and extra envelope fields (schemaVersion, sourceId, sourceSha256,
+company, readLocators, coverage, ...) are tolerated and ignored.
+
+``validate_reading_response(response, request)``:
+  * raises ``MalformedResponseError`` (a ``DocumentValidationError``) when the
+    response is not an object or lacks ``decisions``/``vesselUpdates`` arrays;
+    the caller should re-request (up to 3 times).
+  * otherwise classifies each item as valid or held. Held items are returned in
+    ``issues`` with their original index, reason and raw item; valid items
+    are normalized and applied independently of held ones.
+
+Checks per item: vesselId is a registered vessel of ``request.company``; a
+non-null contractId is an existing contract of that vessel; withdraw needs a
+contractId; upsert needs a row; dates are real YYYY-MM-DD and start <= end;
+numbers are finite and >= 0 (baseDurationDays > 0); status enums. Missing or
+unmatched reasonKo/quote/locator never hold anything.
+
+Normalized decision: ``{vesselId, contractId, action, row}`` plus any of
+``reasonKo``/``quote``/``locator`` given as non-empty strings. ``row`` is None
+unless action is upsert; then it holds exactly ``startDate, endDate, dayRate,
+client, region, status, interpretation``. ``interpretation`` always exists and
+``derivedUsdPerDay`` is recomputed by ``derived_usd_per_day`` (the model value
+is discarded). Normalized vessel update: ``{vesselId, status, statusAsOf}``
+plus optional ``reasonKo``/``quote``.
+
+No natural-language dates or amounts are parsed here.
 """
 from __future__ import annotations
 
 import base64
 import binascii
-from collections import Counter
 from dataclasses import dataclass, field
-from datetime import datetime
-from io import BytesIO
+from datetime import date
 import hashlib
 import json
 import math
 import re
-import warnings
 from typing import Any, Literal, NotRequired, Protocol, TypedDict
 
-from jsonschema import Draft202012Validator, FormatChecker
-from PIL import Image
+from .model import AwardType, Company, ContractStatus, ReadingAction, ReadingInputMode, ReadingKind, ShipStatus
 
-from .model import AwardType, Company, ContractStatus, DateBasis, DatePrecision, RateBasis, ReadingAction, ReadingInputMode, ReadingKind, ShipStatus
+COMPANIES = ("Transocean", "Valaris", "Noble", "Seadrill")
+KINDS = ("fleet-report", "official-news")
+INPUT_MODES = ("document", "stored-result")
+ACTIONS = ("upsert", "withdraw", "no-change", "hold")
+CONTRACT_STATUSES = ("Firm", "Option", "Contingent")
+SHIP_STATUSES = ("Active", "Idle", "Warm-Stacked", "Cold-Stacked")
+AWARD_TYPES = ("signed-contract", "letter-of-award", "option-exercised", "extension", "unreported")
+# Accepted when reading previously published rows; never offered to the model.
+LEGACY_AWARD_TYPES = ("binding-letter-of-award",)
+INTERPRETATION_TEXT_FIELDS = ("sourceStartText", "sourceEndText", "placementBasis",
+                              "termText", "optionText", "valueText")
+ROW_FIELDS = ("startDate", "endDate", "dayRate", "client", "region", "status", "interpretation")
+
+DURATION_ASSUMPTION = "1 year = 365 days; 1 month = 365/12 days"
+MAX_PAGE_IMAGE_BYTES = 5 * 1024 * 1024
+MAX_DOCUMENT_IMAGE_BYTES = 40 * 1024 * 1024
+_PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+_DATE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", re.ASCII)
+_SHA256 = re.compile(r"[a-f0-9]{64}", re.ASCII)
+STORED_REVIEW_LOCATOR = "stored-review"
+
+
+# --- types -----------------------------------------------------------------
+
+class ContractInterpretation(TypedDict, total=False):
+    sourceStartText: str | None
+    sourceEndText: str | None
+    placementBasis: str | None
+    awardType: AwardType | None
+    termText: str | None
+    optionText: str | None
+    valueText: str | None
+    valueUsd: float | None
+    baseDurationDays: float | None
+    includes: list[str]
+    excludes: list[str]
+    derivedUsdPerDay: float | None  # computed by code only
+
+
+class ReadingRow(TypedDict):
+    startDate: str
+    endDate: str
+    dayRate: float
+    client: str
+    region: str
+    status: ContractStatus
+    interpretation: ContractInterpretation
+
+
+class ReadingDecision(TypedDict):
+    vesselId: str
+    contractId: str | None
+    action: ReadingAction
+    row: ReadingRow | None
+    reasonKo: NotRequired[str]
+    quote: NotRequired[str]
+    locator: NotRequired[str]
+
+
+class VesselUpdate(TypedDict):
+    vesselId: str
+    status: ShipStatus
+    statusAsOf: str
+    reasonKo: NotRequired[str]
+    quote: NotRequired[str]
+
+
+class ReadingResponse(TypedDict):
+    reportDate: NotRequired[str | None]
+    vesselUpdates: list[VesselUpdate]
+    decisions: list[ReadingDecision]
 
 
 class ReadingPageImage(TypedDict):
     mimeType: Literal["image/png"]
-    sha256: str
     dataBase64: str
+    sha256: NotRequired[str]
 
 
 class ReadingPage(TypedDict):
@@ -43,127 +142,16 @@ class ReadingPage(TypedDict):
     image: NotRequired[ReadingPageImage]
 
 
-class ReadingEvidence(TypedDict):
-    """Claim paths, e.g. facts.client or row.interpretation.valueUsd.
-
-    A complete interpretation path may cite the object. A leaf path supports
-    only that leaf. Bare aliases require equal facts/row values. Source metadata
-    is checked against input/baseline rather than requiring body quotations.
-    """
-
-    fields: list[str]
-    sourceId: str
-    locator: str
-    quote: str
-
-
-class ContractInterpretation(TypedDict):
-    sourceStartText: str | None
-    sourceEndText: str | None
-    startPrecision: DatePrecision
-    endPrecision: DatePrecision
-    dateBasis: DateBasis
-    placementBasis: str | None
-    awardType: AwardType
-    termText: str | None
-    optionText: str | None
-    valueText: str | None
-    rateBasis: RateBasis
-    reportedUsdPerDay: float | None
-    derivedUsdPerDay: float | None
-    valueUsd: float | None
-    baseDurationDays: float | None
-    durationAssumption: str | None
-    maximumTerm: bool
-    includes: list[str]
-    excludes: list[str]
-
-
-class ReadingFacts(TypedDict):
-    client: str | None
-    region: str | None
-    interpretation: ContractInterpretation
-
-
-class ReadingRow(TypedDict):
-    id: str | None
-    vesselId: str
-    startDate: str
-    endDate: str
-    dayRate: float
-    client: str
-    region: str
-    status: ContractStatus
-    interpretation: ContractInterpretation
-    newsReviewed: NotRequired[bool | None]
-    sourceUrl: NotRequired[str | None]
-    sourcePublishedAt: NotRequired[str | None]
-    datePrecision: NotRequired[dict[str, str] | None]
-
-
-class ReadingDecision(TypedDict):
-    vesselId: str
-    contractId: str | None
-    action: ReadingAction
-    row: ReadingRow | None
-    facts: ReadingFacts
-    reasonKo: str
-    evidence: list[ReadingEvidence]
-
-
-class VesselUpdate(TypedDict):
-    vesselId: str
-    status: ShipStatus
-    statusAsOf: str
-    reasonKo: str
-    evidence: list[ReadingEvidence]
-
-
-class VesselCoverage(TypedDict):
-    vesselId: str
-    state: Literal["included", "not-mentioned", "held"]
-
-
-class StoredReadingProvenance(TypedDict):
-    """A saved reading record, never a claim that its original body was read.
-
-    originalSourceSha256 preserves the old record's source digest verbatim;
-    it need not be a downloaded-document digest. The ledger adapter verifies
-    that the complete record actually exists at legacyLedger.
-    """
-
-    legacyLedger: str
-    recordSha256: str
-    originalSourceSha256: str | None
-    reviewedAt: str | None
-
-
 class ReadingInput(TypedDict):
     sourceId: str
-    sourceSha256: str
     company: Company
     kind: ReadingKind
     url: str
     publishedAt: str | None
     pages: list[ReadingPage]
     baseline: list[dict[str, Any]]
-    priorEvidence: list[dict[str, Any]]
-    contextSha256: str
-    readerPolicySha256: str
+    openHolds: NotRequired[list[dict[str, Any]]]
     inputMode: NotRequired[ReadingInputMode]
-    storedReading: NotRequired[StoredReadingProvenance]
-
-
-class ReadingResponse(TypedDict):
-    schemaVersion: Literal[2]
-    sourceId: str
-    sourceSha256: str
-    company: Company
-    reportDate: str | None
-    readLocators: list[str]
-    coverage: list[VesselCoverage]
-    vesselUpdates: list[VesselUpdate]
-    decisions: list[ReadingDecision]
 
 
 class NewsJob(TypedDict):
@@ -171,15 +159,13 @@ class NewsJob(TypedDict):
     kind: ReadingKind
     company: Company
     url: str
-    sourceSha256: str
-    contextSha256: str
-    readerPolicySha256: str
+    documentSha256: str
 
 
 class NewsQueue(TypedDict):
     schemaVersion: Literal[2]
     pendingCount: int
-    fingerprint: str
+    fingerprint: NotRequired[str]
     jobs: list[NewsJob]
 
 
@@ -190,642 +176,391 @@ class ReadingPort(Protocol):
 
 
 class DocumentValidationError(ValueError):
-    """The input/envelope is untrusted; no part of this document may be applied."""
+    """The input or response as a whole is unusable; nothing from it applies."""
+
+
+class MalformedResponseError(DocumentValidationError):
+    """The model output is not the expected JSON shape; re-request it."""
 
 
 @dataclass(frozen=True)
 class ValidationIssue:
+    """One held item: collection ("decisions", "vesselUpdates", "reportDate"),
+    its index in the response, a short reason and the raw item as received."""
+
     collection: str
     index: int
     message: str
+    item: Any = None
 
 
 @dataclass
 class ReadingValidationResult:
-    """Only structurally valid items; issues preserve original response indices.
-
-    This is validation, not approval: callers still reconcile semantic conflicts,
-    keep holds/no-change decisions and persist withdrawals in their history.
-    """
-
     decisions: list[ReadingDecision] = field(default_factory=list)
     vessel_updates: list[VesselUpdate] = field(default_factory=list)
     issues: list[ValidationIssue] = field(default_factory=list)
+    report_date: str | None = None
 
 
-COMPANIES = ["Transocean", "Valaris", "Noble", "Seadrill"]
-STRING = {"type": "string"}
-ID = {"type": "string", "minLength": 1}
-NULL_STRING = {"type": ["string", "null"]}
-NULL_NUMBER = {"type": ["number", "null"], "minimum": 0}
-HASH = {"type": "string", "pattern": "^[a-f0-9]{64}$"}
-DATE = {"type": "string", "format": "date"}
-ISO_TIMESTAMP = {"anyOf": [DATE, {"type": "string", "format": "date-time"}, {"type": "null"}]}
+# --- wire schemas (Structured Outputs subset) ------------------------------
+
+def _object(properties: dict) -> dict:
+    return {"type": "object", "properties": properties, "required": list(properties),
+            "additionalProperties": False}
 
 
-def _object(properties: dict, optional: dict | None = None) -> dict:
-    return {"type": "object", "properties": {**properties, **(optional or {})},
-            "required": list(properties), "additionalProperties": False}
+def _nullable(kind: str) -> dict:
+    return {"type": [kind, "null"]}
 
 
-def _array(items: dict) -> dict:
-    return {"type": "array", "items": items}
-
-
-def _enum(*values: str) -> dict:
+def _enum(values: tuple[str, ...], *, nullable: bool = False) -> dict:
+    if nullable:
+        return {"type": ["string", "null"], "enum": [*values, None]}
     return {"type": "string", "enum": list(values)}
 
 
-# Limits apply to decoded PNG bytes (the transport adds base64 overhead).
-# These bounds accommodate every page of the four fixture reports at 144 DPI.
-MAX_PAGE_IMAGE_BYTES = 5 * 1024 * 1024
-MAX_DOCUMENT_IMAGE_BYTES = 40 * 1024 * 1024
-MAX_PAGE_IMAGE_PIXELS = 10_000_000
-_PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
-PAGE_IMAGE_SCHEMA = _object({"mimeType": {"type": "string", "const": "image/png"},
-                             "sha256": HASH, "dataBase64": ID})
-PAGE_SCHEMA = _object({"locator": ID, "text": STRING}, {"image": PAGE_IMAGE_SCHEMA})
-PAGE_SCHEMA["if"] = {"not": {"required": ["image"]}}
-PAGE_SCHEMA["then"] = {"properties": {"text": {"type": "string", "minLength": 1}}}
-EVIDENCE_SCHEMA = _object({"fields": {**_array(ID), "minItems": 1, "uniqueItems": True},
-                           "sourceId": ID, "locator": ID, "quote": ID})
-INTERPRETATION_SCHEMA = _object({
-    "sourceStartText": NULL_STRING, "sourceEndText": NULL_STRING,
-    "startPrecision": _enum("day", "month", "quarter", "half-year", "year", "approximate", "unknown"),
-    "endPrecision": _enum("day", "month", "quarter", "half-year", "year", "approximate", "unknown"),
-    "dateBasis": _enum("source", "placement", "unresolved"), "placementBasis": NULL_STRING,
-    "awardType": _enum("signed-contract", "binding-letter-of-award", "letter-of-award", "option-exercised", "extension", "unreported"),
-    "termText": NULL_STRING, "optionText": NULL_STRING, "valueText": NULL_STRING,
-    "rateBasis": _enum("reported", "backlog-derived", "undisclosed"),
-    "reportedUsdPerDay": NULL_NUMBER, "derivedUsdPerDay": NULL_NUMBER,
-    "valueUsd": NULL_NUMBER, "baseDurationDays": NULL_NUMBER, "durationAssumption": NULL_STRING,
-    "maximumTerm": {"type": "boolean"}, "includes": _array(STRING), "excludes": _array(STRING),
+_WIRE_DATE = {"type": "string", "pattern": r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$"}
+_WIRE_INTERPRETATION = _object({
+    **{name: _nullable("string") for name in INTERPRETATION_TEXT_FIELDS},
+    "awardType": _enum(AWARD_TYPES, nullable=True),
+    "valueUsd": _nullable("number"), "baseDurationDays": _nullable("number"),
+    "includes": {"type": "array", "items": {"type": "string"}},
+    "excludes": {"type": "array", "items": {"type": "string"}},
 })
-# These are the existing published source fields. They are optional on proposals,
-# retained verbatim when supplied, and never reconstructed from English text.
-ROW_SCHEMA = _object({
-    "id": {"type": ["string", "null"], "minLength": 1}, "vesselId": ID,
-    "startDate": DATE, "endDate": DATE, "dayRate": {"type": "number", "minimum": 0},
-    "client": STRING, "region": STRING, "status": _enum("Firm", "Option", "Contingent"),
-    "interpretation": INTERPRETATION_SCHEMA,
-}, {"newsReviewed": {"type": ["boolean", "null"]}, "sourceUrl": NULL_STRING, "sourcePublishedAt": NULL_STRING,
-    "datePrecision": {"anyOf": [_object({"start": STRING, "end": STRING}), {"type": "null"}]}})
-FACTS_SCHEMA = _object({"client": NULL_STRING, "region": NULL_STRING, "interpretation": INTERPRETATION_SCHEMA})
-DECISION_SCHEMA = _object({"vesselId": ID, "contractId": {"type": ["string", "null"], "minLength": 1},
-    "action": _enum("upsert", "withdraw", "no-change", "hold"),
-    "row": {"anyOf": [ROW_SCHEMA, {"type": "null"}]}, "facts": FACTS_SCHEMA,
-    "reasonKo": ID, "evidence": _array(EVIDENCE_SCHEMA)})
-VESSEL_UPDATE_SCHEMA = _object({"vesselId": ID, "status": _enum("Active", "Idle", "Warm-Stacked", "Cold-Stacked"),
-    "statusAsOf": DATE, "reasonKo": ID, "evidence": _array(EVIDENCE_SCHEMA)})
-COVERAGE_SCHEMA = _object({"vesselId": ID, "state": _enum("included", "not-mentioned", "held")})
-STORED_READING_SCHEMA = _object({"legacyLedger": ID, "recordSha256": HASH,
-    "originalSourceSha256": {"anyOf": [HASH, {"type": "null"}]}, "reviewedAt": ISO_TIMESTAMP})
-# The record is opaque except for provenance binding. Retain every unknown
-# field, including arbitrary legacy/v2 result objects and audit metadata.
-_STORED_REVIEW_RECORD_SCHEMA = {"type": "object", "required": ["company", "url", "result"],
-    "properties": {"company": _enum(*COMPANIES), "url": ID, "result": {"type": "object"},
-        "publishedAt": ISO_TIMESTAMP, "sourceSha256": {"anyOf": [HASH, {"type": "null"}]},
-        "reader": {"type": ["object", "null"], "properties": {"reviewedAt": ISO_TIMESTAMP}}}}
-_STORED_REVIEW_LOCATOR_PREFIX = "stored-review:"
-READING_INPUT_SCHEMA = _object({
-    "sourceId": ID, "sourceSha256": HASH, "company": _enum(*COMPANIES),
-    "kind": _enum("fleet-report", "official-news"), "url": ID, "publishedAt": ISO_TIMESTAMP,
-    "pages": {**_array(PAGE_SCHEMA), "minItems": 1}, "baseline": _array({"type": "object"}),
-    "priorEvidence": _array({"type": "object"}), "contextSha256": HASH, "readerPolicySha256": HASH,
-}, {"inputMode": {**_enum("document", "stored-result"), "default": "document"}, "storedReading": STORED_READING_SCHEMA})
-READING_INPUT_SCHEMA["allOf"] = [{
-    "if": {"required": ["inputMode"], "properties": {"inputMode": {"const": "stored-result"}}},
-    "then": {"required": ["storedReading"]},
-    "else": {"not": {"required": ["storedReading"]}},
-}]
-_RESPONSE_SCHEMA = {"$schema": "https://json-schema.org/draft/2020-12/schema", **_object({
-    "schemaVersion": {"type": "integer", "const": 2}, "sourceId": ID, "sourceSha256": HASH,
-    "company": _enum(*COMPANIES), "reportDate": {"anyOf": [DATE, {"type": "null"}]},
-    "readLocators": {**_array(ID), "uniqueItems": True}, "coverage": _array(COVERAGE_SCHEMA),
-    "vesselUpdates": _array(VESSEL_UPDATE_SCHEMA), "decisions": _array(DECISION_SCHEMA),
-})}
-NEWS_JOB_SCHEMA = _object({"jobId": ID, "kind": _enum("fleet-report", "official-news"), "company": _enum(*COMPANIES),
-    "url": ID, "sourceSha256": HASH, "contextSha256": HASH, "readerPolicySha256": HASH})
-NEWS_QUEUE_SCHEMA = _object({"schemaVersion": {"type": "integer", "const": 2},
-    "pendingCount": {"type": "integer", "minimum": 0}, "fingerprint": HASH, "jobs": _array(NEWS_JOB_SCHEMA)})
-# Validate array membership separately so one invalid decision does not poison
-# the otherwise trustworthy response envelope.
-_ENVELOPE_SCHEMA = {**_RESPONSE_SCHEMA, "properties": {**_RESPONSE_SCHEMA["properties"],
-    "decisions": {"type": "array"}, "vesselUpdates": {"type": "array"}}}
-def _strict_reader_schema(value: Any) -> Any:
-    # Decoder schemas require every object property in required. Optional row
-    # provenance is nullable, representing no supplied value; application must
-    # preserve existing provenance when a model returns null for those fields.
-    if isinstance(value, list):
-        return [_strict_reader_schema(item) for item in value]
-    if not isinstance(value, dict):
-        return value
-    result = {key: _strict_reader_schema(item) for key, item in value.items()}
-    if result.get("type") == "object":
-        result["required"] = list(result["properties"])
-        result["additionalProperties"] = False
-    return result
+_WIRE_ROW = _object({
+    "startDate": _WIRE_DATE, "endDate": _WIRE_DATE, "dayRate": {"type": "number"},
+    "client": {"type": "string"}, "region": {"type": "string"},
+    "status": _enum(CONTRACT_STATUSES), "interpretation": _WIRE_INTERPRETATION,
+})
+READER_RESPONSE_SCHEMA = _object({
+    "reportDate": {"type": ["string", "null"], "pattern": _WIRE_DATE["pattern"]},
+    "vesselUpdates": {"type": "array", "items": _object({
+        "vesselId": {"type": "string"}, "status": _enum(SHIP_STATUSES), "statusAsOf": _WIRE_DATE,
+        "reasonKo": _nullable("string"), "quote": _nullable("string")})},
+    "decisions": {"type": "array", "items": _object({
+        "vesselId": {"type": "string"}, "contractId": _nullable("string"), "action": _enum(ACTIONS),
+        "row": {"anyOf": [_WIRE_ROW, {"type": "null"}]},
+        "reasonKo": _nullable("string"), "quote": _nullable("string"), "locator": _nullable("string")})},
+})
+TITLE_TRIAGE_SCHEMA = _object({"selected": {"type": "array", "items": {"type": "string"}}})
 
 
-READER_RESPONSE_SCHEMA = _strict_reader_schema(_RESPONSE_SCHEMA)
-_FORMAT_CHECKER = FormatChecker()
+# --- small checks ----------------------------------------------------------
 
-
-@_FORMAT_CHECKER.checks("date-time", raises=(ValueError, OverflowError))
-def _iso_datetime(value: Any) -> bool:
-    # jsonschema's RFC3339 checker is an optional extra, absent from the pinned
-    # runtime. Keep date-time validation active using the standard library.
-    if not isinstance(value, str):
-        return True
-    if re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt][0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]+)?(?:[Zz]|[+-][0-9]{2}:[0-9]{2})", value) is None:
+def _is_date(value: Any) -> bool:
+    if not isinstance(value, str) or _DATE.fullmatch(value) is None:
         return False
-    datetime.fromisoformat(value.upper().replace("Z", "+00:00"))
+    try:
+        date.fromisoformat(value)
+    except ValueError:
+        return False
     return True
 
 
-DURATION_ASSUMPTION = "1 year = 365 days; 1 month = 365/12 days"
+def _is_number(value: Any) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
 
 
-def _validate_schema(value: Any, schema: dict, *, check_finite: bool = True) -> None:
-    errors = sorted(Draft202012Validator(schema, format_checker=_FORMAT_CHECKER).iter_errors(value),
-                    key=lambda error: str(list(error.absolute_path)))
-    if errors:
-        error = errors[0]
-        path = ".".join(str(part) for part in error.absolute_path) or "$"
-        raise ValueError(f"{path}: {error.message}")
-    if check_finite:
-        _finite_numbers(value)
+def _nonempty(value: Any) -> bool:
+    return isinstance(value, str) and bool(value.strip())
 
 
-def _finite_numbers(value: Any) -> None:
-    if isinstance(value, float) and not math.isfinite(value):
-        raise ValueError("numbers must be finite")
-    if isinstance(value, dict):
-        for item in value.values():
-            _finite_numbers(item)
-    elif isinstance(value, list):
-        for item in value:
-            _finite_numbers(item)
+def _optional_texts(source: dict, names: tuple[str, ...]) -> dict:
+    """Keep optional display text only when it is a non-empty string."""
+    return {name: source[name] for name in names if _nonempty(source.get(name))}
 
 
-def _canonical_json(value: Any) -> str:
-    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False)
-
-
-def _digest(value: Any) -> str:
-    return hashlib.sha256(_canonical_json(value).encode("utf-8")).hexdigest()
-
-
-def stored_record_sha256(record: dict[str, Any]) -> str:
-    """Hash the whole saved record without selecting or rewriting its facts."""
-    return _digest(record)
-
-
-def stored_review_page(record: dict[str, Any]) -> ReadingPage:
-    """Supply the complete saved record as canonical JSON, not original prose.
-
-    Quotes must be exact substrings of this JSON representation. An embedded
-    old quote is still stored-result evidence, not a newly read original source.
-    Unknown fields are preserved. This helper neither reads a ledger nor fetches
-    the original document; the adapter authenticates the persisted record.
-    """
-    return {"locator": _STORED_REVIEW_LOCATOR_PREFIX + stored_record_sha256(record),
-            "text": _canonical_json(record)}
-
+# --- derived rate ----------------------------------------------------------
 
 def duration_days(*, years: float = 0, months: float = 0, days: float = 0) -> float:
-    """Convert already-selected numeric units without parsing source prose."""
+    """Convert already-selected numeric units (1 year = 365, 1 month = 365/12)."""
     values = (years, months, days)
-    if any(isinstance(value, bool) or not isinstance(value, (int, float)) or
-           not math.isfinite(value) or value < 0 for value in values):
+    if not all(_is_number(value) and value >= 0 for value in values):
         raise ValueError("duration units must be finite nonnegative numbers")
-    result = years * 365 + months * (365 / 12) + days
-    if not math.isfinite(result):
-        raise ValueError("duration result must be finite")
+    return years * 365 + months * (365 / 12) + days
+
+
+def derived_usd_per_day(value_usd: Any, base_duration_days: Any) -> float | None:
+    """valueUsd / baseDurationDays when both are usable numbers, else None."""
+    if not (_is_number(value_usd) and _is_number(base_duration_days)):
+        return None
+    if value_usd < 0 or base_duration_days <= 0:
+        return None
+    return value_usd / base_duration_days
+
+
+def normalize_interpretation(value: Any) -> ContractInterpretation:
+    """Check an interpretation's safety-relevant types and recompute the rate.
+
+    Missing or null means an empty interpretation. Unknown keys (including the
+    legacy dateBasis/startPrecision/rateBasis/... of published rows) are kept
+    verbatim; the model's derivedUsdPerDay is always replaced. Raises
+    ValueError for unsafe values.
+    """
+    if value is None:
+        value = {}
+    if not isinstance(value, dict):
+        raise ValueError("interpretation must be an object")
+    result = dict(value)
+    for name in INTERPRETATION_TEXT_FIELDS:
+        if result.get(name) is not None and not isinstance(result[name], str):
+            raise ValueError(f"interpretation.{name} must be text")
+    award = result.get("awardType")
+    if award is not None and award not in AWARD_TYPES + LEGACY_AWARD_TYPES:
+        raise ValueError(f"interpretation.awardType is invalid: {award}")
+    amount, days = result.get("valueUsd"), result.get("baseDurationDays")
+    if amount is not None and not (_is_number(amount) and amount >= 0):
+        raise ValueError("interpretation.valueUsd must be a finite number >= 0")
+    if days is not None and not (_is_number(days) and days > 0):
+        raise ValueError("interpretation.baseDurationDays must be a finite number > 0")
+    for name in ("includes", "excludes"):
+        items = result.get(name)
+        if items is None:
+            result[name] = []
+        elif not isinstance(items, list) or not all(isinstance(item, str) for item in items):
+            raise ValueError(f"interpretation.{name} must be a list of text")
+    result["derivedUsdPerDay"] = derived_usd_per_day(amount, days)
+    return result  # type: ignore[return-value]
+
+
+# --- response validation ---------------------------------------------------
+
+def parse_reading_response(text: str) -> dict:
+    """Decode model output text; non-JSON or non-object raises MalformedResponseError."""
+    def reject_constant(name: str) -> Any:
+        raise ValueError(f"non-JSON number {name}")
+    try:
+        value = json.loads(text, parse_constant=reject_constant)
+    except (TypeError, ValueError) as error:
+        raise MalformedResponseError(f"response is not JSON: {error}") from error
+    _check_envelope(value)
+    return value
+
+
+def _check_envelope(response: Any) -> None:
+    if not isinstance(response, dict):
+        raise MalformedResponseError("response must be a JSON object")
+    for key in ("decisions", "vesselUpdates"):
+        if not isinstance(response.get(key), list):
+            raise MalformedResponseError(f"response.{key} must be an array")
+
+
+def _registry(request: ReadingInput) -> tuple[set[str], dict[str, str]]:
+    """Vessel IDs of request.company and {contractId: vesselId} for them."""
+    vessels: set[str] = set()
+    contracts: dict[str, str] = {}
+    for vessel in request["baseline"]:
+        if not isinstance(vessel, dict) or vessel.get("company") != request["company"]:
+            continue
+        vessel_id = vessel.get("id")
+        if not isinstance(vessel_id, str):
+            continue
+        vessels.add(vessel_id)
+        for contract in vessel.get("contracts") or []:
+            if isinstance(contract, dict) and isinstance(contract.get("id"), str):
+                contracts[contract["id"]] = vessel_id
+    return vessels, contracts
+
+
+def _row(value: Any) -> ReadingRow:
+    if not isinstance(value, dict):
+        raise ValueError("upsert requires a row object")
+    for name in ("startDate", "endDate"):
+        if not _is_date(value.get(name)):
+            raise ValueError(f"row.{name} must be a real YYYY-MM-DD date")
+    if value["startDate"] > value["endDate"]:
+        raise ValueError("row.startDate is after row.endDate")
+    if not (_is_number(value.get("dayRate")) and value["dayRate"] >= 0):
+        raise ValueError("row.dayRate must be a finite number >= 0")
+    for name in ("client", "region"):
+        if not _nonempty(value.get(name)):
+            raise ValueError(f"row.{name} must be non-empty text")
+    if value.get("status") not in CONTRACT_STATUSES:
+        raise ValueError(f"row.status is invalid: {value.get('status')}")
+    row = {name: value[name] for name in ROW_FIELDS if name != "interpretation"}
+    row["interpretation"] = normalize_interpretation(value.get("interpretation"))
+    return row  # type: ignore[return-value]
+
+
+def _decision(item: Any, vessels: set[str], contracts: dict[str, str]) -> ReadingDecision:
+    if not isinstance(item, dict):
+        raise ValueError("decision must be an object")
+    vessel_id, contract_id, action = item.get("vesselId"), item.get("contractId"), item.get("action")
+    if vessel_id not in vessels:
+        raise ValueError(f"vessel is not registered for this company: {vessel_id}")
+    if action not in ACTIONS:
+        raise ValueError(f"action is invalid: {action}")
+    if contract_id is not None and contracts.get(contract_id) != vessel_id:
+        raise ValueError(f"contractId is not an existing contract of {vessel_id}: {contract_id}")
+    if action == "withdraw" and contract_id is None:
+        raise ValueError("withdraw requires contractId")
+    row = _row(item.get("row")) if action == "upsert" else None
+    return {"vesselId": vessel_id, "contractId": contract_id, "action": action, "row": row,
+            **_optional_texts(item, ("reasonKo", "quote", "locator"))}
+
+
+def _vessel_update(item: Any, vessels: set[str]) -> VesselUpdate:
+    if not isinstance(item, dict):
+        raise ValueError("vessel update must be an object")
+    if item.get("vesselId") not in vessels:
+        raise ValueError(f"vessel is not registered for this company: {item.get('vesselId')}")
+    if item.get("status") not in SHIP_STATUSES:
+        raise ValueError(f"vessel status is invalid: {item.get('status')}")
+    if not _is_date(item.get("statusAsOf")):
+        raise ValueError("statusAsOf must be a real YYYY-MM-DD date")
+    return {"vesselId": item["vesselId"], "status": item["status"], "statusAsOf": item["statusAsOf"],
+            **_optional_texts(item, ("reasonKo", "quote"))}
+
+
+def validate_reading_response(response: Any, request: ReadingInput) -> ReadingValidationResult:
+    """Screen-safety validation; see module docstring for the rules."""
+    _check_envelope(response)
+    vessels, contracts = _registry(request)
+    result = ReadingValidationResult()
+    report_date = response.get("reportDate")
+    if report_date is not None:
+        if _is_date(report_date):
+            result.report_date = report_date
+        else:
+            result.issues.append(ValidationIssue("reportDate", 0, "reportDate is not a real YYYY-MM-DD date", report_date))
+    for index, item in enumerate(response["decisions"]):
+        try:
+            result.decisions.append(_decision(item, vessels, contracts))
+        except (ValueError, TypeError) as error:
+            result.issues.append(ValidationIssue("decisions", index, str(error), item))
+    for index, item in enumerate(response["vesselUpdates"]):
+        try:
+            result.vessel_updates.append(_vessel_update(item, vessels))
+        except (ValueError, TypeError) as error:
+            result.issues.append(ValidationIssue("vesselUpdates", index, str(error), item))
     return result
 
 
+def select_triage_ids(response: Any, candidate_ids: list[str]) -> list[str]:
+    """IDs from ``{"selected": [...]}`` that exist in candidate_ids, in candidate order."""
+    if not isinstance(response, dict) or not isinstance(response.get("selected"), list):
+        raise MalformedResponseError("triage response must be {\"selected\": [ids]}")
+    chosen = {item for item in response["selected"] if isinstance(item, str)}
+    return [item for item in dict.fromkeys(candidate_ids) if item in chosen]
+
+
+# --- reading input ---------------------------------------------------------
+
+def stored_review_page(record: dict[str, Any]) -> ReadingPage:
+    """The single page of a stored-result input: the saved review as JSON text."""
+    return {"locator": STORED_REVIEW_LOCATOR,
+            "text": json.dumps(record, ensure_ascii=False, sort_keys=True, allow_nan=False)}
+
+
+def _check_image(locator: str, image: Any) -> int:
+    if not isinstance(image, dict) or image.get("mimeType") != "image/png":
+        raise ValueError(f"{locator}: image must be an image/png object")
+    encoded = image.get("dataBase64")
+    if not isinstance(encoded, str) or len(encoded) > ((MAX_PAGE_IMAGE_BYTES + 2) // 3) * 4:
+        raise ValueError(f"{locator}: image data missing or over the size limit")
+    try:
+        content = base64.b64decode(encoded, validate=True)
+    except (binascii.Error, ValueError) as error:
+        raise ValueError(f"{locator}: image data is not base64") from error
+    if len(content) > MAX_PAGE_IMAGE_BYTES:
+        raise ValueError(f"{locator}: image is over the size limit")
+    if not content.startswith(_PNG_SIGNATURE):
+        raise ValueError(f"{locator}: image is not a PNG")
+    return len(content)
+
+
+def validate_reading_input(request: Any, *, reader_policy: str | None = None) -> None:
+    """Basic shape and page-image checks; raises DocumentValidationError.
+
+    ``reader_policy`` is accepted for compatibility and ignored. Extra fields
+    (old hashes, priorEvidence, storedReading, ...) are tolerated, not verified.
+    """
+    try:
+        if not isinstance(request, dict):
+            raise ValueError("reading input must be an object")
+        for name in ("sourceId", "url"):
+            if not _nonempty(request.get(name)):
+                raise ValueError(f"{name} must be non-empty text")
+        if request.get("company") not in COMPANIES:
+            raise ValueError("company is invalid")
+        if request.get("kind") not in KINDS:
+            raise ValueError("kind is invalid")
+        if request.get("publishedAt") is not None and not isinstance(request["publishedAt"], str):
+            raise ValueError("publishedAt must be text or null")
+        mode = request.get("inputMode", "document")
+        if mode not in INPUT_MODES:
+            raise ValueError("inputMode is invalid")
+        baseline = request.get("baseline")
+        if not isinstance(baseline, list) or not all(isinstance(item, dict) for item in baseline):
+            raise ValueError("baseline must be a list of vessel objects")
+        if "openHolds" in request and not isinstance(request["openHolds"], list):
+            raise ValueError("openHolds must be a list")
+        pages = request.get("pages")
+        if not isinstance(pages, list) or not pages:
+            raise ValueError("pages must be a non-empty list")
+        locators: set[str] = set()
+        total = 0
+        for page in pages:
+            if not isinstance(page, dict) or not _nonempty(page.get("locator")) or not isinstance(page.get("text"), str):
+                raise ValueError("each page needs a locator and text")
+            if page["locator"] in locators:
+                raise ValueError(f"duplicate page locator: {page['locator']}")
+            locators.add(page["locator"])
+            if "image" in page:
+                total += _check_image(page["locator"], page["image"])
+        if total > MAX_DOCUMENT_IMAGE_BYTES:
+            raise ValueError("document images are over the size limit")
+        if mode == "stored-result":
+            if len(pages) != 1 or "image" in pages[0]:
+                raise ValueError("stored-result input is one text page with the saved review JSON")
+            if not isinstance(json.loads(pages[0]["text"]), dict):
+                raise ValueError("stored review page must be a JSON object")
+    except (ValueError, TypeError) as error:
+        raise DocumentValidationError(str(error)) from error
+
+
+# --- news queue ------------------------------------------------------------
+
+def validate_news_queue(queue: Any) -> None:
+    """schemaVersion 2, pendingCount == len(jobs), unique jobId, required job fields."""
+    try:
+        if not isinstance(queue, dict) or queue.get("schemaVersion") != 2:
+            raise ValueError("news queue must be schemaVersion 2")
+        jobs = queue.get("jobs")
+        if not isinstance(jobs, list) or queue.get("pendingCount") != len(jobs):
+            raise ValueError("pendingCount does not match jobs")
+        ids: set[str] = set()
+        for job in jobs:
+            if not isinstance(job, dict) or not _nonempty(job.get("jobId")) or not _nonempty(job.get("url")):
+                raise ValueError("job needs jobId and url")
+            if job.get("kind") not in KINDS or job.get("company") not in COMPANIES:
+                raise ValueError(f"job {job['jobId']} has invalid kind/company")
+            if not isinstance(job.get("documentSha256"), str) or _SHA256.fullmatch(job["documentSha256"]) is None:
+                raise ValueError(f"job {job['jobId']} needs a documentSha256")
+            if job["jobId"] in ids:
+                raise ValueError("jobId must be unique")
+            ids.add(job["jobId"])
+    except (ValueError, TypeError) as error:
+        raise DocumentValidationError(str(error)) from error
+
+
+# --- compatibility (callers outside this task still import these) ----------
+
+def _digest(value: Any) -> str:
+    text = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False)
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
 def source_sha256(pages: list[ReadingPage]) -> str:
-    """Digest ordered pages including text, locators and any complete image payload."""
+    """Compatibility: digest of pages. Not verified by this module."""
     return _digest(pages)
 
 
 def context_sha256(baseline: list[dict], prior_evidence: list[dict]) -> str:
+    """Compatibility: digest of reader context. Not verified by this module."""
     return _digest({"baseline": baseline, "priorEvidence": prior_evidence})
 
 
 def policy_sha256(reader_policy: str) -> str:
+    """Compatibility: digest of reader policy text. Not verified by this module."""
     return hashlib.sha256(reader_policy.encode("utf-8")).hexdigest()
-
-
-def _registry(request: ReadingInput) -> tuple[dict[str, dict], dict[str, tuple[str, dict]]]:
-    vessels: dict[str, dict] = {}
-    contracts: dict[str, tuple[str, dict]] = {}
-    for vessel in request["baseline"]:
-        vessel_id = vessel.get("id")
-        if not isinstance(vessel_id, str) or not vessel_id or vessel_id in vessels:
-            raise ValueError("baseline vessel IDs must be nonempty and unique")
-        if vessel.get("company") not in COMPANIES or not isinstance(vessel.get("contracts"), list):
-            raise ValueError("baseline vessel company/contracts are required")
-        vessels[vessel_id] = vessel
-        for contract in vessel["contracts"]:
-            if not isinstance(contract, dict):
-                raise ValueError("baseline contracts must be objects")
-            contract_id = contract.get("id")
-            if not isinstance(contract_id, str) or not contract_id or contract_id in contracts:
-                raise ValueError("baseline contract IDs must be nonempty and globally unique")
-            if contract.get("vesselId") != vessel_id:
-                raise ValueError("baseline contract vesselId does not match its vessel")
-            contracts[contract_id] = (vessel_id, contract)
-    return vessels, contracts
-
-
-def _validate_png_container(content: bytes) -> None:
-    """Check every chunk frame and CRC, including the decoder-tolerated IEND.
-
-    Pixel decoding remains Pillow's responsibility. No truncated final CRC,
-    bytes after IEND or claimed chunk length outside the file is acceptable at
-    this file-integrity boundary, even when content digests were recomputed.
-    """
-    view = memoryview(content)
-    offset = len(_PNG_SIGNATURE)
-    saw_header = False
-    saw_data = False
-    while offset < len(view):
-        if len(view) - offset < 12:
-            raise ValueError("PNG chunk header/data/CRC is truncated")
-        length = int.from_bytes(view[offset:offset + 4], "big")
-        kind = bytes(view[offset + 4:offset + 8])
-        payload_end = offset + 8 + length
-        chunk_end = payload_end + 4
-        if length > 0x7FFFFFFF or chunk_end > len(view):
-            raise ValueError("PNG chunk length exceeds file boundary")
-        if any(not (65 <= char <= 90 or 97 <= char <= 122) for char in kind) or kind[2] & 0x20:
-            raise ValueError("PNG chunk type is invalid")
-        if not saw_header and (kind != b"IHDR" or length != 13):
-            raise ValueError("PNG must begin with one complete IHDR chunk")
-        if kind == b"IHDR":
-            if saw_header:
-                raise ValueError("PNG has duplicate IHDR chunks")
-            saw_header = True
-        actual_crc = binascii.crc32(view[offset + 4:payload_end]) & 0xFFFFFFFF
-        stored_crc = int.from_bytes(view[payload_end:chunk_end], "big")
-        if actual_crc != stored_crc:
-            raise ValueError(f"PNG {kind.decode('ascii')} chunk CRC does not match")
-        if kind == b"IDAT":
-            saw_data = True
-        if kind == b"IEND":
-            if length != 0 or not saw_data or chunk_end != len(view):
-                raise ValueError("PNG must end exactly at one empty IEND after image data")
-            return
-        offset = chunk_end
-    raise ValueError("PNG is missing a complete IEND chunk")
-
-
-def _validate_page_images(pages: list[ReadingPage]) -> None:
-    total_bytes = 0
-    for page in pages:
-        image = page.get("image")
-        if image is None:
-            if not page["text"].strip():
-                raise ValueError(f"{page['locator']}: nonempty text or an attached image is required")
-            continue
-        encoded = image["dataBase64"]
-        # Check encoded length before allocating decoded bytes. The decoded
-        # check also handles the last partial base64 group at the exact limit.
-        if len(encoded) > ((MAX_PAGE_IMAGE_BYTES + 2) // 3) * 4:
-            raise ValueError(f"{page['locator']}: page image byte limit exceeded")
-        try:
-            content = base64.b64decode(encoded, validate=True)
-        except (binascii.Error, ValueError) as error:
-            raise ValueError(f"{page['locator']}: image dataBase64 is not strict base64") from error
-        if base64.b64encode(content).decode("ascii") != encoded:
-            raise ValueError(f"{page['locator']}: image dataBase64 is not canonical base64")
-        if len(content) > MAX_PAGE_IMAGE_BYTES:
-            raise ValueError(f"{page['locator']}: page image byte limit exceeded")
-        total_bytes += len(content)
-        if total_bytes > MAX_DOCUMENT_IMAGE_BYTES:
-            raise ValueError("document image byte limit exceeded")
-        if not content.startswith(_PNG_SIGNATURE):
-            raise ValueError(f"{page['locator']}: image is missing the PNG signature")
-        if hashlib.sha256(content).hexdigest() != image["sha256"]:
-            raise ValueError(f"{page['locator']}: image sha256 does not match PNG bytes")
-        try:
-            _validate_png_container(content)
-            # Reuse the pinned image decoder for PNG interpretation and actual
-            # decompression. Check dimensions before pixel allocation.
-            with warnings.catch_warnings():
-                warnings.simplefilter("error", Image.DecompressionBombWarning)
-                with Image.open(BytesIO(content)) as png:
-                    if png.format != "PNG":
-                        raise ValueError("image must decode as PNG")
-                    if png.width * png.height > MAX_PAGE_IMAGE_PIXELS:
-                        raise ValueError("page image pixel limit exceeded")
-                    if getattr(png, "is_animated", False):
-                        raise ValueError("page image must be a static PNG")
-                    png.verify()
-                with Image.open(BytesIO(content)) as png:
-                    png.load()
-        except (OSError, SyntaxError, ValueError, Image.DecompressionBombError,
-                Image.DecompressionBombWarning) as error:
-            raise ValueError(f"{page['locator']}: invalid PNG image: {error}") from error
-
-
-def _validate_input_mode(request: ReadingInput) -> None:
-    if request.get("inputMode", "document") == "document":
-        if any(page["locator"].startswith(_STORED_REVIEW_LOCATOR_PREFIX) for page in request["pages"]):
-            raise ValueError("stored-review locators require stored-result inputMode")
-        return
-    provenance = request["storedReading"]
-    if len(request["pages"]) != 1:
-        raise ValueError("stored-result requires exactly one complete stored review page")
-    page = request["pages"][0]
-    if "image" in page:
-        raise ValueError("stored-result contains saved JSON only, never original document images")
-    if page["locator"] != _STORED_REVIEW_LOCATOR_PREFIX + provenance["recordSha256"]:
-        raise ValueError("stored review locator does not match recordSha256")
-    try:
-        record = json.loads(page["text"])
-    except (ValueError, TypeError) as error:
-        raise ValueError("stored review page must contain the complete saved JSON record") from error
-    _validate_schema(record, _STORED_REVIEW_RECORD_SCHEMA)
-    if page["text"] != _canonical_json(record):
-        raise ValueError("stored review page must be the exact canonical JSON record")
-    if stored_record_sha256(record) != provenance["recordSha256"]:
-        raise ValueError("stored review recordSha256 does not match complete record")
-    for key in ("company", "url", "publishedAt"):
-        if request[key] != record.get(key):
-            raise ValueError(f"stored review {key} does not match input metadata")
-    if provenance["originalSourceSha256"] != record.get("sourceSha256"):
-        raise ValueError("stored review originalSourceSha256 does not match old sourceSha256")
-    if provenance["reviewedAt"] != (record.get("reader") or {}).get("reviewedAt"):
-        raise ValueError("stored review reviewedAt does not match saved reader metadata")
-
-
-def validate_reading_input(request: ReadingInput, *, reader_policy: str | None = None) -> None:
-    """Raise DocumentValidationError on invalid input or stale input hashes.
-
-    Provide reader_policy to verify its digest against actual policy text. When
-    omitted, only hash syntax can be checked at this boundary. inputMode defaults
-    to document; its full text/PNG checks are unchanged. stored-result verifies
-    the entire saved JSON record and its provenance without reading an original
-    body. Actual ledger-record authenticity belongs to the storage adapter.
-    """
-    try:
-        _validate_schema(request, READING_INPUT_SCHEMA)
-        _validate_input_mode(request)
-        _validate_page_images(request["pages"])
-        locators = [page["locator"] for page in request["pages"]]
-        if len(set(locators)) != len(locators):
-            raise ValueError("pages locators must be unique")
-        if request["sourceSha256"] != source_sha256(request["pages"]):
-            raise ValueError("sourceSha256 does not match locator/text input")
-        if request["contextSha256"] != context_sha256(request["baseline"], request["priorEvidence"]):
-            raise ValueError("contextSha256 does not match baseline/priorEvidence")
-        if reader_policy is not None and request["readerPolicySha256"] != policy_sha256(reader_policy):
-            raise ValueError("readerPolicySha256 does not match reader policy")
-        _registry(request)
-    except (ValueError, TypeError, OverflowError) as error:
-        raise DocumentValidationError(str(error)) from error
-
-
-def _check_vessel(vessel_id: str, request: ReadingInput, vessels: dict[str, dict]) -> None:
-    if vessel_id not in vessels or vessels[vessel_id]["company"] != request["company"]:
-        raise ValueError(f"unknown vessel or company mismatch: {vessel_id}")
-
-
-def _check_interpretation(value: ContractInterpretation, *, public: bool = False) -> None:
-    if public and value["dateBasis"] == "unresolved":
-        raise ValueError("unresolved dates are facts only; no public row")
-    if value["dateBasis"] == "placement" and not value["placementBasis"]:
-        raise ValueError("placement dates require placementBasis")
-    reported, derived = value["reportedUsdPerDay"], value["derivedUsdPerDay"]
-    basis = value["rateBasis"]
-    if basis == "reported" and reported is None:
-        raise ValueError("reported rate requires reportedUsdPerDay")
-    if basis == "backlog-derived" and derived is None:
-        raise ValueError("backlog-derived rate requires derivedUsdPerDay")
-    if basis == "undisclosed" and (reported is not None or derived is not None):
-        raise ValueError("undisclosed rate must not carry a reported or derived rate")
-    if derived is not None:
-        if value["maximumTerm"]:
-            raise ValueError("maximum term cannot produce a single derived rate")
-        amount, days = value["valueUsd"], value["baseDurationDays"]
-        if amount is None or days is None or days <= 0 or not value["durationAssumption"]:
-            raise ValueError("derived rate requires valueUsd, positive baseDurationDays and durationAssumption")
-        # USD/day supplied by the model; tolerate at most half a dollar of
-        # rounding without selecting another amount/term pair from the source.
-        if not math.isclose(derived, amount / days, rel_tol=1e-9, abs_tol=0.5):
-            raise ValueError("derivedUsdPerDay does not equal valueUsd / baseDurationDays")
-
-
-_MISSING = object()
-
-
-def _value_at_path(target: dict, path: str) -> Any:
-    value: Any = target
-    for key in path.split("."):
-        if not key or not isinstance(value, dict) or key not in value:
-            return _MISSING
-        value = value[key]
-    return value
-
-
-def _evidence_paths(name: str, target: dict) -> set[str]:
-    """Resolve a real claim path; aliases never merge different claim values."""
-    if name in {"row", "facts"} or name.split(".")[0] in {"evidence", "reasonKo"}:
-        raise ValueError(f"evidence field must identify a claim: {name}")
-    direct = _value_at_path(target, name)
-    if direct is not _MISSING:
-        return {name}
-    if name.split(".")[0] in {"row", "facts"}:
-        raise ValueError(f"evidence field does not exist: {name}")
-    candidates = [(f"{scope}.{name}", _value_at_path(target, f"{scope}.{name}"))
-                  for scope in ("facts", "row")]
-    candidates = [(path, value) for path, value in candidates if value is not _MISSING]
-    if not candidates:
-        raise ValueError(f"evidence field does not exist: {name}")
-    # A null fact makes no affirmative claim. It need not make an otherwise
-    # unambiguous row field alias ambiguous, or acquire an invented quotation.
-    present = [(path, value) for path, value in candidates if value is not None]
-    candidates = present or candidates
-    if any(value != candidates[0][1] for _, value in candidates[1:]):
-        raise ValueError(f"ambiguous evidence field; use facts./row. path: {name}")
-    return {path for path, _ in candidates}
-
-
-def _check_evidence(items: list[ReadingEvidence], request: ReadingInput, required: set[str], target: dict) -> None:
-    """Check exact source text and coverage of actual, scoped claim paths.
-
-    A citation naming an entire interpretation object supports its descendants.
-    A citation naming one leaf supports only that leaf, never its siblings or
-    parent. Bare aliases are accepted only for equal facts/row claim values.
-    """
-    pages = {page["locator"]: page["text"] for page in request["pages"]}
-    covered: set[str] = set()
-    for item in items:
-        if item["sourceId"] != request["sourceId"] or item["locator"] not in pages:
-            raise ValueError("evidence sourceId/locator is not in the reading input")
-        if item["quote"] not in pages[item["locator"]]:
-            raise ValueError("evidence quote must be a verbatim substring at its locator")
-        for name in item["fields"]:
-            covered.update(_evidence_paths(name, target))
-    missing = {name for name in required if not any(
-        name == key or name.startswith(key + ".") for key in covered)}
-    if missing:
-        raise ValueError(f"changed fields lack evidence: {sorted(missing)}")
-
-
-def _interpretation_evidence_fields(value: ContractInterpretation) -> set[str]:
-    # These explicit absence/default values are established by reading the whole
-    # input. They do not require a quotation claiming that a source said nothing.
-    absence = {"startPrecision": "unknown", "endPrecision": "unknown", "dateBasis": "unresolved",
-               "awardType": "unreported", "rateBasis": "undisclosed", "maximumTerm": False}
-    return {key for key, item in value.items() if item is not None and item != [] and
-            not (key in absence and item == absence[key])}
-
-
-def _facts_evidence_fields(facts: ReadingFacts) -> set[str]:
-    fields = {f"facts.{key}" for key in ("client", "region") if facts[key] is not None}
-    fields |= {f"facts.interpretation.{key}" for key in _interpretation_evidence_fields(facts["interpretation"])}
-    return fields
-
-
-def _check_row_metadata(row: ReadingRow, baseline: dict | None, request: ReadingInput) -> None:
-    """Model provenance must preserve baseline or match verified input values.
-
-    Null/missing values are unsupplied, never instructions to clear provenance.
-    These system links need no artificial quote from a document's body.
-    """
-    verified = {"sourceUrl": request["url"], "sourcePublishedAt": request["publishedAt"],
-                "newsReviewed": request["kind"] == "official-news",
-                "datePrecision": {"start": row["interpretation"]["startPrecision"],
-                                  "end": row["interpretation"]["endPrecision"]}}
-    for name, expected in verified.items():
-        supplied = row.get(name)
-        if supplied is None:
-            continue
-        if baseline is not None and supplied == baseline.get(name, _MISSING):
-            continue
-        if supplied != expected:
-            raise ValueError(f"{name} must preserve baseline or match verified reading input/interpretation")
-
-
-def _check_decision(item: ReadingDecision, request: ReadingInput, vessels: dict, contracts: dict) -> None:
-    _validate_schema(item, DECISION_SCHEMA)
-    _check_vessel(item["vesselId"], request, vessels)
-    contract_id = item["contractId"]
-    baseline = None
-    if contract_id is not None:
-        if contract_id not in contracts or contracts[contract_id][0] != item["vesselId"]:
-            raise ValueError("contractId is unknown or belongs to another vessel/company")
-        baseline = contracts[contract_id][1]
-    if item["action"] == "withdraw" and contract_id is None:
-        raise ValueError("withdraw requires an existing contractId")
-    row = item["row"]
-    if (item["action"] == "upsert") != (row is not None):
-        raise ValueError("upsert requires row; all other actions require null row")
-    _check_interpretation(item["facts"]["interpretation"])
-    required = _facts_evidence_fields(item["facts"])
-    if item["action"] == "withdraw":
-        required.add("action")
-    if row is not None:
-        if row["vesselId"] != item["vesselId"] or row["id"] != contract_id:
-            raise ValueError("row IDs must match decision vesselId/contractId; new IDs must be null")
-        if row["startDate"] > row["endDate"]:
-            raise ValueError("row startDate must not exceed endDate")
-        _check_interpretation(row["interpretation"], public=True)
-        if row["status"] == "Firm" and row["interpretation"]["awardType"] in {"letter-of-award", "binding-letter-of-award"}:
-            raise ValueError("LOA enum cannot be promoted to Firm")
-        reported = row["interpretation"]["reportedUsdPerDay"]
-        expected_day_rate = reported if row["interpretation"]["rateBasis"] == "reported" else 0
-        if row["dayRate"] != expected_day_rate:
-            raise ValueError("dayRate must preserve the disclosed reported rate, otherwise zero")
-        _check_row_metadata(row, baseline, request)
-        fields = {"startDate", "endDate", "dayRate", "client", "region", "status"}
-        # Zero is the public representation of a non-reported rate, not a new
-        # source claim. A source-absence quote must never be invented for it.
-        if row["interpretation"]["rateBasis"] != "reported":
-            fields.remove("dayRate")
-        required |= {f"row.{key}" for key in fields if baseline is None or row[key] != baseline.get(key)}
-        old_interpretation = (baseline or {}).get("interpretation") or {}
-        required |= {f"row.interpretation.{key}" for key in _interpretation_evidence_fields(row["interpretation"])
-                     if row["interpretation"][key] != old_interpretation.get(key, _MISSING)}
-    _check_evidence(item["evidence"], request, required, item)
-
-
-def validate_reading_response(response: ReadingResponse, request: ReadingInput) -> ReadingValidationResult:
-    """Validate the envelope atomically and isolate individual item failures.
-
-    Report coverage uses the fixed key ``state``. It must contain every registry
-    vessel in request.company exactly once. News may have no relevant decisions.
-    readLocators must cover every input locator, for either kind of source.
-    In stored-result mode that attests only to the saved JSON record, never to
-    reading original article/PDF locations. All output checks remain identical.
-    """
-    validate_reading_input(request)
-    try:
-        # Do not recursively inspect item numbers at this stage: NaN/Infinity in
-        # one decision must be isolated along with its other schema errors.
-        _validate_schema(response, _ENVELOPE_SCHEMA, check_finite=False)
-        for key in ("sourceId", "sourceSha256", "company"):
-            if response[key] != request[key]:
-                raise ValueError(f"response {key} does not match input")
-        if set(response["readLocators"]) != {page["locator"] for page in request["pages"]}:
-            raise ValueError("readLocators must cover all input locations")
-        vessels, contracts = _registry(request)
-        coverage = response["coverage"]
-        coverage_ids = [item["vesselId"] for item in coverage]
-        if len(coverage_ids) != len(set(coverage_ids)):
-            raise ValueError("coverage vessel IDs must be unique")
-        for vessel_id in coverage_ids:
-            _check_vessel(vessel_id, request, vessels)
-        expected = {key for key, vessel in vessels.items() if vessel["company"] == request["company"]}
-        if request["kind"] == "fleet-report" and set(coverage_ids) != expected:
-            raise ValueError("report coverage must include every company registry vessel")
-    except (ValueError, TypeError, AttributeError) as error:
-        raise DocumentValidationError(str(error)) from error
-
-    result = ReadingValidationResult()
-    # Reject all competing uses of one existing ID; never choose a winner by
-    # response order. New null-ID rows are distinct proposals for reconciliation.
-    decision_ids = Counter(item.get("contractId") for item in response["decisions"]
-                           if isinstance(item, dict) and isinstance(item.get("contractId"), str))
-    update_ids = Counter(item.get("vesselId") for item in response["vesselUpdates"]
-                         if isinstance(item, dict) and isinstance(item.get("vesselId"), str))
-    for index, item in enumerate(response["decisions"]):
-        try:
-            _check_decision(item, request, vessels, contracts)
-            if item["contractId"] is not None and decision_ids[item["contractId"]] > 1:
-                raise ValueError("duplicate contractId decisions")
-            result.decisions.append(item)
-        except (ValueError, TypeError, KeyError, OverflowError) as error:
-            result.issues.append(ValidationIssue("decisions", index, str(error)))
-    for index, item in enumerate(response["vesselUpdates"]):
-        try:
-            _validate_schema(item, VESSEL_UPDATE_SCHEMA)
-            _check_vessel(item["vesselId"], request, vessels)
-            if update_ids[item["vesselId"]] > 1:
-                raise ValueError("duplicate vesselUpdates vesselId")
-            _check_evidence(item["evidence"], request, {"status", "statusAsOf"}, item)
-            result.vessel_updates.append(item)
-        except (ValueError, TypeError, KeyError, OverflowError) as error:
-            result.issues.append(ValidationIssue("vesselUpdates", index, str(error)))
-    return result
-
-
-def validate_news_queue(queue: NewsQueue) -> None:
-    """Validate persisted job identities. URLs/job IDs are data, never commands.
-
-    The scheduling layer owns fingerprint construction and source-file digests;
-    this boundary checks digest syntax, job identity and pending count.
-    """
-    try:
-        _validate_schema(queue, NEWS_QUEUE_SCHEMA)
-        if queue["pendingCount"] != len(queue["jobs"]):
-            raise ValueError("pendingCount does not match jobs")
-        ids = [item["jobId"] for item in queue["jobs"]]
-        if len(ids) != len(set(ids)):
-            raise ValueError("jobId must be unique")
-    except (ValueError, TypeError) as error:
-        raise DocumentValidationError(str(error)) from error

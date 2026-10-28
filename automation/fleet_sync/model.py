@@ -78,12 +78,10 @@ class ParseResult:
     pending_events: list[dict] = field(default_factory=list)
 
 
-# Version 2 reading contracts are additive: existing parser observations and
-# published rows can continue to omit this metadata while adapters migrate.
-DatePrecision = Literal["day", "month", "quarter", "half-year", "year", "approximate", "unknown"]
-DateBasis = Literal["source", "placement", "unresolved"]
-RateBasis = Literal["reported", "backlog-derived", "undisclosed"]
-AwardType = Literal["signed-contract", "binding-letter-of-award", "letter-of-award", "option-exercised", "extension", "unreported"]
+# Reader-port vocabulary. Legacy interpretation enums (date/rate basis,
+# precision, binding-letter-of-award) may still appear in published rows but
+# are no longer produced by the reader.
+AwardType = Literal["signed-contract", "letter-of-award", "option-exercised", "extension", "unreported"]
 ReadingKind = Literal["fleet-report", "official-news"]
 ReadingInputMode = Literal["document", "stored-result"]
 ReadingAction = Literal["upsert", "withdraw", "no-change", "hold"]
