@@ -16,7 +16,7 @@ const compile = (module, filename) => {
 require.extensions['.tsx'] = compile;
 require.extensions['.ts'] = compile;
 const { manifest, events, fleet } = require('./fixtures/legacy-fleet/load.cjs');
-const { default: Card, announcementDetails } = require('../components/OfficialAnnouncementCard.tsx');
+const { default: Card, announcementDetails, decisionDetails } = require('../components/OfficialAnnouncementCard.tsx');
 const { default: Announcements, splitAnnouncements } = require('../components/Announcements.tsx');
 const { default: Gantt } = require('../components/FleetGantt.tsx');
 const { contractSpan, contractPeriod, quarterScrollOffset } = require('../utils/contractTimeline.ts');
@@ -61,7 +61,8 @@ test('KG2 renders all announced terms without inventing exact dates or a dayrate
   assert.equal((html.match(/<dt /g) || []).length, 7);
   assert.match(html, /Dhirubhai Deepwater KG2/);
   assert.match(html, /August 20, 2026/);
-  assert.match(html, /배치에 의존하는 일정은 가동률·평균 공시 dayrate 집계에서 제외/);
+  assert.match(html, /미공개·환산 요율은 평균 공시 dayrate에 포함하지 않습니다/);
+  assert.doesNotMatch(html, /집계에서 제외/);
   assert.doesNotMatch(html, /2027-01-01|2029-01-01|411,|\$0/);
 });
 
@@ -112,8 +113,8 @@ test('Codex-reviewed incomplete terms are distinct from unread articles', () => 
   assert.match(render({ ...reviewed, facts: { ...reviewed.facts, expectedStart: 'fourth quarter of 2026' } }), /fourth quarter of 2026/);
   const applied = render({ ...reviewed, autoApplied: true });
   assert.match(applied, /Fleet Status 반영/);
-  assert.match(applied, /원문 날짜 표현·정밀도와 표시 날짜를 구분/);
-  assert.match(applied, /미공개·환산 요율도 평균 공시 dayrate에 포함하지 않습니다/);
+  assert.match(applied, /원문 날짜 표현과 표시 날짜를 구분/);
+  assert.match(applied, /미공개·환산 요율은 평균 공시 dayrate에 포함하지 않습니다/);
   assert.doesNotMatch(applied, /월초·월말|계약표/);
   assert.match(render({ ...reviewed, reviewStatus: 'conflict' }), /조건 충돌/);
   assert.match(render({ ...kg2, llmReview: undefined }), /확인 대기/);
@@ -125,10 +126,12 @@ test('applied announcements are archived and every detail stays collapsed', () =
   const grouped = splitAnnouncements(events);
   assert.equal(grouped.applied.length, 2);
   assert.equal(grouped.unresolved.length, 6);
+  assert.equal(grouped.applied.length + grouped.unresolved.length + grouped.others.length, events.length);
   assert(grouped.unresolved.every(e => !e.autoApplied));
   const html = renderToStaticMarkup(React.createElement(Announcements, {events, sources: manifest.sources}));
   assert.match(html, /미확정 조건 6건/);
   assert.match(html, /Fleet Status 반영 이력 2건/);
+  assert.match(html, new RegExp(`기타 발표 ${events.length - 8}건`));
   assert.doesNotMatch(html, /계약표/);
   assert.doesNotMatch(html, /<details[^>]*\sopen(?:\s|=|>)|Codex|gpt-6-luna/);
 });
@@ -162,7 +165,7 @@ test('generated feed renders separately without mutating fleet or announcement d
   for (const event of pending) {
     const html = render(event, manifest.sources.find(source => source.company === event.company));
     assert.equal((html.match(/<dt /g) || []).length, 7);
-    assert.match(html, /배치에 의존하는 일정은 가동률·평균 공시 dayrate 집계에서 제외/);
+    assert.doesNotMatch(html, /집계에서 제외|undefined/);
   }
   assert.equal(JSON.stringify({ fleet, events }), before);
 });
@@ -173,11 +176,78 @@ test('stored-result announcement distinguishes original reading time and source 
     llmReview: { reviewedAt: '2026-10-28T10:00:00Z' } };
   const html = render(stored);
   assert.match(html, /저장된 읽기 결과로 보완/);
-  assert.match(html, /원래 읽기 시각: 2026-08-20T09:10:00Z/);
+  assert.match(html, /원래 읽은 시각 2026-08-20T09:10:00Z/);
   assert.match(html, /원문 URL/);
   assert.match(html, /href="https:\/\/investor.deepwater.com\/news-releases\/example"/);
-  assert.doesNotMatch(html.slice(0, html.indexOf('</summary>')), /저장된 읽기 결과로 보완|원래 읽기 시각/);
+  assert.doesNotMatch(html.slice(0, html.indexOf('</summary>')), /저장된 읽기 결과로 보완|원래 읽은 시각/);
   assert.doesNotMatch(html, /2026-10-28T10:00:00Z|<details[^>]*\sopen(?:\s|=|>)/);
-  assert.match(render({ ...stored, storedReading: { ...stored.storedReading, reviewedAt: null } }), /원래 읽기 시각: 확인되지 않음/);
-  assert.doesNotMatch(render(kg2), /저장된 읽기 결과로 보완|원래 읽기 시각/);
+  assert.match(render({ ...stored, storedReading: { ...stored.storedReading, reviewedAt: null } }), /원래 읽은 시각 확인되지 않음/);
+  assert.doesNotMatch(render(kg2), /저장된 읽기 결과로 보완|원래 읽은 시각/);
+});
+
+test('every event is listed; non-contract items appear as title + link', () => {
+  const others = [
+    { company: 'Transocean', classification: 'official-news-signal', autoApplied: false, pendingReview: false, reviewStatus: 'not-contract-news', title: 'Quarterly results', url: 'https://example.com/q3', publishedAt: '2026-10-01' },
+    { company: 'Noble', classification: 'official-news-signal', autoApplied: false, pendingReview: false, title: 'Conference call', url: 'javascript:alert(1)' },
+  ];
+  const grouped = splitAnnouncements(others);
+  assert.equal(grouped.others.length, 2);
+  const html = renderToStaticMarkup(React.createElement(Announcements, { events: others, sources: [] }));
+  assert.match(html, /기타 발표 2건/);
+  assert.match(html, /href="https:\/\/example.com\/q3"[^>]*>Quarterly results ↗/);
+  assert.match(html, /Conference call/);
+  assert.doesNotMatch(html, /javascript:|<dt /);
+});
+
+const newInterpretation = { sourceStartText: 'mid-2027', placementBasis: '앞선 계약 뒤에 배치', termText: '2 years',
+  valueText: '$300 million', valueUsd: 300e6, baseDurationDays: 730, derivedUsdPerDay: 300e6 / 730 };
+
+test('new readingDecision shape renders action, row, reason, quote, locator and hold reason', () => {
+  const upsert = { company: 'Seadrill', vessel: 'West Saturn', classification: 'official-news-signal', autoApplied: true, url: 'https://example.com/a',
+    readingDecision: { action: 'upsert', contractId: 'c1', reasonKo: '신규 계약', quote: 'awarded a two-year contract', locator: 'p1',
+      row: { startDate: '2027-07-01', endDate: '2029-06-30', dayRate: 0, client: 'Petrobras', region: 'Brazil', status: 'Firm', interpretation: newInterpretation } } };
+  const details = Object.fromEntries(announcementDetails(upsert));
+  assert.equal(details['고객·지역'], 'Petrobras · Brazil');
+  assert.equal(details['작업 시작'], 'mid-2027');
+  assert.equal(details['기본 기간'], '2 years');
+  assert.equal(details['기본 계약 가치'], '$300 million');
+  assert.equal(details.Dayrate, '미공개');
+  const { notes, quotes } = decisionDetails(upsert);
+  assert(notes.includes('판단: Fleet Status 반영'));
+  assert(notes.includes('신규 계약'));
+  assert(notes.includes('표시 구간: 2027-07-01 – 2029-06-30'));
+  assert(notes.some(n => n.includes('일정 배치: 앞선 계약 뒤에 배치')));
+  assert(notes.some(n => n.includes('$300,000,000 ÷ 730일 = $410,959 / 일')));
+  assert.deepEqual(quotes, ['awarded a two-year contract · p1']);
+  const reported = { ...upsert, readingDecision: { ...upsert.readingDecision, row: { ...upsert.readingDecision.row, dayRate: 415000 } } };
+  assert.equal(Object.fromEntries(announcementDetails(reported)).Dayrate, '$415,000 / 일');
+
+  const hold = { ...upsert, autoApplied: false, readingDecision: { action: 'hold', contractId: null, row: null, holdReason: 'end date before start date' } };
+  const held = decisionDetails(hold);
+  assert(held.notes.includes('판단: 보류'));
+  assert(held.notes.includes('보류 사유: end date before start date'));
+  assert.deepEqual(held.quotes, []);
+  const html = render(hold);
+  assert.match(html, /보류 사유: end date before start date/);
+  assert.doesNotMatch(html, /undefined|null/);
+
+  const bare = render({ ...upsert, readingDecision: { action: 'no-change', contractId: null, row: null } });
+  assert.match(bare, /판단: 변경 없음/);
+  assert.doesNotMatch(bare, /undefined|null/);
+});
+
+test('legacy readingDecision facts/evidence shape still renders', () => {
+  const legacy = { company: 'Seadrill', vessel: 'Ship', classification: 'official-news-signal', autoApplied: false, url: 'https://example.com/b',
+    readingDecision: { action: 'hold', contractId: null, row: null, reasonKo: '시작 근거 부족',
+      facts: { client: 'Client', region: 'Brazil', interpretation: { ...newInterpretation, sourceStartText: 'fourth quarter of 2026', dateBasis: 'unresolved', startPrecision: 'quarter', rateBasis: 'backlog-derived', includes: ['동원 비용'], excludes: [] } },
+      evidence: [{ fields: ['termText'], quote: '880 days', locator: 'p2' }, { quote: 'no locator' }] } };
+  const details = Object.fromEntries(announcementDetails(legacy));
+  assert.equal(details['고객·지역'], 'Client · Brazil');
+  assert.equal(details['작업 시작'], 'fourth quarter of 2026');
+  const { notes, quotes } = decisionDetails(legacy);
+  assert(notes.includes('시작 근거 부족'));
+  assert(notes.some(n => n.includes('포함: 동원 비용')));
+  assert.deepEqual(quotes, ['880 days · p2', 'no locator']);
+  const html = render(legacy);
+  assert.doesNotMatch(html, /undefined|\(quarter\)|배치 보류/);
 });

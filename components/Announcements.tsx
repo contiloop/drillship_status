@@ -1,6 +1,6 @@
 import React from 'react';
 import type { FleetSource, OfficialEvent } from '../types';
-import { isIsoDate } from '../utils/contractTimeline';
+import { contractSource, isIsoDate } from '../utils/contractTimeline';
 import OfficialAnnouncementCard from './OfficialAnnouncementCard';
 
 const publicationTime = (event: OfficialEvent) => {
@@ -8,16 +8,23 @@ const publicationTime = (event: OfficialEvent) => {
   return isIsoDate(date) ? Date.parse(`${date}T00:00:00Z`) : 0;
 };
 
+const isContractItem = (event: OfficialEvent) =>
+  !['superseded', 'covered-by-report', 'not-contract-news'].includes(event.reviewStatus || '')
+  && (Boolean((event.llmReview || event.readingDecision) && event.vessel) || (event.pendingReview !== false && !event.autoApplied));
+
+/** Every event is listed: contract items as cards, everything else as title + link. */
 export function splitAnnouncements(events: OfficialEvent[]) {
-  const relevant = [...events]
-    .filter(event => !['superseded', 'covered-by-report', 'not-contract-news'].includes(event.reviewStatus || ''))
-    .filter(event => Boolean((event.llmReview || event.readingDecision) && event.vessel) || (event.pendingReview !== false && !event.autoApplied))
-    .sort((a, b) => publicationTime(b) - publicationTime(a));
-  return { unresolved: relevant.filter(e => !e.autoApplied), applied: relevant.filter(e => e.autoApplied) };
+  const sorted = [...events].sort((a, b) => publicationTime(b) - publicationTime(a));
+  const relevant = sorted.filter(isContractItem);
+  return {
+    unresolved: relevant.filter(e => !e.autoApplied),
+    applied: relevant.filter(e => e.autoApplied),
+    others: sorted.filter(event => !isContractItem(event)),
+  };
 }
 
 export default function Announcements({ events, sources }: { events: OfficialEvent[]; sources: FleetSource[] }) {
-  const { unresolved, applied } = splitAnnouncements(events);
+  const { unresolved, applied, others } = splitAnnouncements(events);
   const cards = (rows: OfficialEvent[]) => rows.map((event, index) => (
     <OfficialAnnouncementCard key={`${event.url}-${event.vessel || index}`} event={event}
       source={sources.find(source => source.company === event.company)} />
@@ -32,6 +39,21 @@ export default function Announcements({ events, sources }: { events: OfficialEve
         <details className="border-t border-slate-800 pt-4">
           <summary className="cursor-pointer py-2 text-sm text-slate-500">Fleet Status 반영 이력 {applied.length}건</summary>
           <div className="mt-3 space-y-3">{cards(applied)}</div>
+        </details>
+      )}
+      {others.length > 0 && (
+        <details className="border-t border-slate-800 pt-4">
+          <summary className="cursor-pointer py-2 text-sm text-slate-500">기타 발표 {others.length}건</summary>
+          <ul className="mt-3 space-y-2 text-sm text-slate-300">
+            {others.map((event, index) => {
+              const title = event.title || event.vessel || event.vessels?.join(', ') || `${event.company} 공식 발표`;
+              const href = contractSource(event.url);
+              return <li key={`${event.url}-${index}`} className="break-words">
+                {href ? <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-300 underline underline-offset-4 hover:text-blue-200">{title} ↗</a> : title}
+                <span className="ml-2 text-xs text-slate-500">{event.company}{event.publishedAt ? ` · ${event.publishedAt.slice(0, 10)}` : ''}</span>
+              </li>;
+            })}
+          </ul>
         </details>
       )}
     </section>

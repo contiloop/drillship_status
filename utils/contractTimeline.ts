@@ -7,8 +7,7 @@ export function quarterScrollOffset(month: number, totalMonths: number, timeline
   return Math.floor(month / 3) * 3 / totalMonths * timelineWidth;
 }
 
-export function contractSpan(contract: Contract, year: number, endYear: number) {
-  if (contract.interpretation?.dateBasis === 'unresolved') return null;
+export function contractSpan(contract: Pick<Contract, 'startDate' | 'endDate'>, year: number, endYear: number) {
   if (!isIsoDate(contract.startDate) || !isIsoDate(contract.endDate)) return null;
   const origin = Date.UTC(year, 0, 1);
   const limit = Date.UTC(endYear + 1, 0, 1);
@@ -19,11 +18,12 @@ export function contractSpan(contract: Contract, year: number, endYear: number) 
   return { left: (start - origin) / (limit - origin) * 100, width: (end - start) / (limit - origin) * 100 };
 }
 
-export function contractPeriod(contract: Contract) {
+/** Reader rows carry the dates to display; legacy report rows keep their month presentation. */
+export function contractPeriod(contract: Pick<Contract, 'startDate' | 'endDate' | 'datePrecision' | 'interpretation'>) {
+  const full = (key: 'start' | 'end') => Boolean(contract.interpretation) || contract.datePrecision?.[key] === 'day';
   const label = (key: 'start' | 'end') => {
     const value = key === 'start' ? contract.startDate : contract.endDate;
-    const precision = contract.interpretation?.[key === 'start' ? 'startPrecision' : 'endPrecision'] || contract.datePrecision?.[key];
-    return contract.interpretation?.dateBasis === 'placement' || precision === 'day' ? value : value.slice(0, 7);
+    return full(key) ? value : value.slice(0, 7);
   };
   return `${label('start')} ~ ${label('end')}`;
 }
@@ -39,17 +39,13 @@ export function isIsoDate(value: string) {
     && new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10) === value;
 }
 
-/** Preserve legacy/month-based statistics while excluding model placement. */
-export function isStatisticalContract(contract: Contract) {
-  if (!isIsoDate(contract.startDate) || !isIsoDate(contract.endDate) || contract.endDate < contract.startDate) return false;
-  const value = contract.interpretation;
-  return !value || (value.dateBasis === 'source'
-    && ['day', 'month'].includes(value.startPrecision) && ['day', 'month'].includes(value.endPrecision));
+/** Statistics use every row with a valid ISO period, including reader-placed dates. */
+export function isStatisticalContract(contract: Pick<Contract, 'startDate' | 'endDate'>) {
+  return isIsoDate(contract.startDate) && isIsoDate(contract.endDate) && contract.startDate <= contract.endDate;
 }
 
-export function reportedRate(contract: Contract): number {
-  const value = contract.interpretation;
-  if (value && (value.rateBasis !== 'reported' || value.reportedUsdPerDay !== contract.dayRate)) return 0;
+/** dayRate holds only a disclosed rate; derived values live in interpretation. */
+export function reportedRate(contract: Pick<Contract, 'dayRate'>): number {
   return Number.isFinite(contract.dayRate) && contract.dayRate > 0 ? contract.dayRate : 0;
 }
 
@@ -58,22 +54,25 @@ export function isCurrentReportedRate(contract: Contract, today: string) {
     && contract.startDate <= today && contract.endDate >= today;
 }
 
-export function interpretationDetails(contract: Contract | ContractInterpretation) {
-  const value = 'dateBasis' in contract ? contract : contract.interpretation;
+const list = (values: unknown) => Array.isArray(values) ? values.filter(value => typeof value === 'string' && value) : [];
+
+/** Display-only reader text; legacy enum fields are ignored. */
+export function interpretationDetails(contract: Contract | ContractInterpretation | null | undefined) {
+  const value: ContractInterpretation | null | undefined = contract && 'startDate' in contract ? (contract as Contract).interpretation : contract as ContractInterpretation | null | undefined;
   if (!value) return '';
-  return [value.sourceStartText ? `원문 시작: ${value.sourceStartText} (${value.startPrecision})` : '',
-    value.sourceEndText ? `원문 종료: ${value.sourceEndText} (${value.endPrecision})` : '',
+  const includes = list(value.includes);
+  const excludes = list(value.excludes);
+  return [value.sourceStartText ? `원문 시작: ${value.sourceStartText}` : '',
+    value.sourceEndText ? `원문 종료: ${value.sourceEndText}` : '',
     value.placementBasis ? `일정 배치: ${value.placementBasis}` : '',
-    value.dateBasis === 'unresolved' ? '배치 보류 · 일정 근거 확인 필요' : value.dateBasis === 'placement' ? '표시 날짜는 배치 기준이며 공개된 정확한 일자가 아닙니다. 가동률·평균 공시 dayrate 집계에서 제외합니다.' : '',
     value.termText, value.optionText, value.valueText,
-    value.maximumTerm ? '최대 기간만 공개 · 단일 환산 요율 미산출' : '',
-    value.includes.length ? `포함: ${value.includes.join('·')}` : '',
-    value.excludes.length ? `제외: ${value.excludes.join('·')}` : '',
+    includes.length ? `포함: ${includes.join('·')}` : '',
+    excludes.length ? `제외: ${excludes.join('·')}` : '',
   ].filter(Boolean).join(' · ');
 }
 
 /** Audit label only: do not replace the original review time with completion time. */
 export function storedReadingDetails(value: Pick<Contract, 'inputMode' | 'storedReading'>) {
   if (value.inputMode !== 'stored-result') return '';
-  return `저장된 읽기 결과로 보완 · 원래 읽기 시각: ${value.storedReading?.reviewedAt || '확인되지 않음'}`;
+  return `저장된 읽기 결과로 보완 · 원래 읽은 시각 ${value.storedReading?.reviewedAt || '확인되지 않음'}`;
 }

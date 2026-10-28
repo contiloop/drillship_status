@@ -1,6 +1,6 @@
 import { regressionLoess } from 'd3-regression';
-import type { Company, Drillship, FleetSource, Generation, OfficialEvent } from '../types';
-import { contractSource, isIsoDate, interpretationDetails, reportedRate } from './contractTimeline';
+import type { Company, Drillship, FleetSource, Generation } from '../types';
+import { contractSource, interpretationDetails, isStatisticalContract, reportedRate } from './contractTimeline';
 import { economicsDetails, timelineContracts } from './newsEconomics';
 
 const DAY = 86_400_000;
@@ -24,27 +24,24 @@ export interface DayrateObservation {
 }
 
 /** Only supported firm rate-periods, not an invented historical award database. */
-export function dayrateObservations(ships: Drillship[], events: OfficialEvent[], sources: FleetSource[] = []): DayrateObservation[] {
+export function dayrateObservations(ships: Drillship[], sources: FleetSource[] = []): DayrateObservation[] {
   const observations: DayrateObservation[] = [];
   for (const ship of ships) {
-    for (const row of timelineContracts(ship, events)) {
-      if (row.status !== 'Firm' || row.interpretation?.dateBasis === 'unresolved' || !isIsoDate(row.startDate) || !isIsoDate(row.endDate)) continue;
+    for (const row of timelineContracts(ship)) {
+      if (row.status !== 'Firm' || !isStatisticalContract(row)) continue;
       const time = Date.parse(`${row.startDate}T00:00:00Z`);
       const end = Date.parse(`${row.endDate}T00:00:00Z`);
-      if (!Number.isFinite(time + end) || end < time) continue;
       const reported = reportedRate(row) > 0;
-      // Each canonical model row represents its own value/term tranche.
-      const conversion = row.economics?.rates.length === 1 ? row.economics.rates[0] : undefined;
-      if (!reported && !conversion) continue;
-      const rate = reported ? row.dayRate : conversion!.usdPerDay;
-      if (!Number.isFinite(rate) || rate <= 0) continue;
+      // Each canonical row carries its own value/term tranche.
+      if (!reported && !row.economics) continue;
+      const rate = reported ? row.dayRate : row.economics!.usdPerDay;
       observations.push({
         id: row.id, vessel: ship.name, company: ship.company, generation: ship.generation, client: row.client,
         time, start: row.startDate, end: row.endDate, days: (end - time) / DAY + 1, rate,
         basis: reported ? 'reported' : 'backlog',
         sourceUrl: contractSource(row.sourceUrl) || contractSource(sources.find(s => s.company === ship.company)?.documentUrl),
-        detail: [reported ? '공식 Fleet Status Report에 공개된 일당' : economicsDetails(row.economics!),
-          row.interpretation ? interpretationDetails(row) : '월 단위 계약 구간은 월초·월말로 배치'].join(' · '),
+        detail: [reported ? '공개된 일당' : economicsDetails(row.economics!),
+          row.interpretation ? interpretationDetails(row) : '월 단위 계약 구간은 월초·월말로 배치'].filter(Boolean).join(' · '),
       });
     }
   }
