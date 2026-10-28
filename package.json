@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "data:sync": "python3 -m automation.fleet_sync --write",
-    "data:check": "python3 -m automation.fleet_sync --check",
-    "test": "python3 -m pytest automation/tests -q && npm run test:ui",
+    "data:sync": ".venv/bin/python -m automation.fleet_sync --write",
+    "data:check": ".venv/bin/python -m automation.fleet_sync --check",
+    "test": ".venv/bin/python -m pytest automation/tests -q && npm run test:ui",
     "test:ui": "node --test tests/*.test.cjs",
     "verify": "npm run test && npm run build",
     "preview": "vite preview"

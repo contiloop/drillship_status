@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from collections import Counter
 from dataclasses import asdict
 from datetime import date, datetime
@@ -482,7 +483,8 @@ def validate_fleet(fleet: list[dict[str, Any]], expected_names: dict[str, set[st
             validate_iso_date(contract["endDate"])
             if contract["startDate"] > contract["endDate"]:
                 raise PipelineError(f"{ship['name']}: contract dates are reversed")
-            if not isinstance(contract.get("dayRate"), int) or contract["dayRate"] < 0:
+            if (isinstance(contract.get("dayRate"), bool) or not isinstance(contract.get("dayRate"), (int, float))
+                    or not math.isfinite(contract["dayRate"]) or contract["dayRate"] < 0):
                 raise PipelineError(f"{ship['name']}: invalid dayrate")
             if not contract.get("client") or not contract.get("region"):
                 raise PipelineError(f"{ship['name']}: blank client or region")
@@ -501,6 +503,8 @@ def _build_outputs(
     list[str],
     list[dict[str, Any]],
 ]:
+    if not offline:
+        raise PipelineError("legacy semantic parser is fixture-only; use the reading pipeline")
     current = _load_current_fleet(root)
     by_company = {
         company: [ship for ship in current if ship.get("company") == company]
@@ -820,138 +824,22 @@ def _build_outputs(
 
 
 def run(root: Path, *, write: bool, offline: bool = False) -> dict[str, Any]:
-    before = _load_current_fleet(root)
-    fleet, sources, observations, events, warnings, source_health = _build_outputs(
-        root, offline=offline
-    )
-    warnings = _dedupe_warnings(warnings)
-    fleet_hash = content_hash(fleet, length=20)
-    events_hash = content_hash(events, length=20)
-    health_by_company = {item["company"]: item for item in source_health}
-    source_facts = [
-        {
-            "company": item.company,
-            "indexUrl": item.index_url,
-            "documentUrl": item.document_url,
-            "reportDate": item.report_date,
-            "sha256": item.sha256,
-            "byteSize": item.byte_size,
-            "parserVersion": item.parser_version,
-            "discovery": item.discovery,
-            "contentType": item.content_type,
-            "health": health_by_company[item.company]["fleetReport"],
-            "newsMonitor": health_by_company[item.company]["newsMonitor"],
-        }
-        for item in sorted(sources, key=lambda source: source.company)
-    ]
-    state_fingerprint = content_hash(
-        {
-            "fleetHash": fleet_hash,
-            "sources": source_facts,
-            "eventsHash": events_hash,
-            "sourceHealth": source_health,
-            "warningsHash": content_hash(warnings, length=20),
-            "newsQueue": queue_from_events(events),
-        },
-        length=20,
-    )
-    public_data = root / "public" / "data"
-    existing_manifest_path = public_data / "manifest.json"
-    existing_manifest = (
-        load_json(existing_manifest_path) if existing_manifest_path.exists() else {}
-    )
-    unchanged = (
-        isinstance(existing_manifest, dict)
-        and existing_manifest.get("stateFingerprint") == state_fingerprint
-    )
-    generated_at = (
-        existing_manifest.get("generatedAt")
-        if unchanged and isinstance(existing_manifest, dict)
-        else retrieved_at()
-    )
-    manifest = {
-        "schemaVersion": 1,
-        "generatedAt": generated_at,
-        "updatedAsOf": max(item.report_date for item in sources),
-        "dataHash": fleet_hash,
-        "stateFingerprint": state_fingerprint,
-        "fleetFile": f"fleet.{fleet_hash}.json",
-        "eventsFile": f"events.{events_hash}.json",
-        "eventsHash": events_hash,
-        "shipCount": len(fleet),
-        "contractCount": sum(len(ship["contracts"]) for ship in fleet),
-        "sourceCount": len(sources),
-        "sources": source_facts,
-        "sourceHealth": source_health,
-        "warningsCount": len(warnings),
-        "eventCount": len(events),
-        "pendingEventCount": sum(event.get("pendingReview") is True for event in events),
-        "newsQueue": queue_from_events(events),
-        "newsReview": {
-            "engine": "Codex CLI / ChatGPT login", "model": "gpt-6-luna",
-            "reasoningEffort": "medium", "fast": False,
-            "reviewedVesselEvents": sum(bool(e.get("llmReview")) and bool(e.get("vessel")) for e in events),
-            "detailsIncompleteCount": sum(bool(e.get("needsDetails")) for e in events),
-        },
-    }
-    changes = {
-        "generatedAt": generated_at,
-        "fromDataHash": (
-            existing_manifest.get("dataHash")
-            if isinstance(existing_manifest, dict)
-            else None
-        ),
-        "toDataHash": fleet_hash,
-        **_semantic_changes(before, fleet),
-    }
-    source_provenance = {
-        "generatedAt": generated_at,
-        "documents": [asdict(item) for item in sorted(sources, key=lambda source: source.company)],
-        "health": source_health,
-        "warnings": warnings,
-    }
-    observation_provenance = {
-        "generatedAt": generated_at,
-        "parserVersion": PARSER_VERSION,
-        "observations": observations,
-    }
-
-    if write and not unchanged:
-        dump_json(public_data / manifest["fleetFile"], fleet)
-        dump_json(public_data / manifest["eventsFile"], {"generatedAt": generated_at, "events": events})
-        dump_json(public_data / "changes.json", changes)
-        dump_json(root / "data" / "provenance" / "sources.json", source_provenance)
-        dump_json(root / "data" / "provenance" / "observations.json", observation_provenance)
-        # Publish the manifest only after its content-addressed payloads exist.
-        dump_json(existing_manifest_path, manifest)
-
-    if write:
-        # Vercel deploys each Git revision atomically, so payloads referenced by
-        # older deployments remain available there without accumulating in main.
-        _prune_obsolete_payloads(
-            public_data,
-            {manifest["fleetFile"], manifest["eventsFile"]},
-        )
-
-    return {
-        "ok": True,
-        "writeRequested": write,
-        "changed": not unchanged,
-        "manifest": manifest,
-        "events": len(events),
-        "warnings": len(warnings),
-    }
+    """Server entry point: collect/queue only, retaining the last good fleet."""
+    if offline:
+        raise PipelineError("offline semantic parser publishing is retired; use controlled collector fixtures")
+    from .reading_pipeline import execute
+    return execute(root, mode="server", write=write)
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Synchronize official drillship fleet reports")
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--write", action="store_true", help="write validated generated artifacts")
-    mode.add_argument("--check", action="store_true", help="fetch, parse, and validate without writing")
+    mode.add_argument("--check", action="store_true", help="collect and plan reading jobs without publishing")
     parser.add_argument(
         "--offline",
         action="store_true",
-        help="use local official PDF fixtures (for development only)",
+        help="retired; offline semantic parser publication is refused",
     )
     parser.add_argument("--root", type=Path, default=Path.cwd())
     args = parser.parse_args(argv)

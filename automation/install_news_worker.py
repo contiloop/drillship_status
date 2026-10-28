@@ -48,7 +48,8 @@ def main() -> int:
     target.write_bytes(plistlib.dumps(launch_agent(root, sys.executable, paths)))
     target.chmod(0o600)
     subprocess.run(["launchctl", "bootstrap", domain, str(target)], check=True)
-    print(f"Installed {service}: server queue checked every 5 minutes, Codex only for pending work.")
+    subprocess.run(["launchctl", "print", service], check=True, capture_output=True)
+    print(f"Installed compatible v1/v2 worker {service}: server queue checked every 5 minutes, Codex only for pending work.")
     return 0
 
 
