@@ -1,59 +1,54 @@
 import type { Contract, ContractInterpretation, Drillship, OfficialEvent } from '../types';
 
-export interface AwardDuration {
-  days: number;
-  label: string;
-  assumption?: string;
-}
-export interface BacklogRate {
-  usdPerDay: number;
-  valueUsd: number;
-  duration: AwardDuration;
-}
+/** Daily value derived by code from contract value ÷ base duration; never a disclosed dayrate. */
 export interface NewsEconomics {
   scope: 'award' | 'extension';
-  rates: BacklogRate[];
-  includes: string[];
-  excludes: string[];
+  usdPerDay: number;
+  valueUsd?: number;
+  days?: number;
 }
 export interface TimelineContract extends Contract {
   economics?: NewsEconomics;
 }
 
-const positive = (value: number | null | undefined): value is number => typeof value === 'number' && Number.isFinite(value) && value > 0;
+const positive = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value) && value > 0;
 
-/** Validate the model's numeric pairing; never select amounts or terms from prose. */
-export function interpretationEconomics(value?: ContractInterpretation): NewsEconomics | undefined {
-  if (!value || value.rateBasis !== 'backlog-derived' || value.maximumTerm
-    || !positive(value.valueUsd) || !positive(value.baseDurationDays) || !positive(value.derivedUsdPerDay)) return undefined;
-  const expected = value.valueUsd / value.baseDurationDays;
-  if (Math.abs(expected - value.derivedUsdPerDay) > Math.max(1, expected * 0.00001)) return undefined;
+/** A derived rate exists iff derivedUsdPerDay is a positive finite number. */
+export function interpretationEconomics(value?: ContractInterpretation | null): NewsEconomics | undefined {
+  if (!value || !positive(value.derivedUsdPerDay)) return undefined;
   return {
-    scope: ['extension', 'option-exercised'].includes(value.awardType) ? 'extension' : 'award',
-    rates: [{ valueUsd: value.valueUsd, usdPerDay: value.derivedUsdPerDay,
-      duration: { days: value.baseDurationDays, label: value.termText || `${value.baseDurationDays.toLocaleString('en-US')}일`, assumption: value.durationAssumption || undefined } }],
-    includes: value.includes, excludes: value.excludes,
+    scope: value.awardType === 'extension' || value.awardType === 'option-exercised' ? 'extension' : 'award',
+    usdPerDay: value.derivedUsdPerDay,
+    valueUsd: positive(value.valueUsd) ? value.valueUsd : undefined,
+    days: positive(value.baseDurationDays) ? value.baseDurationDays : undefined,
   };
 }
 
-export function newsEconomics(event: OfficialEvent): NewsEconomics | undefined {
-  return interpretationEconomics(event.readingDecision?.facts.interpretation);
+/** Interpretation attached to an event decision (new row shape first, legacy facts second). */
+export function eventInterpretation(event: OfficialEvent): ContractInterpretation | undefined {
+  const decision = event.readingDecision;
+  return decision?.row?.interpretation || decision?.facts?.interpretation || undefined;
 }
 
-/** Canonical rows already contain model-resolved identity, dates and status.
- * News is detail/provenance only: it must never synthesize a second schedule. */
-export function timelineContracts(ship: Drillship, _events: OfficialEvent[] = []): TimelineContract[] {
+export function newsEconomics(event: OfficialEvent): NewsEconomics | undefined {
+  return interpretationEconomics(eventInterpretation(event));
+}
+
+/** Bars come only from canonical fleet rows; news never adds or moves a period. */
+export function timelineContracts(ship: Drillship): TimelineContract[] {
   return ship.contracts.map(row => ({ ...row, economics: interpretationEconomics(row.interpretation) }));
 }
 
+const usd = (value: number) => `$${Math.round(value).toLocaleString('en-US')}`;
+
 export function backlogRateLabel(economics: NewsEconomics, compact = false) {
-  return `${economics.scope === 'extension' ? '연장 ' : ''}${economics.rates.map(r => compact
-    ? `$${Math.round(r.usdPerDay / 1000)}k` : `$${Math.round(r.usdPerDay).toLocaleString('en-US')}`).join(' / ')}${compact ? '' : ' / 일'}`;
+  const rate = compact ? `$${Math.round(economics.usdPerDay / 1000)}k` : usd(economics.usdPerDay);
+  return `${economics.scope === 'extension' ? '연장 ' : ''}${rate}${compact ? '' : ' / 일'}`;
 }
 
 export function economicsDetails(economics: NewsEconomics) {
-  const calculations = economics.rates.map(r => `$${r.valueUsd.toLocaleString('en-US')} ÷ ${r.duration.days.toLocaleString('en-US', { maximumFractionDigits: 2 })}일${r.duration.assumption ? ` (${r.duration.assumption})` : ''}`);
-  return [...calculations, '계약 가치의 일평균 환산액 · 공시 dayrate 아님',
-    economics.includes.length ? `포함: ${economics.includes.join('·')}` : '추가 비용 포함 여부는 원문 기준',
-    economics.excludes.length ? `제외: ${economics.excludes.join('·')}` : ''].filter(Boolean).join(' · ');
+  const formula = economics.valueUsd && economics.days
+    ? `${usd(economics.valueUsd)} ÷ ${economics.days.toLocaleString('en-US', { maximumFractionDigits: 2 })}일 = ${usd(economics.usdPerDay)} / 일`
+    : `${usd(economics.usdPerDay)} / 일`;
+  return `${formula} · 계약 가치의 일평균 환산액 · 공시 dayrate 아님`;
 }

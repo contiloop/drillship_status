@@ -258,7 +258,7 @@ export default function App() {
         </header>
 
         {activeTab === 'news' ? <Announcements events={officialEvents} sources={reportSources} /> : activeTab === 'dayrates' ? (
-          <Suspense fallback={<p role="status" className="py-12 text-sm text-slate-400">Dayrates 불러오는 중…</p>}><DayrateTrends ships={ships} events={officialEvents} sources={reportSources} /></Suspense>
+          <Suspense fallback={<p role="status" className="py-12 text-sm text-slate-400">Dayrates 불러오는 중…</p>}><DayrateTrends ships={ships} sources={reportSources} /></Suspense>
         ) : (activeTab === 'overview' || activeTab === 'transocean' || activeTab === 'valaris' || activeTab === 'noble' || activeTab === 'seadrill') ? (
           <div className="space-y-5">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
@@ -314,7 +314,7 @@ export default function App() {
 
             {filteredShips.length > 0 ? (
               <>
-                <FleetGantt ships={filteredShips} events={officialEvents} />
+                <FleetGantt ships={filteredShips} />
                 <details className="rounded-xl border border-slate-800 p-4">
                   <summary className="cursor-pointer text-sm font-bold text-slate-400">시장 분석 차트</summary>
                   <div className="mt-4"><MarketChart ships={filteredShips} /></div>

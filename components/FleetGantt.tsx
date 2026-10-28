@@ -1,13 +1,12 @@
 
 import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Drillship, OfficialEvent } from '../types';
+import { Drillship } from '../types';
 import { getComputedStatus } from '../utils/shipStatus';
 import { contractPeriod, contractSource, contractSpan, interpretationDetails, reportedRate, storedReadingDetails, quarterScrollOffset } from '../utils/contractTimeline';
 import { economicsDetails, backlogRateLabel, timelineContracts, TimelineContract } from '../utils/newsEconomics';
 
 interface FleetGanttProps {
   ships: Drillship[];
-  events?: OfficialEvent[];
 }
 
 const periodLabel = (row: TimelineContract) => contractPeriod(row);
@@ -31,11 +30,11 @@ export function ContractDetails({ selected, shipName, onClose }: { selected: Tim
   );
 }
 
-const FleetGantt: React.FC<FleetGanttProps> = ({ ships, events = [] }) => {
+const FleetGantt: React.FC<FleetGanttProps> = ({ ships }) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const axisRef = useRef<HTMLDivElement>(null);
-  const timelineShips = useMemo(() => ships.map(s => ({ ...s, contracts: timelineContracts(s, events) })), [ships, events]);
+  const timelineShips = useMemo(() => ships.map(s => ({ ...s, contracts: timelineContracts(s) })), [ships]);
   const selectedShip = timelineShips.find(s => s.contracts.some(c => c.id === selectedId));
   const selected = selectedShip?.contracts.find(c => c.id === selectedId);
   const now = new Date();
@@ -142,7 +141,6 @@ const FleetGantt: React.FC<FleetGanttProps> = ({ ships, events = [] }) => {
                 return a.company.localeCompare(b.company);
               })
               .map((ship) => {
-                // Status uses statistical contracts, not model placement dates.
                 const canonicalShip = ships.find(s => s.id === ship.id)!;
                 const computedStatus = getComputedStatus(canonicalShip, now);
                 const isColdStacked = computedStatus === 'Cold-Stacked';

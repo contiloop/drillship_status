@@ -1,7 +1,7 @@
 import React from 'react';
 import type { FleetSource, OfficialEvent } from '../types';
-import { interpretationDetails, storedReadingDetails } from '../utils/contractTimeline';
-import { economicsDetails, backlogRateLabel, newsEconomics } from '../utils/newsEconomics';
+import { interpretationDetails, reportedRate, storedReadingDetails } from '../utils/contractTimeline';
+import { economicsDetails, backlogRateLabel, eventInterpretation, newsEconomics } from '../utils/newsEconomics';
 
 const UNKNOWN = '확인된 정보 없음';
 function publicationLabel(value?: string): string {
@@ -25,18 +25,21 @@ function disclosedText(value: string | undefined, fallback: string): string {
   return value === 'Undisclosed' ? '미공개' : value;
 }
 
+const ACTIONS: Record<string, string> = { upsert: 'Fleet Status 반영', withdraw: '계약 철회', 'no-change': '변경 없음', hold: '보류' };
+
 export function announcementDetails(event: OfficialEvent): [string, string][] {
-  const model = event.readingDecision?.facts;
-  const interpretation = model?.interpretation;
+  const decision = event.readingDecision;
+  const interpretation = eventInterpretation(event);
   const facts = event.facts;
-  const unknown = event.llmReview ? '원문 미공개' : UNKNOWN;
+  const unknown = event.llmReview || decision ? '원문 미공개' : UNKNOWN;
   const awardType = interpretation?.awardType || facts?.awardType || event.classification;
   const award = awardType === 'binding-letter-of-award'
     ? '구속력 있는 LOA (수주 통지)'
     : awardType === 'letter-of-award' ? 'LOA (수주 통지) · 확정 계약으로 미분류'
-      : ({ 'signed-contract': '확정 계약 수주', 'option-exercised': '옵션 행사 · 확정 계약', extension: '계약 연장' }[awardType] || UNKNOWN);
-  const start = interpretation ? interpretation.sourceStartText : facts?.expectedStart || event.start;
-  const approximateStart = ['quarter', 'month', 'half-year', 'year', 'approximate'].includes(interpretation?.startPrecision || facts?.startPrecision || '');
+      : ({ 'signed-contract': '확정 계약 수주', 'option-exercised': '옵션 행사 · 확정 계약', extension: '계약 연장' } as Record<string, string>)[awardType] || UNKNOWN;
+  // Reader text is shown verbatim; only legacy event facts carry a precision hint.
+  const start = interpretation ? interpretation.sourceStartText || undefined : facts?.expectedStart || event.start;
+  const approximateStart = !interpretation && ['quarter', 'month', 'half-year', 'year', 'approximate'].includes(facts?.startPrecision || '');
   const term = interpretation ? interpretation.termText || unknown : facts?.termText || (facts?.awardTermYears
     ? `${facts.awardTermYears}년`
     : start && (facts?.expectedEnd || event.end)
@@ -48,16 +51,21 @@ export function announcementDetails(event: OfficialEvent): [string, string][] {
   const included = (facts?.valueIncludes || []).map(value => ({
     'additional services': '추가 서비스',
     'mobilization fee': '이동 비용',
-  }[value] || value));
-  const value = interpretation ? interpretation.valueText || (interpretation.valueUsd ? `$${interpretation.valueUsd.toLocaleString('en-US')}` : unknown) : facts?.valueText || (facts?.announcedValueUsdApprox && facts.announcedValueUsdApprox > 0
+  } as Record<string, string>)[value] || value);
+  const valueUsd = interpretation?.valueUsd;
+  const value = interpretation ? interpretation.valueText || (valueUsd && Number.isFinite(valueUsd) && valueUsd > 0 ? `$${valueUsd.toLocaleString('en-US')}` : unknown) : facts?.valueText || (facts?.announcedValueUsdApprox && facts.announcedValueUsdApprox > 0
     ? `약 ${new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 2 }).format(facts.announcedValueUsdApprox / 100_000_000)}억 달러${included.length ? ` · ${included.join('·')} 포함` : ''}`
     : unknown);
-  const modelRate = interpretation?.reportedUsdPerDay;
-  const rate = interpretation ? (interpretation.rateBasis === 'reported' && modelRate && Number.isFinite(modelRate) && modelRate > 0 ? `$${modelRate.toLocaleString('en-US')} / 일` : '미공개') : facts?.dayRateDisclosure === 'reported' && (facts.dayRateUsd ?? 0) > 0
-    ? `$${new Intl.NumberFormat('en-US').format(facts.dayRateUsd!)} / 일`
-    : facts?.dayRateDisclosure === 'undisclosed' ? '미공개' : UNKNOWN;
+  const rowRate = decision?.row ? reportedRate(decision.row) : 0;
+  const rate = rowRate > 0 ? `$${rowRate.toLocaleString('en-US')} / 일`
+    : decision ? '미공개'
+      : facts?.dayRateDisclosure === 'reported' && (facts.dayRateUsd ?? 0) > 0
+        ? `$${new Intl.NumberFormat('en-US').format(facts.dayRateUsd!)} / 일`
+        : facts?.dayRateDisclosure === 'undisclosed' ? '미공개' : UNKNOWN;
+  const client = decision ? decision.row?.client || decision.facts?.client || undefined : facts?.counterparty;
+  const region = decision ? decision.row?.region || decision.facts?.region || undefined : facts?.location;
   return [
-    ['고객·지역', `${disclosedText(model ? model.client || undefined : facts?.counterparty, event.llmReview ? '원문 미공개' : '고객 확인되지 않음')} · ${model ? disclosedText(model.region || undefined, '원문 미공개') : facts?.location === 'India' ? '인도' : disclosedText(facts?.location, event.llmReview ? '원문 미공개' : '지역 확인되지 않음')}`],
+    ['고객·지역', `${disclosedText(client, unknown === UNKNOWN ? '고객 확인되지 않음' : unknown)} · ${!decision && region === 'India' ? '인도' : disclosedText(region, unknown === UNKNOWN ? '지역 확인되지 않음' : unknown)}`],
     ['수주 형태', award],
     ['작업 시작', start ? `${start}${approximateStart ? ' 예정 · 정확한 날짜 미공개' : ''}` : unknown],
     ['기본 기간', term],
@@ -67,13 +75,32 @@ export function announcementDetails(event: OfficialEvent): [string, string][] {
   ];
 }
 
+/** Optional reader notes and quotes for the collapsed event body; every field may be absent. */
+export function decisionDetails(event: OfficialEvent): { notes: string[]; quotes: string[] } {
+  const decision = event.readingDecision;
+  const economics = newsEconomics(event);
+  const quote = (text?: string | null, locator?: string | null) => text ? (locator ? `${text} · ${locator}` : text) : '';
+  const notes = [
+    decision?.action ? `판단: ${ACTIONS[decision.action] || decision.action}` : '',
+    decision?.reasonKo || event.reason || '',
+    decision?.holdReason ? `보류 사유: ${decision.holdReason}` : '',
+    decision?.row ? `표시 구간: ${decision.row.startDate} – ${decision.row.endDate}` : '',
+    interpretationDetails(eventInterpretation(event)),
+    economics ? `${backlogRateLabel(economics)} (백로그 환산) · ${economicsDetails(economics)}` : '',
+  ].filter(Boolean);
+  const evidence = decision
+    ? [quote(decision.quote, decision.locator), ...(Array.isArray(decision.evidence) ? decision.evidence.map(e => quote(e?.quote, e?.locator)) : [])]
+    : (event.evidence || []).map(e => quote(e?.quote));
+  return { notes, quotes: evidence.filter(Boolean) };
+}
+
 export default function OfficialAnnouncementCard({ event, source }: { event: OfficialEvent; source?: FleetSource }) {
   const vessel = event.vessel || event.vessels?.join(', ');
   const isReport = event.classification === 'letter-of-award';
   // Only report-derived events may fall back to the company's FSR provenance.
   const href = sourceHref(event.url || (isReport ? source?.documentUrl : undefined));
   const publishedAt = publicationLabel(event.publishedAt || (isReport ? source?.reportDate : undefined));
-  const economics = newsEconomics(event);
+  const { notes, quotes } = decisionDetails(event);
   return (
     <details className="min-w-0 rounded-xl border border-slate-800 bg-slate-900/50 p-4">
       <summary className="cursor-pointer rounded text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400">
@@ -90,7 +117,6 @@ export default function OfficialAnnouncementCard({ event, source }: { event: Off
           </div>
         ))}
       </dl>
-      {economics && <p className="mt-4 text-sm text-slate-200">{backlogRateLabel(economics)} (백로그 환산)<span className="mt-1 block text-xs text-slate-400">{economicsDetails(economics)}</span></p>}
       <div className="mt-5 border-t border-slate-800 pt-4 text-sm leading-relaxed text-slate-300">
         {href ? (
           <a href={href} target="_blank" rel="noopener noreferrer" className="inline-block rounded py-2 text-blue-300 underline underline-offset-4 hover:text-blue-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-400">
@@ -98,12 +124,9 @@ export default function OfficialAnnouncementCard({ event, source }: { event: Off
           </a>
         ) : <p>출처 원문 링크 확인되지 않음 · {publishedAt}</p>}
         {storedReadingDetails(event) && <p className="mt-2 text-slate-400">{storedReadingDetails(event)}</p>}
-        {(event.readingDecision?.reasonKo || event.reason) && <p className="mt-2 text-slate-300">{event.readingDecision?.reasonKo || event.reason}</p>}
-        {event.readingDecision && <p className="mt-2 text-slate-400">{interpretationDetails(event.readingDecision.facts.interpretation)}</p>}
-        {event.readingDecision?.row && <p className="mt-2 text-slate-400">표시 구간: {event.readingDecision.row.startDate} – {event.readingDecision.row.endDate}</p>}
-        {event.readingDecision?.evidence.map((evidence, index) => <blockquote key={index} className="mt-2 text-xs text-slate-400">{evidence.quote} · {evidence.locator}</blockquote>)}
-        {!event.readingDecision && event.evidence?.map((evidence, index) => <blockquote key={index} className="mt-2 text-xs text-slate-400">{evidence.quote}</blockquote>)}
-        <p className="mt-2 text-slate-400">원문 날짜 표현·정밀도와 표시 날짜를 구분합니다. 배치에 의존하는 일정은 가동률·평균 공시 dayrate 집계에서 제외하며, 미공개·환산 요율도 평균 공시 dayrate에 포함하지 않습니다.</p>
+        {notes.map((note, index) => <p key={index} className="mt-2 text-slate-400">{note}</p>)}
+        {quotes.map((quote, index) => <blockquote key={index} className="mt-2 text-xs text-slate-400">{quote}</blockquote>)}
+        <p className="mt-2 text-slate-400">원문 날짜 표현과 표시 날짜를 구분합니다. 미공개·환산 요율은 평균 공시 dayrate에 포함하지 않습니다.</p>
       </div>
     </details>
   );
