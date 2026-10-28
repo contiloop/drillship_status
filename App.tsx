@@ -237,7 +237,7 @@ export default function App() {
               {activeTab === 'readme' && 'Database Management'}
               {activeTab === 'news' && '뉴스·공시'}
             </h2>
-            <p className="mt-2 text-[11px] text-slate-500">{dataSource === 'live' ? `공식 출처 ${manifest?.sourceCount ?? 0}/4` : dataSource === 'custom' ? '사용자 데이터' : '기본 데이터'} · {manifest?.generatedAt ? `갱신 ${new Date(manifest.generatedAt).toLocaleString()}` : '불러오는 중'}</p>
+            <p className="mt-2 text-[11px] text-slate-500">{dataSource === 'live' ? `공식 출처 ${manifest?.sourceCount ?? 0}/4` : dataSource === 'custom' ? '사용자 데이터' : '기본 데이터'} · {manifest?.generatedAt ? `자료 확인 ${new Date(manifest.generatedAt).toLocaleString()}` : '불러오는 중'}</p>
             {(activeTab === 'news' || activeTab === 'readme') && <p className="mt-2 text-xs text-slate-500">{reportDateRange} · {reportSources.map(source => `${source.company} ${source.reportDate}`).join(' · ')}</p>}
             {syncError && <p className="text-[11px] text-amber-500/80 mt-2">Live sync fallback: {syncError}</p>}
           </div>
