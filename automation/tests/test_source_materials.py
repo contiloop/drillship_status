@@ -49,7 +49,7 @@ def article(text='All shareholders are invited to the company meeting. ' * 12):
 
 
 def collect(client, monkeypatch, *, specs=SOURCE_SPECS[:1], previous_sources=None, preserved_news=()):
-    monkeypatch.setattr(materials, 'discover_document', lambda c, s: (s.fallback_document_url, 'official-index'))
+    monkeypatch.setattr(materials, 'discover_document', lambda c, s, **kwargs: (s.fallback_document_url, 'official-index'))
     monkeypatch.setattr(materials, 'discover_official_news', lambda c, s, **kw: ([], None))
     return materials.collect_reading_materials(
         client, baseline=[], prior_evidence=[], reader_policy_sha256='a' * 64,
@@ -333,3 +333,130 @@ def test_html_retains_article_header_and_footer_disclosures():
     assert 'Release title' in pages[0]['text']
     assert 'Disclosure with material release terms.' in pages[0]['text']
     assert 'site navigation' not in pages[0]['text'] and 'site footer' not in pages[0]['text']
+
+
+def test_blocked_noble_news_index_does_not_block_official_release_index():
+    from automation.fleet_sync.sources import discover_official_news
+    spec = SOURCE_SPECS[2]
+    quarterly = 'https://noblecorp.com/our-investors/reports-filings/quarterly-results/'
+    pdf = 'https://noblecorp.com/wp-content/uploads/2026/10/release.pdf'
+    calls = []
+    class NobleClient:
+        def get(self, url):
+            calls.append(url)
+            if url == spec.news_url:
+                raise requests.HTTPError('Forbidden', response=SimpleNamespace(status_code=403))
+            assert url == quarterly
+            return Response(url, f'<a href="{pdf}">Earnings Release</a>')
+    events, warning = discover_official_news(NobleClient(), spec)
+    assert [event['url'] for event in events] == [pdf]
+    assert calls == [spec.news_url, quarterly]
+    assert warning and '403' in warning
+
+
+def test_malformed_q4_item_cannot_discard_valid_peers_or_trigger_html_fallback():
+    from automation.fleet_sync.sources import discover_official_news
+    spec = SOURCE_SPECS[1]
+    calls = []
+    class Q4Client:
+        def get(self, url):
+            calls.append(url)
+            if '/feed/' in url:
+                return SimpleNamespace(json=lambda: {'GetPressReleaseListResult': [
+                    {'Headline': 'Announcement A', 'LinkToDetailPage': '/news/news-details/2026/a/default.aspx'},
+                    None,
+                    {'Headline': 'Announcement B', 'LinkToDetailPage': '/news/news-details/2026/b/default.aspx'},
+                ]})
+            raise requests.HTTPError('Forbidden', response=SimpleNamespace(status_code=403))
+    events, warning = discover_official_news(Q4Client(), spec)
+    assert [event['title'] for event in events] == ['Announcement A', 'Announcement B']
+    assert len(calls) == 1
+    assert warning and 'item' in warning.lower()
+
+
+def test_report_discovery_http_status_survives_successful_fallback(monkeypatch):
+    spec = SOURCE_SPECS[0]
+    monkeypatch.setattr(materials, 'discover_official_news', lambda *args, **kwargs: ([], None))
+    client = Client({
+        spec.index_url: requests.HTTPError('Forbidden', response=SimpleNamespace(status_code=403)),
+        spec.fallback_document_url: Response(spec.fallback_document_url, article()),
+    })
+    result = materials.collect_reading_materials(client, baseline=[], prior_evidence=[], reader_policy_sha256='a' * 64, specs=(spec,))
+    assert len(result['materials']) == 1
+    assert result['sources'][0]['bodyRead'] is True and result['sources'][0]['httpStatus'] == 200
+    failures = [error for error in result['errors'] if error.get('phase') == 'discovery']
+    assert len(failures) == 1 and failures[0]['httpStatus'] == 403
+    assert failures[0]['url'] == spec.index_url
+
+
+def test_noble_fallback_material_and_primary_403_diagnostic_coexist(monkeypatch):
+    spec = SOURCE_SPECS[2]
+    quarterly = 'https://noblecorp.com/our-investors/reports-filings/quarterly-results/'
+    pdf = 'https://noblecorp.com/wp-content/uploads/2026/10/release.pdf'
+    monkeypatch.setattr(materials, 'discover_document', lambda *args, **kwargs: (spec.fallback_document_url, 'official-index'))
+    client = Client({
+        spec.fallback_document_url: Response(spec.fallback_document_url, article()),
+        spec.news_url: requests.HTTPError('Forbidden', response=SimpleNamespace(status_code=403)),
+        quarterly: Response(quarterly, f'<a href="{pdf}">Earnings Release</a>'),
+        pdf: Response(pdf, article()),
+    })
+    result = materials.collect_reading_materials(client, baseline=[], prior_evidence=[], reader_policy_sha256='a' * 64, specs=(spec,))
+    assert len(result['materials']) == 2
+    successful = next(source for source in result['sources'] if source['url'] == pdf)
+    assert successful['bodyRead'] is True and successful['httpStatus'] == 200
+    assert len(result['errors']) == 1
+    assert result['errors'][0]['url'] == spec.news_url and result['errors'][0]['httpStatus'] == 403
+    assert result['errors'][0]['stage'] == 'official-news-index'
+
+
+def test_q4_malformed_diagnostic_is_structured_and_good_bodies_are_collected(monkeypatch):
+    spec = SOURCE_SPECS[1]
+    first = 'https://www.valaris.com/news/news-details/2026/a/default.aspx'
+    second = 'https://www.valaris.com/news/news-details/2026/b/default.aspx'
+    monkeypatch.setattr(materials, 'discover_document', lambda *args, **kwargs: (spec.fallback_document_url, 'official-index'))
+    class Q4Client:
+        def get(self, url):
+            if '/feed/' in url:
+                return SimpleNamespace(json=lambda: {'GetPressReleaseListResult': [
+                    {'Headline': 'Announcement A', 'LinkToDetailPage': first}, None,
+                    {'Headline': 'Announcement B', 'LinkToDetailPage': second},
+                ]})
+            assert url in {spec.fallback_document_url, first, second}
+            return Response(url, article())
+    result = materials.collect_reading_materials(Q4Client(), baseline=[], prior_evidence=[], reader_policy_sha256='a' * 64, specs=(spec,))
+    assert len(result['materials']) == 3
+    assert len(result['errors']) == 1
+    assert result['errors'][0]['itemIndex'] == 1
+    assert result['errors'][0]['errorType'] == 'ValueError'
+    assert result['errors'][0]['httpStatus'] is None
+    assert {source['url'] for source in result['sources']} >= {first, second}
+
+
+def test_report_failed_index_and_failed_fallback_are_separate(monkeypatch):
+    spec = SOURCE_SPECS[0]
+    monkeypatch.setattr(materials, 'discover_official_news', lambda *args, **kwargs: ([], None))
+    client = Client({
+        spec.index_url: requests.HTTPError('Forbidden', response=SimpleNamespace(status_code=403)),
+        spec.fallback_document_url: requests.HTTPError('Unavailable', response=SimpleNamespace(status_code=503)),
+    })
+    result = materials.collect_reading_materials(client, baseline=[], prior_evidence=[], reader_policy_sha256='a' * 64, specs=(spec,))
+    assert result['materials'] == []
+    assert [failure['httpStatus'] for failure in result['errors']] == [403, 503]
+    assert result['errors'][0]['url'] == spec.index_url
+    assert result['errors'][1]['url'] == spec.fallback_document_url
+    assert result['sources'][0]['bodyRead'] is False
+
+
+def test_legacy_report_discovery_tuple_keeps_compatibility_and_optional_http_diagnostic(monkeypatch):
+    from automation.fleet_sync import sources
+    spec = SOURCE_SPECS[1]
+    def blocked(*args):
+        raise requests.HTTPError('Forbidden', response=SimpleNamespace(status_code=403))
+    monkeypatch.setattr(sources, '_discover_valaris_official', blocked)
+    monkeypatch.setattr(sources, '_discover_valaris_sec', lambda _: 'https://www.sec.gov/Archives/edgar/data/314808/report.htm')
+    expected = ('https://www.sec.gov/Archives/edgar/data/314808/report.htm', 'sec-submissions-after-official-HTTPError')
+    assert sources.discover_document(object(), spec) == expected
+    diagnostics = []
+    assert sources.discover_document(object(), spec, diagnostics=diagnostics) == expected
+    assert len(diagnostics) == 1 and diagnostics[0]['httpStatus'] == 403
+    assert diagnostics[0]['url'] == spec.index_url

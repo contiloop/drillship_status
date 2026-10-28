@@ -219,19 +219,22 @@ def collect_reading_materials(
     result: dict[str, list[dict[str, Any]]] = {"materials": [], "sources": [], "errors": []}
     candidates: list[dict] = []
     for spec in specs:
+        report_diagnostics: list[dict] = []
         try:
-            url, mode = discover_document(client, spec)
+            url, mode = discover_document(client, spec, diagnostics=report_diagnostics)
             candidates.append({"company": spec.company, "kind": "fleet-report", "url": url, "discoveryMode": mode})
-            if mode.startswith("fallback-after-"):
-                result["errors"].append({"company": spec.company, "kind": "fleet-report", "url": spec.index_url,
-                                         "phase": "discovery", "error": mode, "httpStatus": None, "lastAttemptAt": now})
+            result["errors"].extend({**issue, "company": spec.company, "kind": "fleet-report",
+                                     "phase": "discovery", "lastAttemptAt": now} for issue in report_diagnostics)
         except Exception as error:
             result["errors"].append({"company": spec.company, "kind": "fleet-report", "url": spec.index_url,
                                      "phase": "discovery", "error": type(error).__name__, "httpStatus": _http_status(error), "lastAttemptAt": now})
+        news_diagnostics: list[dict] = []
         try:
-            items, warning = discover_official_news(client, spec, limit=news_limit)
+            items, warning = discover_official_news(client, spec, limit=news_limit, diagnostics=news_diagnostics)
             candidates.extend({**item, "company": spec.company, "kind": "official-news"} for item in items)
-            if warning:
+            result["errors"].extend({**issue, "company": spec.company, "kind": "official-news",
+                                     "phase": "discovery", "lastAttemptAt": now} for issue in news_diagnostics)
+            if warning and not news_diagnostics:
                 result["errors"].append({"company": spec.company, "kind": "official-news", "url": spec.news_url,
                                          "phase": "discovery", "error": warning, "httpStatus": None, "lastAttemptAt": now})
         except Exception as error:

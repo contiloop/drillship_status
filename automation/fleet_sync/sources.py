@@ -197,7 +197,11 @@ class HttpClient:
         )
 
 
-def discover_document(client: HttpClient, spec: SourceSpec) -> tuple[str, str]:
+def discover_document(
+    client: HttpClient, spec: SourceSpec, *, diagnostics: list[dict] | None = None,
+) -> tuple[str, str]:
+    """Keep the legacy URL/mode result and optionally retain attempt failures."""
+    attempt_url = spec.index_url
     try:
         if spec.company == "Transocean":
             return _discover_transocean(client, spec), "official-index"
@@ -205,6 +209,9 @@ def discover_document(client: HttpClient, spec: SourceSpec) -> tuple[str, str]:
             try:
                 return _discover_valaris_official(client, spec), "official-index"
             except Exception as official_error:
+                if diagnostics is not None:
+                    diagnostics.append(_discovery_diagnostic(official_error, spec.index_url, "official-report-index"))
+                attempt_url = "https://data.sec.gov/submissions/CIK0000314808.json"
                 return (
                     _discover_valaris_sec(client),
                     f"sec-submissions-after-official-{type(official_error).__name__}",
@@ -214,8 +221,9 @@ def discover_document(client: HttpClient, spec: SourceSpec) -> tuple[str, str]:
         if spec.company == "Seadrill":
             return _discover_seadrill(client, spec), "official-wordpress-api"
     except Exception as error:
-        # The known-good official document is intentionally a last-resort safety
-        # net. Parsing and freshness validation still run before publication.
+        # Keep the failed discovery attempt separate from its official fallback.
+        if diagnostics is not None:
+            diagnostics.append(_discovery_diagnostic(error, attempt_url, "official-report-discovery"))
         return spec.fallback_document_url, f"fallback-after-{type(error).__name__}"
     raise AssertionError(spec.company)
 
@@ -226,6 +234,17 @@ def _error_summary(error: Exception) -> str:
     if isinstance(error, requests.HTTPError) and error.response is not None:
         return f"{type(error).__name__}({error.response.status_code})"
     return type(error).__name__
+
+
+def _discovery_diagnostic(error: Exception, url: str, stage: str, **metadata: object) -> dict:
+    """Structured attempt evidence; consumers never parse human warning text."""
+    response = getattr(error, "response", None)
+    return {
+        "url": getattr(response, "url", None) or url,
+        "stage": stage, "errorType": type(error).__name__,
+        "error": f"{type(error).__name__}: {error}",
+        "httpStatus": getattr(response, "status_code", None), **metadata,
+    }
 
 
 def _discover_transocean(client: HttpClient, spec: SourceSpec) -> str:
@@ -558,16 +577,25 @@ def publication_date(value: object) -> str | None:
 
 def discover_official_news(
     client: HttpClient, spec: SourceSpec, *, limit: int = 20,
+    diagnostics: list[dict] | None = None,
 ) -> tuple[list[dict], str | None]:
-    """Discover article URLs without judging headline or vessel relevance.
+    """Discover official articles without judging headline/vessel relevance.
 
-    The Q4 public GET adapter follows the issuer site's q4Api implementation.
-    This function only discovers; source_materials fetches complete bodies and
-    records per-article failures. The legacy signal collector stays compatible.
+    Each listing and Q4 item is an independent attempt. Optional structured
+    diagnostics preserve HTTP status/item identity; warnings remain compatible
+    with existing callers. Full article acquisition belongs to source_materials.
     """
     if limit <= 0:
         return [], None
-    warning = None
+    events: list[dict] = []
+    seen: set[str] = set()
+    warnings: list[str] = []
+
+    def failed(error: Exception, url: str, stage: str, **metadata: object) -> None:
+        if diagnostics is not None:
+            diagnostics.append(_discovery_diagnostic(error, url, stage, **metadata))
+        warnings.append(f"{stage} {_error_summary(error)}")
+
     if spec.company in {"Valaris", "Seadrill"}:
         host = urlparse(spec.news_url).hostname
         query = urlencode({
@@ -581,92 +609,88 @@ def discover_official_news(
             items = client.get(endpoint).json()["GetPressReleaseListResult"]
             if not isinstance(items, list):
                 raise ValueError("Q4 list result is not an array")
-            events = []
-            seen = set()
-            for item in items:
-                href = item.get("LinkToDetailPage") or item.get("LinkToUrl")
-                if not isinstance(href, str) or not href:
-                    # Preserve an invalid candidate for the per-material error
-                    # ledger; one broken list item must not hide valid peers.
-                    events.append({"company": spec.company, "url": None,
-                                   "title": clean_text(item.get("Headline")),
-                                   "publishedAt": publication_date(item.get("PressReleaseDate")),
-                                   "discoveryMode": "official-q4-public-feed"})
-                    continue
-                url = urljoin(spec.news_url, href)
-                if url in seen:
-                    continue
-                seen.add(url)
-                events.append({
-                    "company": spec.company, "url": url,
-                    "title": clean_text(item.get("Headline")),
-                    "publishedAt": publication_date(item.get("PressReleaseDate")),
-                    "discoveryMode": "official-q4-public-feed",
-                })
-                if len(events) >= limit:
-                    break
-            if events:
-                return events, None
-            warning = "Q4 public feed returned no articles; rendered-page fallback used"
-        except Exception as error:
-            warning = f"Q4 public feed {_error_summary(error)}; rendered-page fallback used"
-    try:
-        response = client.get(spec.news_url)
-        soup = BeautifulSoup(response.text, "lxml")
-        events = []
-        seen = set()
-        for link in soup.find_all("a", href=True):
-            url = urljoin(response.url, link["href"])
-            parsed = urlparse(url)
-            # Article route shapes are collection metadata, not relevance rules.
-            is_article = (
-                bool(re.search(r"/news/detail/?$", parsed.path, re.I))
-                and bool(dict(parse_qsl(parsed.query)).get("ID"))
-            ) or bool(re.search(r"/news/news-details/|/news-releases/news-release-details/", parsed.path, re.I))
-            if not is_article or url in seen:
-                continue
-            seen.add(url)
-            container = link.find_parent(["tr", "article", "li"]) or link.parent
-            time_node = container.find("time") if container else None
-            published = publication_date(time_node.get("datetime") or time_node.get_text()) if time_node else None
-            if published is None and container:
-                date_match = re.search(r"\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},\s+\d{4}\b|\b\d{2}/\d{2}/\d{4}\b", container.get_text(" "))
-                published = publication_date(date_match.group(0)) if date_match else None
-            events.append({
-                "company": spec.company, "url": url,
-                "title": clean_text(unescape(link.get_text(" "))),
-                "publishedAt": published, "discoveryMode": "official-news-index",
-            })
-            if len(events) >= limit:
-                break
-        if spec.company == "Noble":
-            # The issuer links its news to GCS, which can return HTTP 403. Its
-            # quarterly-results page separately publishes the full releases as
-            # accessible official PDFs. Retain both identities/errors; never
-            # mark the blocked URL successfully read using a different source.
-            try:
-                releases_url = "https://noblecorp.com/our-investors/reports-filings/quarterly-results/"
-                releases = client.get(releases_url)
-                release_soup = BeautifulSoup(releases.text, "lxml")
-                count = 0
-                for link in release_soup.find_all("a", href=True):
-                    if clean_text(link.get_text(" ")).casefold() != "earnings release":
-                        continue
-                    url = urljoin(releases.url, link["href"])
+            for index, item in enumerate(items):
+                try:
+                    if not isinstance(item, dict):
+                        raise ValueError("Q4 list item is not an object")
+                    href = item.get("LinkToDetailPage") or item.get("LinkToUrl")
+                    if not isinstance(href, str) or not href:
+                        raise ValueError("Q4 article has no detail URL")
+                    url = urljoin(spec.news_url, href)
                     if url in seen:
                         continue
                     seen.add(url)
-                    events.append({"company": spec.company, "url": url, "title": "Earnings Release",
-                                   "publishedAt": None, "discoveryMode": "official-quarterly-release-pdf"})
-                    count += 1
-                    if count >= limit:
+                    events.append({
+                        "company": spec.company, "url": url,
+                        "title": clean_text(item.get("Headline")),
+                        "publishedAt": publication_date(item.get("PressReleaseDate")),
+                        "discoveryMode": "official-q4-public-feed",
+                    })
+                    if len(events) >= limit:
                         break
+                except Exception as error:
+                    failed(error, endpoint, f"Q4 item[{index}]", itemIndex=index)
+            if events:
+                return events, "; ".join(warnings) or None
+            failed(ValueError("Q4 public feed returned no valid article URLs"), endpoint, "official-q4-public-feed")
+        except Exception as error:
+            failed(error, endpoint, "official-q4-public-feed")
+
+    # The primary listing and the Noble PDF listing are deliberately sibling
+    # attempts: an HTTP failure in either cannot prevent the other being read.
+    try:
+        response = client.get(spec.news_url)
+        soup = BeautifulSoup(response.text, "lxml")
+        for index, link in enumerate(soup.find_all("a", href=True)):
+            try:
+                url = urljoin(response.url, link["href"])
+                parsed = urlparse(url)
+                # Route shapes and dates are collection metadata, not relevance.
+                is_article = (
+                    bool(re.search(r"/news/detail/?$", parsed.path, re.I))
+                    and bool(dict(parse_qsl(parsed.query)).get("ID"))
+                ) or bool(re.search(r"/news/news-details/|/news-releases/news-release-details/", parsed.path, re.I))
+                if not is_article or url in seen:
+                    continue
+                seen.add(url)
+                container = link.find_parent(["tr", "article", "li"]) or link.parent
+                time_node = container.find("time") if container else None
+                published = publication_date(time_node.get("datetime") or time_node.get_text()) if time_node else None
+                if published is None and container:
+                    date_match = re.search(r"\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},\s+\d{4}\b|\b\d{2}/\d{2}/\d{4}\b", container.get_text(" "))
+                    published = publication_date(date_match.group(0)) if date_match else None
+                events.append({
+                    "company": spec.company, "url": url,
+                    "title": clean_text(unescape(link.get_text(" "))),
+                    "publishedAt": published, "discoveryMode": "official-news-index",
+                })
+                if len(events) >= limit:
+                    break
             except Exception as error:
-                detail = f"official quarterly-release index {_error_summary(error)}"
-                warning = f"{warning}; {detail}" if warning else detail
-        if not events:
-            raise ValueError("official index did not expose article URLs")
-        return events, warning
+                failed(error, spec.news_url, "official-news-index-item", itemIndex=index)
     except Exception as error:
-        detail = _error_summary(error)
-        return [], f"{warning}; {detail}" if warning else detail
+        failed(error, spec.news_url, "official-news-index")
+
+    if spec.company == "Noble":
+        releases_url = "https://noblecorp.com/our-investors/reports-filings/quarterly-results/"
+        try:
+            releases = client.get(releases_url)
+            release_soup = BeautifulSoup(releases.text, "lxml")
+            count = 0
+            for link in release_soup.find_all("a", href=True):
+                if clean_text(link.get_text(" ")).casefold() != "earnings release":
+                    continue
+                url = urljoin(releases.url, link["href"])
+                if url in seen:
+                    continue
+                seen.add(url)
+                events.append({"company": spec.company, "url": url, "title": "Earnings Release",
+                               "publishedAt": None, "discoveryMode": "official-quarterly-release-pdf"})
+                count += 1
+                if count >= limit:
+                    break
+        except Exception as error:
+            failed(error, releases_url, "official-quarterly-release-index")
+    if not events:
+        failed(ValueError("official indices did not expose article URLs"), spec.news_url, "official-news-discovery")
+    return events, "; ".join(warnings) or None
