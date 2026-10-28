@@ -1,130 +1,251 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-19T17:05:02Z",
-  "updatedAsOf": "2026-08-10",
-  "dataHash": "c045fba043000b4056e5",
-  "stateFingerprint": "3e731269b2d55530546e",
-  "fleetFile": "fleet.c045fba043000b4056e5.json",
-  "eventsFile": "events.9544e9a3aa9b4b265cff.json",
-  "eventsHash": "9544e9a3aa9b4b265cff",
+  "generatedAt": "2026-10-28T13:28:19Z",
+  "updatedAsOf": "2026-10-26",
+  "dataHash": "740f584011f227fa23f4",
+  "stateFingerprint": "251a79d661b84a2ecc1c",
+  "fleetFile": "fleet.740f584011f227fa23f4.json",
+  "eventsFile": "events.4d054fee922fbb44d209.json",
+  "eventsHash": "4d054fee922fbb44d209",
   "shipCount": 62,
-  "contractCount": 116,
+  "contractCount": 132,
   "sourceCount": 4,
   "sources": [
     {
       "company": "Noble",
       "indexUrl": "https://noblecorp.com/our-investors/reports-filings/fleet-status-report/",
-      "documentUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-3/?wpdmdl=3701",
-      "reportDate": "2026-07-27",
-      "sha256": "ddfdfe43090fe4f2589352abb7bf14cb292ee7323569f29a9f89e20c079807a6",
-      "byteSize": 195253,
-      "parserVersion": "2026.09.04.1",
+      "documentUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
       "discovery": "official-index",
-      "contentType": "application/pdf",
+      "sha256": "4dd3a586ae73f5752ae3893a970800ec6c8300dfd110e9c067c5f525bfebaa22",
+      "reportDate": "2026-10-26",
+      "lastSuccessAt": "2026-10-28T13:27:41Z",
+      "httpStatus": 200,
+      "error": null,
       "health": "healthy",
-      "newsMonitor": "healthy"
+      "readingStatus": "completed"
     },
     {
       "company": "Seadrill",
       "indexUrl": "https://www.seadrill.com/wp-json/wp/v2/pages/987508015",
       "documentUrl": "https://www.seadrill.com/wp-content/uploads/2026/08/Seadrill-Fleet-Status-Report-August-2026-vF.pdf",
-      "reportDate": "2026-08-10",
-      "sha256": "b774357daafdb62dcc8c371fe5f5d118fb8d7d51c91badd05cd6cae3c9a39cb1",
-      "byteSize": 408026,
-      "parserVersion": "2026.09.04.1",
       "discovery": "official-wordpress-api",
-      "contentType": "application/pdf",
+      "sha256": "b774357daafdb62dcc8c371fe5f5d118fb8d7d51c91badd05cd6cae3c9a39cb1",
+      "reportDate": "2026-08-10",
+      "lastSuccessAt": "2026-10-28T13:27:41Z",
+      "httpStatus": 200,
+      "error": null,
       "health": "healthy",
-      "newsMonitor": "healthy"
+      "readingStatus": "completed"
     },
     {
       "company": "Transocean",
       "indexUrl": "https://www.deepwater.com/investors/fleet-status-report",
       "documentUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/August%202026%20Fleet%20Status%20Report.pdf",
-      "reportDate": "2026-08-05",
-      "sha256": "f2f98b03f750b5c4f6d299bff9b55d0ecc4dbeb0cb4f069054193968894db8b6",
-      "byteSize": 633637,
-      "parserVersion": "2026.09.04.1",
       "discovery": "official-index",
-      "contentType": "application/pdf",
+      "sha256": "f2f98b03f750b5c4f6d299bff9b55d0ecc4dbeb0cb4f069054193968894db8b6",
+      "reportDate": "2026-08-05",
+      "lastSuccessAt": "2026-10-28T13:27:41Z",
+      "httpStatus": 200,
+      "error": null,
       "health": "healthy",
-      "newsMonitor": "healthy"
+      "readingStatus": "completed"
     },
     {
       "company": "Valaris",
       "indexUrl": "https://www.valaris.com/investors/",
       "documentUrl": "https://s23.q4cdn.com/956522167/files/doc_financials/2026/q2/08052026-Fleet-Status-Report_FINAL.pdf",
-      "reportDate": "2026-08-05",
-      "sha256": "c94713719e350294eb91b0361212df7e5951c8d00b9e108ff7afa4a797e55e80",
-      "byteSize": 974321,
-      "parserVersion": "2026.09.04.1",
       "discovery": "official-index",
-      "contentType": "application/pdf",
+      "sha256": "c94713719e350294eb91b0361212df7e5951c8d00b9e108ff7afa4a797e55e80",
+      "reportDate": "2026-08-05",
+      "lastSuccessAt": "2026-10-28T13:27:41Z",
+      "httpStatus": 200,
+      "error": null,
       "health": "healthy",
-      "newsMonitor": "healthy"
+      "readingStatus": "completed"
     }
   ],
   "sourceHealth": [
     {
       "company": "Noble",
       "fleetReport": "healthy",
-      "discovery": "official-index",
       "newsMonitor": "healthy",
-      "preservedNewsEvents": 0,
-      "reportDate": "2026-07-27",
-      "documentUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-3/?wpdmdl=3701",
-      "sha256": "ddfdfe43090fe4f2589352abb7bf14cb292ee7323569f29a9f89e20c079807a6",
-      "fallbackStreak": 0
+      "reportDate": "2026-10-26",
+      "documentUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "sha256": "4dd3a586ae73f5752ae3893a970800ec6c8300dfd110e9c067c5f525bfebaa22",
+      "lastSuccessAt": "2026-10-28T13:27:41Z",
+      "httpStatus": 200,
+      "error": null
     },
     {
       "company": "Seadrill",
       "fleetReport": "healthy",
-      "discovery": "official-wordpress-api",
       "newsMonitor": "healthy",
-      "preservedNewsEvents": 0,
       "reportDate": "2026-08-10",
       "documentUrl": "https://www.seadrill.com/wp-content/uploads/2026/08/Seadrill-Fleet-Status-Report-August-2026-vF.pdf",
       "sha256": "b774357daafdb62dcc8c371fe5f5d118fb8d7d51c91badd05cd6cae3c9a39cb1",
-      "fallbackStreak": 0
+      "lastSuccessAt": "2026-10-28T13:27:41Z",
+      "httpStatus": 200,
+      "error": null
     },
     {
       "company": "Transocean",
       "fleetReport": "healthy",
-      "discovery": "official-index",
       "newsMonitor": "healthy",
-      "preservedNewsEvents": 0,
       "reportDate": "2026-08-05",
       "documentUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/August%202026%20Fleet%20Status%20Report.pdf",
       "sha256": "f2f98b03f750b5c4f6d299bff9b55d0ecc4dbeb0cb4f069054193968894db8b6",
-      "fallbackStreak": 0
+      "lastSuccessAt": "2026-10-28T13:27:41Z",
+      "httpStatus": 200,
+      "error": null
     },
     {
       "company": "Valaris",
       "fleetReport": "healthy",
-      "discovery": "official-index",
       "newsMonitor": "healthy",
-      "preservedNewsEvents": 0,
       "reportDate": "2026-08-05",
       "documentUrl": "https://s23.q4cdn.com/956522167/files/doc_financials/2026/q2/08052026-Fleet-Status-Report_FINAL.pdf",
       "sha256": "c94713719e350294eb91b0361212df7e5951c8d00b9e108ff7afa4a797e55e80",
-      "fallbackStreak": 0
+      "lastSuccessAt": "2026-10-28T13:27:41Z",
+      "httpStatus": 200,
+      "error": null
     }
   ],
-  "warningsCount": 12,
-  "eventCount": 41,
-  "pendingEventCount": 0,
+  "warningsCount": 9,
+  "eventCount": 106,
+  "pendingEventCount": 2,
   "newsQueue": {
-    "schemaVersion": 1,
+    "schemaVersion": 2,
     "pendingCount": 0,
     "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
     "jobs": []
   },
-  "newsReview": {
-    "engine": "Codex CLI / ChatGPT login",
-    "model": "gpt-6-luna",
-    "reasoningEffort": "medium",
-    "fast": false,
-    "reviewedVesselEvents": 8,
-    "detailsIncompleteCount": 8
+  "readingStatus": {
+    "reports": [
+      {
+        "company": "Noble",
+        "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+        "collectionStatus": "collected",
+        "readingStatus": "completed",
+        "lastReadAt": "2026-10-28T13:23:29Z"
+      },
+      {
+        "company": "Seadrill",
+        "url": "https://www.seadrill.com/wp-content/uploads/2026/08/Seadrill-Fleet-Status-Report-August-2026-vF.pdf",
+        "collectionStatus": "collected",
+        "readingStatus": "completed",
+        "lastReadAt": null
+      },
+      {
+        "company": "Transocean",
+        "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/August%202026%20Fleet%20Status%20Report.pdf",
+        "collectionStatus": "collected",
+        "readingStatus": "completed",
+        "lastReadAt": null
+      },
+      {
+        "company": "Valaris",
+        "url": "https://s23.q4cdn.com/956522167/files/doc_financials/2026/q2/08052026-Fleet-Status-Report_FINAL.pdf",
+        "collectionStatus": "collected",
+        "readingStatus": "completed",
+        "lastReadAt": null
+      }
+    ],
+    "lastCollectedAt": "2026-10-28T13:28:19Z",
+    "lastReadAt": "2026-10-28T13:27:07Z",
+    "lastAppliedAt": "2026-10-28T13:27:07Z",
+    "usageLimitedUntil": null,
+    "collectionErrors": [
+      {
+        "company": "Noble",
+        "kind": "official-news",
+        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-third-quarter-2026-results",
+        "phase": null,
+        "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-third-quarter-2026-results",
+        "httpStatus": 403,
+        "lastSuccessAt": null,
+        "lastAttemptAt": "2026-10-28T13:27:41Z"
+      },
+      {
+        "company": "Noble",
+        "kind": "official-news",
+        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-third-quarter-2026-results",
+        "phase": null,
+        "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-third-quarter-2026-results",
+        "httpStatus": 403,
+        "lastSuccessAt": null,
+        "lastAttemptAt": "2026-10-28T13:27:41Z"
+      },
+      {
+        "company": "Noble",
+        "kind": "official-news",
+        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-second-quarter-2026-results",
+        "phase": null,
+        "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-second-quarter-2026-results",
+        "httpStatus": 403,
+        "lastSuccessAt": null,
+        "lastAttemptAt": "2026-10-28T13:27:41Z"
+      },
+      {
+        "company": "Noble",
+        "kind": "official-news",
+        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-second-quarter-2026-results",
+        "phase": null,
+        "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-second-quarter-2026-results",
+        "httpStatus": 403,
+        "lastSuccessAt": null,
+        "lastAttemptAt": "2026-10-28T13:27:41Z"
+      },
+      {
+        "company": "Noble",
+        "kind": "official-news",
+        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-pricing-upsized-offering-800",
+        "phase": null,
+        "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-pricing-upsized-offering-800",
+        "httpStatus": 403,
+        "lastSuccessAt": null,
+        "lastAttemptAt": "2026-10-28T13:27:41Z"
+      },
+      {
+        "company": "Noble",
+        "kind": "official-news",
+        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-proposed-offering-500-million",
+        "phase": null,
+        "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-proposed-offering-500-million",
+        "httpStatus": 403,
+        "lastSuccessAt": null,
+        "lastAttemptAt": "2026-10-28T13:27:41Z"
+      },
+      {
+        "company": "Noble",
+        "kind": "official-news",
+        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-new-director-appointment",
+        "phase": null,
+        "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-new-director-appointment",
+        "httpStatus": 403,
+        "lastSuccessAt": null,
+        "lastAttemptAt": "2026-10-28T13:27:41Z"
+      },
+      {
+        "company": "Noble",
+        "kind": "official-news",
+        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-first-quarter-2026-results",
+        "phase": null,
+        "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-first-quarter-2026-results",
+        "httpStatus": 403,
+        "lastSuccessAt": null,
+        "lastAttemptAt": "2026-10-28T13:27:41Z"
+      },
+      {
+        "company": "Noble",
+        "kind": "official-news",
+        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-first-quarter-2026-results",
+        "phase": null,
+        "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-first-quarter-2026-results",
+        "httpStatus": 403,
+        "lastSuccessAt": null,
+        "lastAttemptAt": "2026-10-28T13:27:41Z"
+      }
+    ],
+    "readingErrors": []
   }
 }
