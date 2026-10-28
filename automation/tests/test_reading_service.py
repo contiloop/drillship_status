@@ -12,7 +12,8 @@ from automation.fleet_sync.codex_reader import CodexReader, _prepare_page_images
 from automation.fleet_sync.reading_contracts import context_sha256, policy_sha256, source_sha256
 from automation.fleet_sync.reading_service import (
     POLICY_SHA256, READER_POLICY, READER_PROMPT, ReadingService,
-    ReadingFailed, ReaderOutputError, build_reader_policy,
+    CLI_RESPONSE_SCHEMA, ReaderConfigurationError, ReadingFailed, ReaderOutputError,
+    build_reader_policy, structured_output_schema,
 )
 
 
@@ -434,3 +435,105 @@ def test_image_file_boundary_rechecks_strict_decode_and_raw_identity(tmp_path, m
     with pytest.raises(ValueError):
         _prepare_page_images(req, tmp_path)
     assert list(tmp_path.iterdir()) == []
+
+
+def test_cli_transport_schema_preserves_structure_and_supported_constraints():
+    from automation.fleet_sync.reading_contracts import READER_RESPONSE_SCHEMA
+    original = deepcopy(READER_RESPONSE_SCHEMA)
+    transport = structured_output_schema(original)
+    assert transport == CLI_RESPONSE_SCHEMA
+    assert original == READER_RESPONSE_SCHEMA
+    assert original["properties"]["readLocators"]["uniqueItems"] is True
+    assert original["properties"]["sourceId"]["minLength"] == 1
+    assert original["properties"]["schemaVersion"]["const"] == 2
+    assert transport["properties"]["schemaVersion"] == {"type": "integer", "enum": [2]}
+    assert transport["properties"]["sourceSha256"]["pattern"] == original["properties"]["sourceSha256"]["pattern"]
+    assert transport["properties"]["reportDate"]["anyOf"][0]["format"] == "date"
+    row = transport["properties"]["decisions"]["items"]["properties"]["row"]["anyOf"][0]
+    assert row["properties"]["dayRate"]["minimum"] == 0
+    assert row["properties"]["sourceUrl"]["type"] == ["string", "null"]
+    assert row["additionalProperties"] is False
+    assert set(row["required"]) == set(row["properties"])
+    policy = json.loads(build_reader_policy())
+    assert policy["transportResponseSchema"] == transport
+    assert policy["responseSchema"] == original
+
+    def check(node):
+        assert not {"uniqueItems", "minLength", "maxLength", "$schema", "const"}.intersection(node)
+        if node.get("type") == "object":
+            assert node["additionalProperties"] is False
+            assert set(node["required"]) == set(node["properties"])
+        for name in ("properties", "$defs"):
+            for child in node.get(name, {}).values():
+                check(child)
+        if "items" in node:
+            check(node["items"])
+        for child in node.get("anyOf", []):
+            check(child)
+    check(transport)
+    evidence_fields = transport["properties"]["decisions"]["items"]["properties"]["evidence"]["items"]["properties"]["fields"]
+    assert evidence_fields["minItems"] == 1
+
+
+def test_schema_conversion_treats_property_names_and_enum_values_as_data():
+    names = ["uniqueItems", "minLength", "const", "$schema", "properties", "enum"]
+    schema = dict(type="object", properties={name: dict(type="string", minLength=1, enum=names) for name in names},
+                  required=names, additionalProperties=False)
+    transport = structured_output_schema(schema)
+    assert list(transport["properties"]) == names
+    for value in transport["properties"].values():
+        assert value == {"type": "string", "enum": names}
+    with pytest.raises(ValueError, match="unsupported.*if"):
+        structured_output_schema({"type": "object", "if": {"type": "string"}})
+
+
+@pytest.mark.parametrize("mutate,envelope", [
+    (lambda out: out["readLocators"].append("page:1"), True),
+    (lambda out: out.update(sourceId=""), True),
+    (lambda out: out["decisions"][0].update(reasonKo=""), False),
+    (lambda out: out["decisions"][0]["evidence"][0]["fields"].append("facts.client"), False),
+    (lambda out: out["decisions"][0]["row"].update(dayRate=-1), False),
+    (lambda out: out["decisions"][0]["row"]["interpretation"].update(derivedUsdPerDay=600000), False),
+])
+def test_local_final_validation_stays_strict_after_transport_conversion(mutate, envelope):
+    from automation.fleet_sync.reading_contracts import DocumentValidationError, validate_reading_response
+    req = request()
+    out = response(req)
+    mutate(out)
+    if envelope:
+        with pytest.raises(DocumentValidationError):
+            validate_reading_response(out, req)
+    else:
+        checked = validate_reading_response(out, req)
+        assert checked.decisions == [] and len(checked.issues) == 1
+
+
+@pytest.mark.parametrize("stderr,configuration_error", [
+    ('ERROR: {"type":"error","error":{"message":"unsupported uniqueItems","type":"invalid_request_error","param":"text.format.schema","code":"invalid_json_schema"},"status":400}\n', True),
+    ('{"type":"error","error":{"code":"invalid_json_schema"}}\n', True),
+    ('ERROR: {"type":"error","error":{"code":"invalid_json_schema"}}\nERROR: {"type":"error","error":{"code":"invalid_json_schema"}}\n', True),
+    ('source says invalid_json_schema or {"code":"invalid_json_schema"}', False),
+    ('ERROR: {"type":"error","error":{"code":"rate_limit_exceeded"}}', False),
+    ('ERROR: {"type":"error","error":{"message":"invalid_json_schema"}}', False),
+    ('ERROR: {"type":"error","error":{"code":"invalid_json_schema"}', False),
+    ('{"type":"message","text":"invalid_json_schema","error":{"code":"invalid_json_schema"}}', False),
+])
+def test_adapter_classifies_only_framed_structured_schema_errors(monkeypatch, stderr, configuration_error):
+    calls = []
+    monkeypatch.setattr("automation.fleet_sync.codex_reader.shutil.which", lambda _: "/bin/codex")
+
+    def run(command, **kwargs):
+        calls.append(command)
+        if command[1:3] == ["login", "status"]:
+            return SimpleNamespace(returncode=0, stdout="Logged in using ChatGPT", stderr="")
+        transmitted = json.loads(Path(command[command.index("--output-schema") + 1]).read_text())
+        assert transmitted == CLI_RESPONSE_SCHEMA
+        assert "uniqueItems" not in transmitted["properties"]["readLocators"]
+        return SimpleNamespace(returncode=1, stdout="", stderr=stderr)
+
+    monkeypatch.setattr("automation.fleet_sync.codex_reader.subprocess.run", run)
+    with pytest.raises(RuntimeError) as caught:
+        ReadingService(CodexReader()).read(request())
+    assert isinstance(caught.value, ReaderConfigurationError) is configuration_error
+    assert stderr.strip() in str(caught.value)
+    assert len(calls) == 2  # One auth check and one exec, never correction retry.
