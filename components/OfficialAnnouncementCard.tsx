@@ -1,6 +1,6 @@
 import React from 'react';
 import type { FleetSource, OfficialEvent } from '../types';
-import { interpretationDetails } from '../utils/contractTimeline';
+import { interpretationDetails, storedReadingDetails } from '../utils/contractTimeline';
 import { economicsDetails, backlogRateLabel, newsEconomics } from '../utils/newsEconomics';
 
 const UNKNOWN = '확인된 정보 없음';
@@ -94,9 +94,10 @@ export default function OfficialAnnouncementCard({ event, source }: { event: Off
       <div className="mt-5 border-t border-slate-800 pt-4 text-sm leading-relaxed text-slate-300">
         {href ? (
           <a href={href} target="_blank" rel="noopener noreferrer" className="inline-block rounded py-2 text-blue-300 underline underline-offset-4 hover:text-blue-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-400">
-            출처: {event.company} {isReport ? '공식 보고서' : '공식 발표'} · {publishedAt} ↗
+            {event.inputMode === 'stored-result' ? '원문 URL:' : '출처:'} {event.company} {isReport ? '공식 보고서' : '공식 발표'} · {publishedAt} ↗
           </a>
         ) : <p>출처 원문 링크 확인되지 않음 · {publishedAt}</p>}
+        {storedReadingDetails(event) && <p className="mt-2 text-slate-400">{storedReadingDetails(event)}</p>}
         {(event.readingDecision?.reasonKo || event.reason) && <p className="mt-2 text-slate-300">{event.readingDecision?.reasonKo || event.reason}</p>}
         {event.readingDecision && <p className="mt-2 text-slate-400">{interpretationDetails(event.readingDecision.facts.interpretation)}</p>}
         {event.readingDecision?.row && <p className="mt-2 text-slate-400">표시 구간: {event.readingDecision.row.startDate} – {event.readingDecision.row.endDate}</p>}

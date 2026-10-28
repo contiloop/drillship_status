@@ -4,7 +4,18 @@ export type Generation = '6G' | '7G' | '7G+' | '8G';
 export type ContractStatus = 'Firm' | 'Option' | 'Contingent';
 export type VesselStatus = 'Active' | 'Idle' | 'Warm-Stacked' | 'Cold-Stacked';
 
+export type ReadingInputMode = 'document' | 'stored-result';
+
+export interface StoredReadingProvenance {
+  legacyLedger: string;
+  recordSha256: string;
+  originalSourceSha256: string | null;
+  reviewedAt: string | null;
+}
+
 export interface Contract {
+  inputMode?: ReadingInputMode;
+  storedReading?: StoredReadingProvenance;
   id: string;
   vesselId: string;
   startDate: string;
@@ -65,6 +76,8 @@ export interface FleetManifest {
 }
 
 export interface OfficialEvent {
+  inputMode?: ReadingInputMode;
+  storedReading?: StoredReadingProvenance;
   readingDecision?: ReadingDecision;
   company: Company;
   title?: string;
@@ -150,6 +163,8 @@ export interface ReadingEvidence {
 }
 
 export interface ReadingInput {
+  inputMode?: ReadingInputMode;
+  storedReading?: StoredReadingProvenance;
   sourceId: string;
   sourceSha256: string;
   company: Company;
@@ -169,7 +184,7 @@ export interface ReadingFacts {
   interpretation: ContractInterpretation;
 }
 
-export interface ReadingRow extends Omit<Contract, 'id' | 'interpretation' | 'newsReviewed' | 'sourceUrl' | 'sourcePublishedAt' | 'datePrecision'> {
+export interface ReadingRow extends Omit<Contract, 'inputMode' | 'storedReading' | 'id' | 'interpretation' | 'newsReviewed' | 'sourceUrl' | 'sourcePublishedAt' | 'datePrecision'> {
   id: string | null;
   interpretation: ContractInterpretation;
   newsReviewed?: boolean | null;
