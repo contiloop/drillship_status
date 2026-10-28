@@ -20,7 +20,7 @@ from typing import Any
 
 from .reading_contracts import READER_RESPONSE_SCHEMA, TITLE_TRIAGE_SCHEMA, ReadingInput, validate_reading_input
 from .reading_service import (
-    CORRECTION_PROMPT, MODEL, READER_PROMPT, REASONING_EFFORT, SERVICE_TIER, TRIAGE_PROMPT,
+    CORRECTION_PROMPT, DUPLICATE_CHECK_PROMPT, MODEL, READER_PROMPT, REASONING_EFFORT, SERVICE_TIER, TRIAGE_PROMPT,
     ReaderConfigurationError, ReaderOutputError, ReaderUsageLimited, prompt_for_reading, target_vessel_ids,
 )
 
@@ -59,6 +59,9 @@ class CodexReader:
     def read_corrected(self, request: ReadingInput, *, previous_response: Any, error: str) -> Any:
         return self._read(request, correction={"error": error, "rejectedOutput": previous_response})
 
+    def read_rechecked(self, request: ReadingInput, *, recheck: dict) -> Any:
+        return self._read(request, correction=None, recheck=recheck)
+
     def triage(self, items: list[dict], *, correction: dict | None = None) -> Any:
         schema = deepcopy(TITLE_TRIAGE_SCHEMA)
         ids = [item["id"] for item in items]
@@ -71,11 +74,13 @@ class CodexReader:
 
     # --- internals ---------------------------------------------------------
 
-    def _read(self, request: ReadingInput, *, correction: dict | None) -> Any:
+    def _read(self, request: ReadingInput, *, correction: dict | None, recheck: dict | None = None) -> Any:
         validate_reading_input(request)
         schema = _request_schema(request)
         supplied, images, manifest = _strip_page_images(request)
         prompt = prompt_for_reading(request) + _correction_text(correction)
+        if recheck is not None:
+            prompt += DUPLICATE_CHECK_PROMPT + json.dumps(recheck, ensure_ascii=False, default=str) + "\n"
         if manifest:
             prompt += "\nPAGE_IMAGE_ATTACHMENTS_JSON:\n" + json.dumps(manifest, ensure_ascii=False, allow_nan=False)
         prompt += "\nINPUT_JSON:\n" + json.dumps(supplied, ensure_ascii=False, allow_nan=False)

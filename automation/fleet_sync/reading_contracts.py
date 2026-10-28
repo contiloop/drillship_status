@@ -441,6 +441,44 @@ def validate_reading_response(response: Any, request: ReadingInput) -> ReadingVa
     return result
 
 
+_UNDISCLOSED_CLIENT = re.compile(r"undisclosed|not disclosed|unnamed|unknown", re.I)
+_DUPLICATE_OVERLAP_DAYS = 31  # adjacent periods share a boundary month by placement convention
+
+
+def _same_client(a: Any, b: Any) -> bool:
+    a, b = str(a or "").strip(), str(b or "").strip()
+    if _UNDISCLOSED_CLIENT.search(a) and _UNDISCLOSED_CLIENT.search(b):
+        return True
+    words = [re.sub(r"[^a-z0-9]", "", text.lower().split()[0]) if text else "" for text in (a, b)]
+    return bool(words[0]) and words[0] == words[1]
+
+
+def _overlap_days(a: dict, b: dict) -> int:
+    start, end = max(a["startDate"], b["startDate"]), min(a["endDate"], b["endDate"])
+    return (date.fromisoformat(end) - date.fromisoformat(start)).days if start <= end else -1
+
+
+def suspected_duplicates(validation: ReadingValidationResult, request: ReadingInput) -> list[dict]:
+    """New rows that overlap a same-client contract of the same vessel by more than a month.
+
+    Not a rejection: the service asks the reader once more whether each pair is
+    the same award. Compared against the baseline and the other new rows.
+    """
+    existing = {ship.get("id"): [dict(c, contractId=c.get("id")) for c in ship.get("contracts", [])]
+                for ship in request.get("baseline", [])}
+    new_rows = [(d["vesselId"], d["row"]) for d in validation.decisions
+                if d["action"] == "upsert" and d["contractId"] is None and d["row"] is not None]
+    pairs = []
+    for index, (vessel, row) in enumerate(new_rows):
+        others = existing.get(vessel, []) + [dict(other, contractId=None) for v, other in new_rows[index + 1:] if v == vessel]
+        for other in others:
+            if _same_client(row["client"], other.get("client")) and _overlap_days(row, other) > _DUPLICATE_OVERLAP_DAYS:
+                pairs.append({"vesselId": vessel,
+                              "newRow": {k: row[k] for k in ("startDate", "endDate", "client", "status")},
+                              "overlapsWith": {k: other.get(k) for k in ("contractId", "startDate", "endDate", "client", "status", "dayRate")}})
+    return pairs
+
+
 def triage_categories(response: Any, candidate_ids: list[str]) -> dict[str, str]:
     """News tag per candidate id; missing, unknown or invalid categories become 기타."""
     given = {}

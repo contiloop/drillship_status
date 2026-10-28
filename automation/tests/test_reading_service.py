@@ -71,6 +71,9 @@ class Reader:
     def read_corrected(self, req, *, previous_response, error):
         return self._next({"request": req, "correction": {"error": error, "rejectedOutput": previous_response}})
 
+    def read_rechecked(self, req, *, recheck):
+        return self._next({"request": req, "recheck": recheck})
+
     def triage(self, items, *, correction=None):
         return self._next({"items": items, "correction": correction})
 
@@ -370,3 +373,55 @@ def test_codex_triage_sends_titles_only_with_triage_schema(monkeypatch):
     expected["properties"]["categories"]["items"]["properties"]["id"]["enum"] = ["n1", "n2"]
     assert run["schema"] == expected
     assert run["command"][run["command"].index("--model") + 1] == "gpt-6-luna"
+
+
+# --- same-award re-ask ---------------------------------------------------------
+
+def test_new_row_overlapping_a_same_client_contract_is_asked_about_once():
+    duplicate = response([{"vesselId": "a", "contractId": None, "action": "upsert",
+                           "row": row(client="Client Energy Ltd", startDate="2027-08-01", endDate="2028-05-31")}])
+    merged = response()
+    reader = Reader(duplicate, merged)
+    outcome = ReadingService(reader).read(request())
+    assert outcome.response == merged and outcome.attempts == 2
+    recheck = reader.calls[1]["recheck"]
+    assert recheck["previousOutput"] == duplicate
+    assert recheck["overlaps"] == [{"vesselId": "a",
+                                    "newRow": {"startDate": "2027-08-01", "endDate": "2028-05-31", "client": "Client Energy Ltd", "status": "Firm"},
+                                    "overlapsWith": {"contractId": "old-a", "startDate": "2027-07-01", "endDate": "2028-06-30",
+                                                     "client": "Client", "status": "Firm", "dayRate": 0}}]
+
+
+def test_reader_may_keep_a_separate_contract_after_the_re_ask():
+    separate = response([{"vesselId": "a", "contractId": None, "action": "upsert",
+                          "row": row(startDate="2027-08-01", endDate="2028-05-31")}])
+    reader = Reader(separate, separate)
+    outcome = ReadingService(reader).read(request())
+    assert outcome.response == separate and len(reader.calls) == 2
+
+
+@pytest.mark.parametrize("new_row", [
+    row(client="Other Co", startDate="2027-08-01", endDate="2028-05-31"),   # different client
+    row(startDate="2028-06-01", endDate="2029-05-31"),                       # boundary month only
+])
+def test_no_re_ask_without_a_real_same_client_overlap(new_row):
+    reader = Reader(response([{"vesselId": "a", "contractId": None, "action": "upsert", "row": new_row}]))
+    ReadingService(reader).read(request())
+    assert len(reader.calls) == 1
+
+
+def test_undisclosed_clients_count_as_the_same_client_and_new_rows_are_compared_too():
+    first = row(client="Undisclosed", startDate="2027-01-01", endDate="2027-10-31")
+    second = row(client="Not Disclosed operator", startDate="2027-07-01", endDate="2028-09-30")
+    reader = Reader(response([{"vesselId": "b", "contractId": None, "action": "upsert", "row": first},
+                              {"vesselId": "b", "contractId": None, "action": "upsert", "row": second}]), response([]))
+    ReadingService(reader).read(request())
+    assert [p["vesselId"] for p in reader.calls[1]["recheck"]["overlaps"]] == ["b"]
+
+
+def test_codex_recheck_prompt_carries_the_earlier_output_and_overlaps(monkeypatch):
+    captured = {}
+    monkeypatch.setattr(CodexReader, "_exec", lambda self, prompt, schema, images: captured.setdefault("prompt", prompt))
+    CodexReader().read_rechecked(request(), recheck={"previousOutput": {"decisions": []}, "overlaps": [{"vesselId": "a"}]})
+    assert "same award" in captured["prompt"] and "RECHECK_JSON" in captured["prompt"]
+    assert '"overlaps": [{"vesselId": "a"}]' in captured["prompt"]
