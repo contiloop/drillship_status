@@ -79,6 +79,18 @@ def document_sha256(content: bytes) -> str:
     return sha256(content).hexdigest()
 
 
+def content_fingerprint(content: bytes, pages: list[ReadingPage]) -> str:
+    """A PDF is identified by its bytes; an HTML page by the article text the reader sees.
+
+    Site chrome around an article (e.g. a live share-price widget) changes the
+    raw HTML between fetches without changing the document, so it must not
+    trigger a re-read.
+    """
+    if content.lstrip().startswith(b"%PDF-"):
+        return document_sha256(content)
+    return document_sha256("\n".join(page["text"] for page in pages).encode("utf-8"))
+
+
 def render_page_image(page: Any, *, locator: str) -> dict:
     """Render every PDF page reproducibly; image/size failures are atomic."""
     pixels = (page.width * PDF_IMAGE_DPI / 72) * (page.height * PDF_IMAGE_DPI / 72)
@@ -252,7 +264,7 @@ def collect_reading_materials(
 
     ``materials``: ``{sourceId, company, kind, url, finalUrl, title, publishedAt, pages,
     documentSha256, legacyArticleSha256, retrievedAt, discoveryMode,
-    extractionWarnings}``. ``documentSha256`` hashes the raw response bytes;
+    extractionWarnings}``. ``documentSha256`` is ``content_fingerprint`` (PDF bytes, HTML article text);
     ``legacyArticleSha256`` reproduces the old article text hash for HTML news
     (migration matching only). ``sources`` has one record per candidate with
     httpStatus/error/lastSuccessAt; ``errors`` is the failing subset plus
@@ -315,10 +327,10 @@ def collect_reading_materials(
             record["httpStatus"] = response.status_code
             record["finalUrl"] = response.url
             validate_official_source(company, response.url)
-            digest = document_sha256(response.content)
             extraction_warnings: list[str] = []
             pages = extract_document_pages(response.content, response.headers.get("content-type", ""), kind=kind, page_ocr=page_ocr,
                                            extraction_warnings=extraction_warnings)
+            digest = content_fingerprint(response.content, pages)
             is_pdf = response.content.lstrip().startswith(b"%PDF-")
             if kind == "official-news" and not is_pdf:
                 record["legacyArticleSha256"] = _legacy_article_sha256(response.text)
@@ -339,9 +351,12 @@ def collect_reading_materials(
     return result
 
 
-def fetch_document_sha256(company: str, url: str, client: HttpClient | None = None) -> str:
-    """Re-fetch one official document and return its raw byte hash (R21 check)."""
+def fetch_document_sha256(company: str, url: str, kind: str = "official-news", client: HttpClient | None = None) -> str:
+    """Re-fetch one official document and return its fingerprint (R21 check)."""
     validate_official_source(company, url)
     response = (client or HttpClient()).get(url)
     validate_official_source(company, response.url)
-    return document_sha256(response.content)
+    if response.content.lstrip().startswith(b"%PDF-"):
+        return document_sha256(response.content)
+    pages = extract_document_pages(response.content, response.headers.get("content-type", ""), kind=kind)
+    return content_fingerprint(response.content, pages)

@@ -243,7 +243,7 @@ def execute(root: Path, *, mode: str, write: bool, service: ReadingService | Non
         clock = now if callable(now) else (lambda: time.time()) if now is None else (lambda: now)
         run = _Run(root, mode=mode, service=service, clock=clock,
                    collector=collector or (lambda **kw: collect_reading_materials(HttpClient(), **kw)),
-                   recheck=recheck or (lambda record: fetch_document_sha256(record["company"], record["url"])),
+                   recheck=recheck or (lambda record: fetch_document_sha256(record["company"], record["url"], record["kind"])),
                    cache_path=cache_path or root / CACHE_PATH)
         return run.execute(write=write, stored_results=stored_results)
 

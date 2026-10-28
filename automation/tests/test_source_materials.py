@@ -528,7 +528,7 @@ def test_legacy_article_hash_matches_old_reader_from_the_same_single_get():
     material, source = result['materials'][0], result['sources'][0]
     assert client.calls == [url]
     assert material['legacyArticleSha256'] == source['legacyArticleSha256'] == expected
-    assert material['documentSha256'] == materials.document_sha256(response.content)
+    assert material['documentSha256'] == materials.content_fingerprint(response.content, material['pages'])
     assert 'The Deepwater Proteus' in material['pages'][0]['text']
     assert 'U.S. Gulf.' in material['pages'][0]['text']
     assert 'discard legacy footer' in material['pages'][0]['text']
@@ -555,3 +555,14 @@ def test_unreadable_html_does_not_offer_a_legacy_hash_as_success():
     assert result['materials'] == []
     assert result['sources'][0]['legacyArticleSha256'] is None
     assert result['sources'][0]['bodyRead'] is False
+
+
+def test_html_fingerprint_ignores_site_chrome_outside_the_article():
+    article = '<main><article class="news"><p>' + 'Contract award for Deepwater Proteus. ' * 8 + '</p></article></main>'
+    first = f'<html><body><div class="ticker">RIG 0.00 0%</div>{article}</body></html>'.encode()
+    second = f'<html><body><div class="ticker">RIG 0.07 0%</div>{article}</body></html>'.encode()
+    changed = article.replace('Proteus', 'Pontus').replace('<main>', '<html><body><main>') + '</body></html>'
+    def fingerprint(content):
+        return materials.content_fingerprint(content, materials.extract_document_pages(content, 'text/html', kind='official-news'))
+    assert fingerprint(first) == fingerprint(second)
+    assert fingerprint(first) != fingerprint(changed.encode())
