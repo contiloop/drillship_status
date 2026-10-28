@@ -79,7 +79,7 @@ export default function OfficialAnnouncementCard({ event, source }: { event: Off
       <summary className="cursor-pointer rounded text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400">
         <span className="ml-2 font-bold">{vessel || event.title || `${event.company} 공식 발표`}</span>
         <span className="ml-3 text-xs text-slate-400">{event.company} · {publishedAt}</span>
-        <span className="ml-3 inline-block text-xs text-amber-200">{event.reviewStatus === 'conflict' ? '조건 충돌 · 확인 필요' : event.autoApplied ? '계약표 반영' : (event.llmReview || event.readingDecision) ? (event.needsDetails === false ? '확인 완료' : '상세 조건 미공개') : '확인 대기'}</span>
+        <span className="ml-3 inline-block text-xs text-amber-200">{event.reviewStatus === 'conflict' ? '조건 충돌 · 확인 필요' : event.autoApplied ? 'Fleet Status 반영' : (event.llmReview || event.readingDecision) ? (event.needsDetails === false ? '확인 완료' : '상세 조건 미공개') : '확인 대기'}</span>
       </summary>
       {event.title && vessel && <p className="mt-2 break-words text-sm leading-relaxed text-slate-400">{event.title}</p>}
       <dl className="mt-5 space-y-3">
@@ -102,7 +102,7 @@ export default function OfficialAnnouncementCard({ event, source }: { event: Off
         {event.readingDecision?.row && <p className="mt-2 text-slate-400">표시 구간: {event.readingDecision.row.startDate} – {event.readingDecision.row.endDate}</p>}
         {event.readingDecision?.evidence.map((evidence, index) => <blockquote key={index} className="mt-2 text-xs text-slate-400">{evidence.quote} · {evidence.locator}</blockquote>)}
         {!event.readingDecision && event.evidence?.map((evidence, index) => <blockquote key={index} className="mt-2 text-xs text-slate-400">{evidence.quote}</blockquote>)}
-        <p className="mt-2 text-slate-400">{event.autoApplied ? '근거가 확인된 기간·계약 상태를 계약표에 반영했습니다. 월 단위 날짜는 월초·월말로 표시하며 정확한 일자는 아닙니다. 미공개 일당은 평균에서 제외합니다.' : '정확한 일자가 없는 일정은 가동률·평균 공시 dayrate 집계에서 제외합니다. 계약 체결 여부는 일자 정밀도와 별개로 Firm/LOA로 표시합니다.'} 환산 요율은 동일 수주의 금액·기본 기간만 사용하며 공시 dayrate와 구분합니다.</p>
+        <p className="mt-2 text-slate-400">원문 날짜 표현·정밀도와 표시 날짜를 구분합니다. 배치에 의존하는 일정은 가동률·평균 공시 dayrate 집계에서 제외하며, 미공개·환산 요율도 평균 공시 dayrate에 포함하지 않습니다.</p>
       </div>
     </details>
   );
