@@ -139,6 +139,7 @@ export interface ContractInterpretation {
 export interface ReadingPage {
   locator: string;
   text: string;
+  image?: { mimeType: 'image/png'; sha256: string; dataBase64: string };
 }
 
 export interface ReadingEvidence {

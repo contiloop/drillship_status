@@ -393,3 +393,139 @@ def test_undisclosed_public_zero_needs_no_absence_quote():
                       valueUsd=None, baseDurationDays=None, durationAssumption=None)
     assert "dayRate" not in d["evidence"][0]["fields"]
     assert validate_reading_response(out, req).issues == []
+
+
+def png_image(size=(2, 2)):
+    import base64
+    import hashlib
+    from io import BytesIO
+    from PIL import Image
+
+    output = BytesIO()
+    Image.new("RGB", size, "white").save(output, format="PNG")
+    content = output.getvalue()
+    return {"mimeType": "image/png", "sha256": hashlib.sha256(content).hexdigest(),
+            "dataBase64": base64.b64encode(content).decode("ascii")}
+
+
+def image_request(*, text="", image=None):
+    req = request("official-news")
+    req["pages"][0] = {"locator": "page:1", "text": text, "image": png_image() if image is None else image}
+    req["sourceSha256"] = source_sha256(req["pages"])
+    return req
+
+
+def test_image_only_page_is_valid_and_needs_no_decoration_quote():
+    req = image_request()
+    validate_reading_input(req)
+    out = response(req)
+    out.update(decisions=[], coverage=[])
+    assert validate_reading_response(out, req).issues == []
+    out["readLocators"] = ["page:2"]
+    with pytest.raises(DocumentValidationError, match="readLocators"):
+        validate_reading_response(out, req)
+
+
+@pytest.mark.parametrize("text", ["", "  \n\t"])
+def test_empty_page_cannot_claim_reading_without_attached_image(text):
+    req = request()
+    req["pages"][0]["text"] = text
+    req["sourceSha256"] = source_sha256(req["pages"])
+    with pytest.raises(DocumentValidationError, match="text|image"):
+        validate_reading_input(req)
+
+
+def test_image_content_and_metadata_are_part_of_the_source_hash():
+    req = image_request()
+    original = req["sourceSha256"]
+    changed = deepcopy(req["pages"])
+    changed[0]["image"] = png_image((3, 3))
+    assert source_sha256(changed) != original
+    req["pages"] = changed
+    with pytest.raises(DocumentValidationError, match="sourceSha256"):
+        validate_reading_input(req)
+
+
+@pytest.mark.parametrize("change", [
+    lambda image: image.update(dataBase64="not base64!"),
+    lambda image: image.update(dataBase64=image["dataBase64"] + "\n"),
+    lambda image: image.update(dataBase64="data:image/png;base64," + image["dataBase64"]),
+    lambda image: image.update(sha256="0" * 64),
+    lambda image: image.update(mimeType="image/jpeg"),
+])
+def test_invalid_image_transport_or_digest_fails_document(change):
+    image = png_image()
+    change(image)
+    with pytest.raises(DocumentValidationError):
+        validate_reading_input(image_request(image=image))
+
+
+@pytest.mark.parametrize("content", [b"not a PNG", b"\x89PNG\r\n\x1a\n", b"\x89PNG\r\n\x1a\ntruncated"])
+def test_self_consistent_hash_does_not_make_broken_png_valid(content):
+    import base64
+    import hashlib
+    image = {"mimeType": "image/png", "sha256": hashlib.sha256(content).hexdigest(),
+             "dataBase64": base64.b64encode(content).decode("ascii")}
+    with pytest.raises(DocumentValidationError):
+        validate_reading_input(image_request(image=image))
+
+
+def test_per_page_encoded_image_limit_precedes_decode(monkeypatch):
+    from automation.fleet_sync import reading_contracts as contracts
+    monkeypatch.setattr(contracts, "MAX_PAGE_IMAGE_BYTES", 1)
+    with pytest.raises(DocumentValidationError, match="limit"):
+        validate_reading_input(image_request())
+
+
+def test_document_total_image_limit_counts_every_attached_page(monkeypatch):
+    import base64
+    from automation.fleet_sync import reading_contracts as contracts
+    image = png_image()
+    image_size = len(base64.b64decode(image["dataBase64"]))
+    monkeypatch.setattr(contracts, "MAX_DOCUMENT_IMAGE_BYTES", image_size * 2 - 1)
+    req = image_request(image=image)
+    req["pages"][1]["image"] = deepcopy(image)
+    req["sourceSha256"] = source_sha256(req["pages"])
+    with pytest.raises(DocumentValidationError, match="document.*limit"):
+        validate_reading_input(req)
+
+
+def test_png_pixel_limit_precedes_full_pixel_decode(monkeypatch):
+    from automation.fleet_sync import reading_contracts as contracts
+    monkeypatch.setattr(contracts, "MAX_PAGE_IMAGE_PIXELS", 3)
+    with pytest.raises(DocumentValidationError, match="pixel.*limit"):
+        validate_reading_input(image_request(image=png_image((2, 2))))
+
+
+def test_ocr_text_keeps_exact_quote_boundary_with_attached_image():
+    req = image_request(text=request()["pages"][0]["text"])
+    assert validate_reading_response(response(req), req).issues == []
+    req["pages"][0]["text"] = ""
+    req["sourceSha256"] = source_sha256(req["pages"])
+    out = response(req)
+    assert len(validate_reading_response(out, req).issues) == 1
+
+
+@pytest.mark.parametrize("damage", ["missing-iend-crc", "altered-iend-crc", "trailing-after-iend", "nonempty-iend"])
+def test_png_end_integrity_is_required_even_after_all_hashes_are_recomputed(damage):
+    import base64
+    import binascii
+    import hashlib
+
+    image = png_image()
+    content = base64.b64decode(image["dataBase64"])
+    assert content[-12:] == b"\x00\x00\x00\x00IEND\xaeB`\x82"
+    if damage == "missing-iend-crc":
+        content = content[:-4]
+    elif damage == "altered-iend-crc":
+        content = content[:-1] + bytes([content[-1] ^ 1])
+    elif damage == "trailing-after-iend":
+        content += b"trailing bytes"
+    else:
+        payload = b"IENDx"
+        content = content[:-12] + (1).to_bytes(4, "big") + payload + binascii.crc32(payload).to_bytes(4, "big")
+    image.update(dataBase64=base64.b64encode(content).decode("ascii"), sha256=hashlib.sha256(content).hexdigest())
+    # image_request recomputes sourceSha256 too: the rejection must come from
+    # PNG integrity, not a stale transport/content digest.
+    with pytest.raises(DocumentValidationError, match="PNG"):
+        validate_reading_input(image_request(image=image))
