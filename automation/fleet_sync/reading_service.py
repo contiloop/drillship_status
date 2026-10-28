@@ -20,7 +20,16 @@ from .reading_contracts import (
 MODEL = "gpt-6-luna"
 REASONING_EFFORT = "medium"
 SERVICE_TIER = "default"
-POLICY_VERSION = "fleet-reading-v2.3"
+POLICY_VERSION = "fleet-reading-v2.4"
+TRANSPORT_SCOPE = {
+    "version": "company-registry-v1",
+    "selection": "baseline.company == request.company",
+    "order": "vesselId ascending",
+    "referenceField": "vesselId",
+    "referenceLocations": ["coverage.items", "vesselUpdates.items", "decisions.items", "decisions.items.row"],
+    "coverageBounds": {"fleet-report": "target count exactly", "official-news": "zero through target count"},
+    "reproduction": "base transportResponseSchema + this rule + request.company/kind + complete baseline bound by contextSha256",
+}
 IMAGE_DELIVERY = {
     "version": "png-page-attachments-v1", "order": "input-page-order",
     "inlineImageData": "omitted-after-validation",
@@ -69,6 +78,13 @@ input locator exactly once. For fleet-report, coverage must include every
 registered vessel of this company exactly once, even if not mentioned. For
 official-news, irrelevant news may have empty coverage/vesselUpdates/decisions.
 Return vessel status/statusAsOf changes only when supported by source evidence.
+INPUT_SCOPE_JSON lists the exact output targets as vesselId/name pairs from the
+registered baseline for this request.company. Use only these vesselId values in
+coverage, vesselUpdates, decisions and each row. Do not construct IDs from vessel names.
+Vessels outside this list may appear in the source, including other rig types or
+other companies' vessels; read them as context, never output targets. The full
+registry and prior evidence remain available for comparison. Every report target
+must appear once in coverage; no unregistered or foreign vessel may be added.
 
 Identify each distinct award and period. Use contractId only for its actual
 existing contract, and null for new awards; never overwrite another award just
@@ -85,22 +101,34 @@ changes proceed automatically. A hold is not a request for human approval.
 Preserve original date expressions in sourceStartText/sourceEndText and their
 actual startPrecision/endPrecision. You, not code, interpret approximate dates,
 quarters, halves, years, durations and continuity using context and existing
-contracts. Choose ISO startDate/endDate placement when you can explain its
+contracts. Coarse or approximate wording alone is not a hold reason. Choose a
+supported single ISO interval even when the source does not disclose exact days.
+Choose ISO startDate/endDate placement when you can explain its
 support; dateBasis=placement and placementBasis explain the choice in Korean.
 Do not label a placement day as an exact source disclosure. Preserve continuous
 coverage as a single interval where supported. If placement lacks sufficient
 support, retain facts with dateBasis=unresolved and action=hold, without a row.
+Keep the original source precision separate from the selected placement dates;
+explain uncertainty without claiming those dates were precisely disclosed.
 
 Preserve Firm/Option/Contingent. A letter of award, including a binding LOA, or
 an unexercised option must not become Firm. Distinguish awards from exercises,
-extensions and unreported terms. Keep multiple extension tranches separate when
+extensions and unreported terms. An LOA can be placed as a Contingent row when
+its evidence supports a single interval; lack of a signed contract or exact days
+does not by itself require hold. Keep the LOA awardType and its conditions.
+Keep multiple extension tranches separate when
 they have different terms/economics; do not create one uniform rate across them.
 
 Keep reported daily rate, backlog-derived daily average and undisclosed separate.
 Select the matching base contract amount and base duration yourself, then supply
 valueUsd/baseDurationDays/derivedUsdPerDay. Use 1 year = 365 days; 1 month =
 365/12 days, and record these assumptions in durationAssumption. Code only checks
-your division. Do not allocate an aggregate multi-vessel amount to each vessel.
+your division. A clearly matched base amount and base term should produce a
+backlog-derived average, including when disclosed value includes services or
+mobilization: preserve those inclusions rather than omitting the calculation.
+A missing reported daily rate alone is not a hold reason. Preserve undisclosed
+reported rate separately and do not present a derived average as a disclosed rate.
+Do not allocate an aggregate multi-vessel amount to each vessel.
 A maximum duration alone cannot support a single derived rate: maximumTerm=true
 and no derivedUsdPerDay. Preserve included/excluded services and mobilization;
 do not subtract undisclosed costs or copy old rates into undisclosed new periods.
@@ -168,6 +196,40 @@ def structured_output_schema(schema: dict) -> dict:
 CLI_RESPONSE_SCHEMA = structured_output_schema(READER_RESPONSE_SCHEMA)
 
 
+def reading_scope(request: ReadingInput) -> dict:
+    """Return deterministic output references from an already-validated input.
+
+    This selects registered IDs mechanically, without recognizing names in prose
+    or narrowing the complete baseline/prior evidence sent to the reader.
+    """
+    vessels = sorted((v for v in request["baseline"] if v["company"] == request["company"]),
+                     key=lambda vessel: vessel["id"])
+    if not vessels:
+        raise DocumentValidationError("reading input has no registered vessels for request.company")
+    return {"company": request["company"], "kind": request["kind"],
+            "targetVessels": [{"vesselId": vessel["id"], "name": vessel.get("name")} for vessel in vessels]}
+
+
+def build_cli_response_schema(request: ReadingInput) -> dict:
+    """Constrain wire references using the policy's versioned scope rule.
+
+    The base wire schema and TRANSPORT_SCOPE live in readerPolicySha256. The
+    complete baseline lives in contextSha256, so the actual request schema is
+    reproducible from recorded policy + request company/kind + saved context.
+    Local reference, duplicate and evidence validation remains authoritative.
+    """
+    target_ids = [vessel["vesselId"] for vessel in reading_scope(request)["targetVessels"]]
+    schema = deepcopy(CLI_RESPONSE_SCHEMA)
+    arrays = schema["properties"]
+    for collection in ("coverage", "vesselUpdates", "decisions"):
+        arrays[collection]["items"]["properties"]["vesselId"]["enum"] = list(target_ids)
+    row = arrays["decisions"]["items"]["properties"]["row"]["anyOf"][0]
+    row["properties"]["vesselId"]["enum"] = list(target_ids)
+    count = len(target_ids)
+    arrays["coverage"].update(minItems=count if request["kind"] == "fleet-report" else 0, maxItems=count)
+    return schema
+
+
 def build_reader_policy(*, extraction_version: str = "") -> str:
     """Stable cache policy; callers pass the extraction adapter's version.
 
@@ -179,6 +241,7 @@ def build_reader_policy(*, extraction_version: str = "") -> str:
         "policyVersion": POLICY_VERSION, "prompt": READER_PROMPT,
         "responseSchema": READER_RESPONSE_SCHEMA, "model": MODEL,
         "transportResponseSchema": CLI_RESPONSE_SCHEMA,
+        "transportScope": TRANSPORT_SCOPE,
         "reasoningEffort": REASONING_EFFORT, "serviceTier": SERVICE_TIER,
         "extractionVersion": extraction_version, "cliConfig": list(CLI_CONFIG),
         "imageDelivery": IMAGE_DELIVERY,

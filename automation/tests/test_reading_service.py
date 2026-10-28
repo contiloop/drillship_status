@@ -13,7 +13,7 @@ from automation.fleet_sync.reading_contracts import context_sha256, policy_sha25
 from automation.fleet_sync.reading_service import (
     POLICY_SHA256, READER_POLICY, READER_PROMPT, ReadingService,
     CLI_RESPONSE_SCHEMA, ReaderConfigurationError, ReadingFailed, ReaderOutputError,
-    build_reader_policy, structured_output_schema,
+    build_reader_policy, structured_output_schema, build_cli_response_schema, reading_scope,
 )
 
 
@@ -527,7 +527,7 @@ def test_adapter_classifies_only_framed_structured_schema_errors(monkeypatch, st
         if command[1:3] == ["login", "status"]:
             return SimpleNamespace(returncode=0, stdout="Logged in using ChatGPT", stderr="")
         transmitted = json.loads(Path(command[command.index("--output-schema") + 1]).read_text())
-        assert transmitted == CLI_RESPONSE_SCHEMA
+        assert transmitted == build_cli_response_schema(request())
         assert "uniqueItems" not in transmitted["properties"]["readLocators"]
         return SimpleNamespace(returncode=1, stdout="", stderr=stderr)
 
@@ -537,3 +537,128 @@ def test_adapter_classifies_only_framed_structured_schema_errors(monkeypatch, st
     assert isinstance(caught.value, ReaderConfigurationError) is configuration_error
     assert stderr.strip() in str(caught.value)
     assert len(calls) == 2  # One auth check and one exec, never correction retry.
+
+
+@pytest.mark.parametrize("kind,min_count", [("fleet-report", 2), ("official-news", 0)])
+def test_request_wire_schema_limits_all_vessel_references_to_company_registry(kind, min_count):
+    req = request(kind)
+    req["baseline"].append({"id": "foreign-rig", "company": "Noble", "name": "Foreign Rig", "contracts": []})
+    req["contextSha256"] = context_sha256(req["baseline"], req["priorEvidence"])
+    original = deepcopy(CLI_RESPONSE_SCHEMA)
+    schema = build_cli_response_schema(req)
+    assert CLI_RESPONSE_SCHEMA == original
+    arrays = schema["properties"]
+    for collection in ("coverage", "vesselUpdates", "decisions"):
+        assert arrays[collection]["items"]["properties"]["vesselId"]["enum"] == ["a", "b"]
+    row = arrays["decisions"]["items"]["properties"]["row"]["anyOf"][0]
+    assert row["properties"]["vesselId"]["enum"] == ["a", "b"]
+    assert arrays["coverage"]["minItems"] == min_count
+    assert arrays["coverage"]["maxItems"] == 2
+    assert reading_scope(req) == dict(company="Seadrill", kind=kind, targetVessels=[
+        {"vesselId": "a", "name": "Rig A"}, {"vesselId": "b", "name": "Rig B"}])
+    req["baseline"].reverse()
+    assert build_cli_response_schema(req) == schema
+
+
+@pytest.mark.parametrize("full_registry", [False, True])
+def test_wire_registry_scope_and_full_context_are_transmitted_without_id_guessing(monkeypatch, full_registry):
+    req = request()
+    if full_registry:
+        req["baseline"] = json.loads((Path(__file__).resolve().parents[2] / "data/data_as_of_26_01_07.json").read_text())
+        assert len(req["baseline"]) == 62
+    else:
+        req["baseline"].append({"id": "foreign", "company": "Valaris", "name": "Other Company Rig", "contracts": []})
+    vessel = next(v for v in req["baseline"] if v["company"] == req["company"])
+    vessel.update(id="registered-opaque-id", contracts=[])
+    req["contextSha256"] = context_sha256(req["baseline"], req["priorEvidence"])
+    out = response(req)
+    observed = []
+    monkeypatch.setattr("automation.fleet_sync.codex_reader.shutil.which", lambda _: "/bin/codex")
+
+    def run(command, **kwargs):
+        if command[1:3] == ["login", "status"]:
+            return SimpleNamespace(returncode=0, stdout="Logged in using ChatGPT", stderr="")
+        schema = json.loads(Path(command[command.index("--output-schema") + 1]).read_text())
+        observed.append(schema)
+        assert schema == build_cli_response_schema(req)
+        scope = json.loads(kwargs["input"].split("\nINPUT_SCOPE_JSON:\n", 1)[1].split("\nINPUT_JSON:\n", 1)[0])
+        assert scope == reading_scope(req)
+        assert [v["vesselId"] for v in scope["targetVessels"]] == sorted(
+            v["id"] for v in req["baseline"] if v["company"] == req["company"])
+        assert any(v["vesselId"] == "registered-opaque-id" for v in scope["targetVessels"])
+        supplied = json.loads(kwargs["input"].split("\nINPUT_JSON:\n", 1)[1])
+        assert supplied == req  # All companies, contracts and prior evidence remain.
+        Path(command[command.index("--output-last-message") + 1]).write_text(json.dumps(out))
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr("automation.fleet_sync.codex_reader.subprocess.run", run)
+    CodexReader().read(req)
+    assert len(observed) == 1
+
+
+@pytest.mark.parametrize("location", ["coverage", "vesselUpdates", "decisions", "row"])
+def test_actual_wire_schema_rejects_nonregistry_vessel_at_each_reference_location(location):
+    from jsonschema import Draft202012Validator
+    req = request()
+    out = response(req)
+    out["decisions"][0]["row"].update(newsReviewed=None, sourceUrl=None, sourcePublishedAt=None, datePrecision=None)
+    out["vesselUpdates"] = [dict(vesselId="a", status="Active", statusAsOf="2026-10-01", reasonKo="공시 상태",
+        evidence=[dict(fields=["status", "statusAsOf"], sourceId="s1", locator="page:2", quote="Rig A Active as of 2026-10-01.")])]
+    validator = Draft202012Validator(build_cli_response_schema(req))
+    assert list(validator.iter_errors(out)) == []
+    target = out["decisions"][0]["row"] if location == "row" else out[location][0]
+    target["vesselId"] = "id-created-from-unregistered-vessel-name"
+    assert list(validator.iter_errors(out))
+
+
+def test_scope_policy_binds_base_schema_rules_and_context_reproduction():
+    policy = json.loads(READER_POLICY)
+    assert policy["transportResponseSchema"] == CLI_RESPONSE_SCHEMA
+    assert policy["transportScope"]["version"] == "company-registry-v1"
+    assert policy["transportScope"]["referenceField"] == "vesselId"
+    assert policy["transportScope"]["selection"] == "baseline.company == request.company"
+    assert "contextSha256" in policy["transportScope"]["reproduction"]
+    first = request()
+    second = deepcopy(first)
+    second["baseline"].append({"id": "new-id", "name": "New Vessel", "company": "Seadrill", "contracts": []})
+    second["contextSha256"] = context_sha256(second["baseline"], second["priorEvidence"])
+    assert first["contextSha256"] != second["contextSha256"]
+    assert build_cli_response_schema(first) != build_cli_response_schema(second)
+
+
+def test_dynamic_schema_does_not_replace_final_duplicate_reference_validation():
+    from automation.fleet_sync.reading_contracts import DocumentValidationError, validate_reading_response
+    req = request()
+    out = response(req)
+    out["coverage"] = [{"vesselId": "a", "state": "included"}] * 2
+    with pytest.raises(DocumentValidationError, match="unique"):
+        validate_reading_response(out, req)
+
+
+def test_generic_prompt_supports_explained_placement_contingent_loa_and_derived_average():
+    assert "Coarse or approximate wording alone is not a hold reason" in READER_PROMPT
+    assert "Contingent row" in READER_PROMPT
+    assert "missing reported daily rate alone is not a hold reason" in READER_PROMPT
+    assert "clearly matched base amount and base term" in READER_PROMPT
+    assert "Do not construct IDs from vessel names" in READER_PROMPT
+    for example in ("KG2", "Barents", "$300", "early 2031"):
+        assert example not in READER_PROMPT
+
+
+def test_model_selected_approximate_contingent_loa_and_conversion_are_retained():
+    req = request()
+    out = response(req)
+    d = out["decisions"][0]
+    d["row"]["status"] = "Contingent"
+    for interpretation in (d["facts"]["interpretation"], d["row"]["interpretation"]):
+        interpretation["awardType"] = "letter-of-award"
+        interpretation["includes"] = ["추가 서비스와 이동비 포함"]
+    d["evidence"][0]["fields"].append("row.status")
+    d["evidence"].append(dict(fields=["facts.interpretation.awardType", "row.interpretation.awardType"],
+        sourceId="s1", locator="page:2", quote="Rig A letter of award."))
+    outcome = ReadingService(Reader(out)).read(req)
+    assert outcome.validation.issues == []
+    row = outcome.validation.decisions[0]["row"]
+    assert row["status"] == "Contingent" and row["interpretation"]["dateBasis"] == "placement"
+    assert row["interpretation"]["derivedUsdPerDay"] == 500000 and row["dayRate"] == 0
+    assert row["interpretation"]["includes"] == ["추가 서비스와 이동비 포함"]
