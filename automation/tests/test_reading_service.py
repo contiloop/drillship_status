@@ -14,6 +14,7 @@ from automation.fleet_sync.reading_service import (
     POLICY_SHA256, READER_POLICY, READER_PROMPT, ReadingService,
     CLI_RESPONSE_SCHEMA, ReaderConfigurationError, ReadingFailed, ReaderOutputError,
     build_reader_policy, structured_output_schema, build_cli_response_schema, reading_scope,
+    STORED_RESULT_PROMPT, prompt_for_reading,
 )
 
 
@@ -662,3 +663,92 @@ def test_model_selected_approximate_contingent_loa_and_conversion_are_retained()
     assert row["status"] == "Contingent" and row["interpretation"]["dateBasis"] == "placement"
     assert row["interpretation"]["derivedUsdPerDay"] == 500000 and row["dayRate"] == 0
     assert row["interpretation"]["includes"] == ["추가 서비스와 이동비 포함"]
+
+
+def stored_request():
+    from automation.fleet_sync.reading_contracts import stored_record_sha256, stored_review_page
+    req = request("official-news")
+    record = dict(company=req["company"], url=req["url"], publishedAt=req["publishedAt"], title="저장된 공식 뉴스 판단",
+        sourceSha256="1" * 64, reader={"reviewedAt": "2026-10-01T12:00:00Z"}, result={"vessels": [dict(
+            vessel="Rig A", facts={"counterparty": "Client", "location": "Angola", "termText": "기본 1년", "valueText": "$182.5m",
+                "announcedValueUsdApprox": 182500000, "expectedStart": "Mid 2027", "expectedEnd": "2028",
+                "awardType": "extension", "dayRateDisclosure": "undisclosed", "dayRateUsd": None},
+            comparison="이전 정책에서 정확 날짜가 없어 보류했습니다.", changes=[],
+            evidence=[{"field": "termText", "quote": 'One year contract value "$182.5m".'}])]})
+    digest = stored_record_sha256(record)
+    req.update(inputMode="stored-result", storedReading=dict(legacyLedger="data/news/reviews.json", recordSha256=digest,
+        originalSourceSha256=record["sourceSha256"], reviewedAt=record["reader"]["reviewedAt"]),
+        sourceId="stored-reading-" + digest, pages=[stored_review_page(record)])
+    req["sourceSha256"] = source_sha256(req["pages"])
+    return req
+
+
+def test_mode_selection_and_policy_preserve_document_prompt_and_track_stored_prompt():
+    req = request()
+    assert prompt_for_reading(req) == READER_PROMPT
+    req["inputMode"] = "document"
+    assert prompt_for_reading(req) == READER_PROMPT
+    req["inputMode"] = "stored-result"
+    assert prompt_for_reading(req) == STORED_RESULT_PROMPT
+    req["inputMode"] = "unsupported"
+    with pytest.raises(ValueError):
+        prompt_for_reading(req)
+    policy = json.loads(READER_POLICY)
+    assert policy["storedResultPrompt"] == STORED_RESULT_PROMPT
+    assert policy["inputModeSelection"]["default"] == "document"
+    assert policy["inputModeSelection"]["stored-result"] == "storedResultPrompt"
+    assert "Do not claim that you reread the original article" in STORED_RESULT_PROMPT
+    assert "old comparison is a historical interpretation" in STORED_RESULT_PROMPT
+    assert "short contiguous substring from the canonical stored JSON" in STORED_RESULT_PROMPT
+    assert "Read every attached page image" not in STORED_RESULT_PROMPT
+
+
+@pytest.mark.parametrize("retry", [False, True])
+def test_stored_mode_transmits_complete_record_with_distinct_prompt_and_no_original_read_claim(monkeypatch, retry):
+    req = stored_request()
+    expected = response(req)
+    expected.update(coverage=[], decisions=[])
+    expected["readLocators"] = [p["locator"] for p in req["pages"]]
+    calls = []
+    monkeypatch.setattr("automation.fleet_sync.codex_reader.shutil.which", lambda _: "/bin/codex")
+
+    def run(command, **kwargs):
+        if command[1:3] == ["login", "status"]:
+            return SimpleNamespace(returncode=0, stdout="Logged in using ChatGPT", stderr="")
+        calls.append(kwargs["input"])
+        assert kwargs["input"].startswith(STORED_RESULT_PROMPT)
+        assert not kwargs["input"].startswith(READER_PROMPT)
+        assert "--image" not in command
+        supplied = json.loads(kwargs["input"].split("\nINPUT_JSON:\n", 1)[1])
+        assert supplied == req
+        assert '"changes":[]' in supplied["pages"][0]["text"]
+        assert '"comparison":' in supplied["pages"][0]["text"]
+        assert '"evidence":' in supplied["pages"][0]["text"]
+        output = deepcopy(expected)
+        if retry and len(calls) == 1:
+            output["readLocators"] = []
+        Path(command[command.index("--output-last-message") + 1]).write_text(json.dumps(output))
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr("automation.fleet_sync.codex_reader.subprocess.run", run)
+    outcome = ReadingService(CodexReader()).read(req)
+    assert outcome.validation.issues == [] and outcome.attempts == (2 if retry else 1)
+    assert len(calls) == (2 if retry else 1)
+
+
+def test_stored_mode_uses_same_validation_without_treating_old_quotes_as_new_source_quotes():
+    req = stored_request()
+    out = response(req)
+    d = out["decisions"][0]
+    d["reasonKo"] = "저장 판단의 조건과 기존 계약을 연결해 누락 배치를 정규화했습니다."
+    for evidence in d["evidence"]:
+        evidence.update(sourceId=req["sourceId"], locator=req["pages"][0]["locator"], quote=req["pages"][0]["text"])
+    result = ReadingService(Reader(out)).read(req)
+    assert result.validation.issues == []
+    d["evidence"][0]["quote"] = 'One year contract value "$182.5m".'
+    result = ReadingService(Reader(out)).read(req)
+    assert result.validation.decisions == [] and len(result.validation.issues) == 1
+    d["evidence"][0]["quote"] = '"termText":"기본 1년"'
+    d["row"]["interpretation"]["derivedUsdPerDay"] = 600000
+    result = ReadingService(Reader(out)).read(req)
+    assert result.validation.decisions == [] and len(result.validation.issues) == 1
