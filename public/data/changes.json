@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-10-28T14:35:55Z",
-  "fromDataHash": "740f584011f227fa23f4",
+  "generatedAt": "2026-10-29T05:51:01Z",
+  "fromDataHash": "f47450ad2846c9bf21e6",
   "toDataHash": "f47450ad2846c9bf21e6",
   "companies": {
     "Transocean": {
@@ -19,7 +19,7 @@
       "statusChanges": 0,
       "contractsAdded": 0,
       "contractsRemoved": 0,
-      "contractsChanged": 13
+      "contractsChanged": 0
     },
     "Seadrill": {
       "statusChanges": 0,
