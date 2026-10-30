@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "lastCollectedAt": "2026-10-30T05:52:09Z",
+  "lastCollectedAt": "2026-10-30T18:01:30Z",
   "lastReadAt": "2026-10-28T14:35:55Z",
   "lastAppliedAt": "2026-10-28T14:35:55Z",
   "collectionErrors": [
@@ -12,7 +12,7 @@
       "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-third-quarter-2026-results",
       "httpStatus": 403,
       "lastSuccessAt": null,
-      "lastAttemptAt": "2026-10-30T05:50:58Z"
+      "lastAttemptAt": "2026-10-30T18:00:52Z"
     },
     {
       "company": "Noble",
@@ -22,7 +22,7 @@
       "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-third-quarter-2026-results",
       "httpStatus": 403,
       "lastSuccessAt": null,
-      "lastAttemptAt": "2026-10-30T05:50:58Z"
+      "lastAttemptAt": "2026-10-30T18:00:52Z"
     },
     {
       "company": "Noble",
@@ -32,7 +32,7 @@
       "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-second-quarter-2026-results",
       "httpStatus": 403,
       "lastSuccessAt": null,
-      "lastAttemptAt": "2026-10-30T05:50:58Z"
+      "lastAttemptAt": "2026-10-30T18:00:52Z"
     },
     {
       "company": "Noble",
@@ -42,7 +42,7 @@
       "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-second-quarter-2026-results",
       "httpStatus": 403,
       "lastSuccessAt": null,
-      "lastAttemptAt": "2026-10-30T05:50:58Z"
+      "lastAttemptAt": "2026-10-30T18:00:52Z"
     },
     {
       "company": "Noble",
@@ -52,7 +52,7 @@
       "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-pricing-upsized-offering-800",
       "httpStatus": 403,
       "lastSuccessAt": null,
-      "lastAttemptAt": "2026-10-30T05:50:58Z"
+      "lastAttemptAt": "2026-10-30T18:00:52Z"
     },
     {
       "company": "Noble",
@@ -62,7 +62,7 @@
       "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-proposed-offering-500-million",
       "httpStatus": 403,
       "lastSuccessAt": null,
-      "lastAttemptAt": "2026-10-30T05:50:58Z"
+      "lastAttemptAt": "2026-10-30T18:00:52Z"
     },
     {
       "company": "Noble",
@@ -72,7 +72,7 @@
       "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-new-director-appointment",
       "httpStatus": 403,
       "lastSuccessAt": null,
-      "lastAttemptAt": "2026-10-30T05:50:58Z"
+      "lastAttemptAt": "2026-10-30T18:00:52Z"
     },
     {
       "company": "Noble",
@@ -82,7 +82,7 @@
       "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-first-quarter-2026-results",
       "httpStatus": 403,
       "lastSuccessAt": null,
-      "lastAttemptAt": "2026-10-30T05:50:58Z"
+      "lastAttemptAt": "2026-10-30T18:00:52Z"
     },
     {
       "company": "Noble",
@@ -92,7 +92,7 @@
       "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-first-quarter-2026-results",
       "httpStatus": 403,
       "lastSuccessAt": null,
-      "lastAttemptAt": "2026-10-30T05:50:58Z"
+      "lastAttemptAt": "2026-10-30T18:00:52Z"
     }
   ],
   "documents": {
@@ -113,7 +113,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-2e62d20ed9312f2995b22e0d5f54653e": {
       "jobId": "job-2e62d20ed9312f2995b22e0d5f54653e",
@@ -132,7 +132,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-861d50671254a28132f1018c532fc83d": {
       "jobId": "job-861d50671254a28132f1018c532fc83d",
@@ -151,7 +151,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "자금·주주"
     },
     "job-ed669224aa2784091ad41fa4a01fd90d": {
@@ -171,7 +171,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "일정"
     },
     "job-825a0e9d976358836d374fddaee447a3": {
@@ -191,7 +191,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-204021e5247c075be7ab685d60ca23f5": {
       "jobId": "job-204021e5247c075be7ab685d60ca23f5",
@@ -210,7 +210,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-0ae026d8b4130c14d931d3a0818eb790": {
       "jobId": "job-0ae026d8b4130c14d931d3a0818eb790",
@@ -229,7 +229,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-ce22a7588cbfa6d7bd55397b0e0da4db": {
       "jobId": "job-ce22a7588cbfa6d7bd55397b0e0da4db",
@@ -248,7 +248,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-7285f1da996397fc3c313342471007b2": {
       "jobId": "job-7285f1da996397fc3c313342471007b2",
@@ -298,7 +298,7 @@
           "quote": "Awarded a one-well extension by Murphy in Ivory Coast"
         }
       ],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "Fleet Status",
       "selected": true
     },
@@ -319,7 +319,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "일정"
     },
     "job-98a628dcab064fb6d63db254d7d35b31": {
@@ -339,7 +339,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "계약",
       "selected": true
     },
@@ -360,7 +360,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-3e1e293f554a03152e0bc26d52c015df": {
       "jobId": "job-3e1e293f554a03152e0bc26d52c015df",
@@ -379,7 +379,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-cada35436ae1cdf9916f832de41b031c": {
       "jobId": "job-cada35436ae1cdf9916f832de41b031c",
@@ -444,7 +444,7 @@
           "quote": "Awarded a 1,156-day contract extension with Petrobras in Brazil."
         }
       ],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "Fleet Status",
       "selected": true
     },
@@ -465,7 +465,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-aa516ba301eb3575037ce1758f6439a5": {
       "jobId": "job-aa516ba301eb3575037ce1758f6439a5",
@@ -484,7 +484,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-9f7dc311ac47397cb5e5ee240c497dac": {
       "jobId": "job-9f7dc311ac47397cb5e5ee240c497dac",
@@ -503,7 +503,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "일정"
     },
     "job-630779ae67d3e1a9cee78d7cbba4c250": {
@@ -523,7 +523,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-243a104f4c7d0fe74288ad7310f22864": {
       "jobId": "job-243a104f4c7d0fe74288ad7310f22864",
@@ -542,7 +542,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-16f8e95dab32eff321b2322ce564d05c": {
       "jobId": "job-16f8e95dab32eff321b2322ce564d05c",
@@ -561,7 +561,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-191d660a133b70b48ae29a4599d2d064": {
       "jobId": "job-191d660a133b70b48ae29a4599d2d064",
@@ -580,7 +580,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-3926c4d4a78beeafe88d2b8e16275946": {
       "jobId": "job-3926c4d4a78beeafe88d2b8e16275946",
@@ -599,7 +599,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-21c02e35d8a54177f09a3d1ce29ea3dc": {
       "jobId": "job-21c02e35d8a54177f09a3d1ce29ea3dc",
@@ -618,7 +618,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "일정"
     },
     "job-e7c3f270dd28a6046541c3d990e91263": {
@@ -638,7 +638,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-2c94c745b85b0aa8a8d1a8c0a0ecf426": {
       "jobId": "job-2c94c745b85b0aa8a8d1a8c0a0ecf426",
@@ -657,7 +657,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "Fleet Status",
       "selected": true
     },
@@ -678,7 +678,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-67905a7d106bf15f4d4397ae8255a209": {
       "jobId": "job-67905a7d106bf15f4d4397ae8255a209",
@@ -697,7 +697,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "일정"
     },
     "job-fdb5cb197c1bd462342cb6fdf80fb524": {
@@ -717,7 +717,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "Fleet Status",
       "selected": true
     },
@@ -738,7 +738,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-91ef3f1d14ba0b906b35a15956774e13": {
       "jobId": "job-91ef3f1d14ba0b906b35a15956774e13",
@@ -757,7 +757,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "일정"
     },
     "job-44de1d05146d966c60bbaf22a5cb1b3a": {
@@ -777,7 +777,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-f7359d0a59c6d872a428f1d0a60f5c17": {
       "jobId": "job-f7359d0a59c6d872a428f1d0a60f5c17",
@@ -796,7 +796,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "경영·인사"
     },
     "job-93221c349472517ef9ae06eb888bcead": {
@@ -816,7 +816,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-21da131fdfed65c740715fad6d37bf05": {
       "jobId": "job-21da131fdfed65c740715fad6d37bf05",
@@ -835,7 +835,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-8cbd65c40849621e40f002bcb2b9aa8a": {
       "jobId": "job-8cbd65c40849621e40f002bcb2b9aa8a",
@@ -854,7 +854,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "일정"
     },
     "job-8783234f0fe03e2421f1f5db7ed77ea3": {
@@ -874,7 +874,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "경영·인사"
     },
     "job-d64bd0f9ea0464cc4e645ddddaf7a07d": {
@@ -894,7 +894,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "일정"
     },
     "job-6d2f654858f2bda5f346746714ff5236": {
@@ -930,7 +930,7 @@
           "quote": "The contract is expected to commence in the first quarter of 2027, with an estimated duration of approximately 800 days"
         }
       ],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "계약",
       "selected": true
     },
@@ -951,7 +951,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "실적"
     },
     "job-5d58c82a25da16d8c1c2d52d8e7055c6": {
@@ -971,7 +971,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "Fleet Status",
       "selected": true
     },
@@ -1008,7 +1008,7 @@
           "quote": "five-well contract with Bp Exploration Delta Limited"
         }
       ],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "계약",
       "selected": true
     },
@@ -1029,7 +1029,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "일정"
     },
     "job-6268634f4467735a8a80e429294f2369": {
@@ -1049,7 +1049,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "실적"
     },
     "job-aeb628e50318815f06eaba8165d0ba29": {
@@ -1069,7 +1069,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "실적"
     },
     "job-b67578c6facbd3fe40d8f71001c39152": {
@@ -1089,7 +1089,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "실적"
     },
     "job-4c9a97f96865aaafa88f9d55f3c6ebf7": {
@@ -1109,7 +1109,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "실적"
     },
     "job-6a72d1ea3c67aa7d32bc45950ec718a1": {
@@ -1149,7 +1149,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-bc67889edec42454ad64e3c4088a3dc7": {
       "jobId": "job-bc67889edec42454ad64e3c4088a3dc7",
@@ -1168,7 +1168,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-891ab22917870956a2680bbd8f90c820": {
       "jobId": "job-891ab22917870956a2680bbd8f90c820",
@@ -1187,7 +1187,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "일정"
     },
     "job-7d0d5a707821ca3ea5b429dc43fdbdcd": {
@@ -1207,7 +1207,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-bbef7a942f8027df03ced1e0e2e8ec08": {
       "jobId": "job-bbef7a942f8027df03ced1e0e2e8ec08",
@@ -1226,7 +1226,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "일정"
     },
     "job-184911aae089467cd868268457a48f03": {
@@ -1246,7 +1246,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "자금·주주"
     },
     "job-324bbf6df4c229dad1201594e30593ed": {
@@ -1266,7 +1266,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "자금·주주"
     },
     "job-98133dbfd504609e6e27dadc9010ee22": {
@@ -1286,7 +1286,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "자금·주주"
     },
     "job-465cb8ece0d498a7a9d296cad69ff903": {
@@ -1306,7 +1306,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "자금·주주"
     },
     "job-ad6c8b8fdcea2003d189236219d7fcba": {
@@ -1326,7 +1326,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-ec4bac03741a8a886cb10ad33423077e": {
       "jobId": "job-ec4bac03741a8a886cb10ad33423077e",
@@ -1345,7 +1345,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-55557c962588f8a378871c5dc8e4233c": {
       "jobId": "job-55557c962588f8a378871c5dc8e4233c",
@@ -1364,7 +1364,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "일정"
     },
     "job-935b2ff23844a40a95b83c15b374d5f4": {
@@ -1384,7 +1384,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-fd7b1b2c86c375c39030f644e27922ab": {
       "jobId": "job-fd7b1b2c86c375c39030f644e27922ab",
@@ -1403,7 +1403,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-bb433a9ab74a9949ac3eb8afc4ff033f": {
       "jobId": "job-bb433a9ab74a9949ac3eb8afc4ff033f",
@@ -1422,7 +1422,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "경영·인사"
     },
     "job-6e67f0453a099418aa9bac42ea0a2b72": {
@@ -1442,7 +1442,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-49291851598ab693e305d7cec946ecff": {
       "jobId": "job-49291851598ab693e305d7cec946ecff",
@@ -1461,7 +1461,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-07631d618619ac6c78b42dbc5b4c4afd": {
       "jobId": "job-07631d618619ac6c78b42dbc5b4c4afd",
@@ -1480,7 +1480,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "일정"
     },
     "job-70f44957a080a27df3117d8dfe545f35": {
@@ -1500,7 +1500,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z"
+      "lastSuccessAt": "2026-10-30T18:01:30Z"
     },
     "job-a761f623ea072f38b9232ec1d6b52394": {
       "jobId": "job-a761f623ea072f38b9232ec1d6b52394",
@@ -1541,7 +1541,7 @@
           "quote": "five-well option has been exercised"
         }
       ],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "계약",
       "selected": true
     },
@@ -1562,7 +1562,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "newsCategory": "실적"
     },
     "job-dc9e30dee7f7ec98f928613a67db9c40": {
@@ -2013,7 +2013,7 @@
           "quote": "Q3/Q4-27 2030"
         }
       ],
-      "lastSuccessAt": "2026-10-30T05:52:09Z",
+      "lastSuccessAt": "2026-10-30T18:01:30Z",
       "reportDate": "2026-10-26"
     }
   }
