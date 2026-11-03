@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-02T21:44:36Z",
+  "generatedAt": "2026-11-03T05:19:48Z",
   "events": [
     {
       "company": "Noble",
@@ -3759,6 +3759,1553 @@
         "quote": "three unpriced one-year options",
         "locator": "page:4"
       },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "news-c28364f3af914ca2ec49",
+      "company": "Transocean",
+      "title": "Transocean Ltd. Reports Third Quarter 2026 Results",
+      "url": "https://www.deepwater.com/news/detail?ID=30681",
+      "publishedAt": "2026-11-02",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "sourceId": "source-d4b8889c22699756c3739b6d86b1867d6285282ffec0fa43c303951feaa85fa1",
+      "newsCategory": "실적"
+    },
+    {
+      "id": "news-fa03f534cf2958316240",
+      "company": "Valaris",
+      "title": "Valaris Reports Third Quarter 2026 Results",
+      "url": "https://www.valaris.com/news/news-details/2026/Valaris-Reports-Third-Quarter-2026-Results/default.aspx",
+      "publishedAt": "2026-11-02",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "sourceId": "source-10ceeb9fe073f1d1ce53d0f715362e8eed172a52201d3acb31ce774a5669fe4b",
+      "newsCategory": "실적"
+    },
+    {
+      "id": "reading-41cffc070701e6e42914",
+      "company": "Transocean",
+      "vessel": "Deepwater Titan",
+      "vessels": [
+        "Deepwater Titan"
+      ],
+      "vesselId": "deepwater-titan",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "deepwater-titan-0498ab8d5a",
+        "row": null,
+        "reasonKo": "보고서 계약기간과 요율이 기존 계약과 일치",
+        "quote": "11-Apr-23 10-Apr-28 463,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-25431ab22acc7dcd0b08",
+      "company": "Transocean",
+      "vessel": "Deepwater Atlas",
+      "vessels": [
+        "Deepwater Atlas"
+      ],
+      "vesselId": "deepwater-atlas",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "deepwater-atlas-e5e064efb5",
+        "row": {
+          "startDate": "2026-09-01",
+          "endDate": "2026-11-30",
+          "dayRate": 580000,
+          "client": "Beacon",
+          "region": "US Gulf",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Sep-26",
+            "sourceEndText": "Nov-26",
+            "placementBasis": "보고서 월 표기로 배치; 다음 기간이 Nov-26 시작이라 종료를 직전 월로 조정",
+            "termText": null,
+            "optionText": null,
+            "valueText": null,
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "보고서 표의 Beacon 기간·요율 반영",
+        "quote": "Sep-26 Nov-26 580,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-137777bfe99b40b20b62",
+      "company": "Transocean",
+      "vessel": "Deepwater Atlas",
+      "vessels": [
+        "Deepwater Atlas"
+      ],
+      "vesselId": "deepwater-atlas",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "deepwater-atlas-991f0699ec",
+        "row": {
+          "startDate": "2026-12-01",
+          "endDate": "2026-12-31",
+          "dayRate": 650000,
+          "client": "Beacon",
+          "region": "US Gulf",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Nov-26",
+            "sourceEndText": "Jan-27",
+            "placementBasis": "월 표기로 배치; 겹침 방지를 위해 Nov-26은 앞 기간에 포함하고 이 기간은 Dec-26부터 배치",
+            "termText": null,
+            "optionText": null,
+            "valueText": null,
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "앞선 기간과 겹치지 않도록 보고서상 연속기간 배치",
+        "quote": "Nov-26 Jan-27 650,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-1aa9d5317c713faf3677",
+      "company": "Transocean",
+      "vessel": "Deepwater Atlas",
+      "vessels": [
+        "Deepwater Atlas"
+      ],
+      "vesselId": "deepwater-atlas",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "deepwater-atlas-950ba82235",
+        "row": {
+          "startDate": "2027-01-01",
+          "endDate": "2027-03-31",
+          "dayRate": 650000,
+          "client": "Beacon",
+          "region": "US Gulf",
+          "status": "Contingent",
+          "interpretation": {
+            "sourceStartText": "Jan-27",
+            "sourceEndText": "Apr-27",
+            "placementBasis": "월 표기로 배치; 다음 Firm 기간 Apr-27 시작에 맞춰 종료월 조정",
+            "termText": null,
+            "optionText": null,
+            "valueText": null,
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "조건부 Beacon 기간과 상태 반영",
+        "quote": "Contingent Jan-27 Apr-27 650,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-fc4df6fd4c9896f4fc84",
+      "company": "Transocean",
+      "vessel": "Deepwater Atlas",
+      "vessels": [
+        "Deepwater Atlas"
+      ],
+      "vesselId": "deepwater-atlas",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "deepwater-atlas-fc99127caa-2",
+        "row": {
+          "startDate": "2027-04-01",
+          "endDate": "2027-05-31",
+          "dayRate": 505000,
+          "client": "Beacon",
+          "region": "US Gulf",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Apr-27",
+            "sourceEndText": "Jun-27",
+            "placementBasis": "월 표기로 배치; 다음 Contingent 기간 Jun-27 시작에 맞춰 종료월 조정",
+            "termText": null,
+            "optionText": null,
+            "valueText": null,
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "Firm 기간 요율과 비중복 기간 반영",
+        "quote": "Apr-27 Jun-27 505,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-fed939b373813def4b47",
+      "company": "Transocean",
+      "vessel": "Deepwater Atlas",
+      "vessels": [
+        "Deepwater Atlas"
+      ],
+      "vesselId": "deepwater-atlas",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "deepwater-atlas-rcd7679e7a0ef",
+        "row": {
+          "startDate": "2027-06-01",
+          "endDate": "2027-09-30",
+          "dayRate": 505000,
+          "client": "Beacon",
+          "region": "US Gulf",
+          "status": "Contingent",
+          "interpretation": {
+            "sourceStartText": "Jun-27",
+            "sourceEndText": "Sep-27",
+            "placementBasis": "보고서 월 표기로 배치",
+            "termText": null,
+            "optionText": null,
+            "valueText": null,
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "보고서에 별도 조건부 기간으로 표시",
+        "quote": "Contingent Jun-27 Sep-27 505,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-23d56aa184d22c64305c",
+      "company": "Transocean",
+      "vessel": "Deepwater Atlas",
+      "vessels": [
+        "Deepwater Atlas"
+      ],
+      "vesselId": "deepwater-atlas",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "deepwater-atlas-8f5a34ab13",
+        "row": null,
+        "reasonKo": "bp 계약기간과 요율이 기존 계약과 일치",
+        "quote": "Jun-28 Jun-30 635,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-4de68e7018bd9cbb9357",
+      "company": "Transocean",
+      "vessel": "Deepwater Aquila",
+      "vessels": [
+        "Deepwater Aquila"
+      ],
+      "vesselId": "deepwater-aquila",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "deepwater-aquila-1c5c082351",
+        "row": null,
+        "reasonKo": "기존 Petrobras 계약과 일치",
+        "quote": "Apr-26 Dec-26 438,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-64c0ff7fa04bb548367e",
+      "company": "Transocean",
+      "vessel": "Deepwater Aquila",
+      "vessels": [
+        "Deepwater Aquila"
+      ],
+      "vesselId": "deepwater-aquila",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "deepwater-aquila-r37936514df36",
+        "row": {
+          "startDate": "2027-01-01",
+          "endDate": "2028-06-30",
+          "dayRate": 442000,
+          "client": "Petrobras",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Jan-27",
+            "sourceEndText": "Jun-28",
+            "placementBasis": "월 표기를 해당 월 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": null,
+            "valueText": null,
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "보고서에 기재된 새 Petrobras 기간",
+        "quote": "Jan-27 Jun-28 442,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-ea195a89f83309074a12",
+      "company": "Transocean",
+      "vessel": "Deepwater Poseidon",
+      "vessels": [
+        "Deepwater Poseidon"
+      ],
+      "vesselId": "deepwater-poseidon",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "deepwater-poseidon-a20ac37fab",
+        "row": null,
+        "reasonKo": "기존 Shell 계약과 일치",
+        "quote": "Sep-18 Feb-28 501,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-66d19a4da724028deb96",
+      "company": "Transocean",
+      "vessel": "Deepwater Pontus",
+      "vessels": [
+        "Deepwater Pontus"
+      ],
+      "vesselId": "deepwater-pontus",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "deepwater-pontus-077654e4b6",
+        "row": null,
+        "reasonKo": "기존 Shell 계약과 일치",
+        "quote": "Oct-17 Oct-27 499,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-e85994e115f28f7bb4e1",
+      "company": "Transocean",
+      "vessel": "Deepwater Conqueror",
+      "vessels": [
+        "Deepwater Conqueror"
+      ],
+      "vesselId": "deepwater-conqueror",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "deepwater-conqueror-r89e1559fc6d7",
+        "row": {
+          "startDate": "2027-01-01",
+          "endDate": "2027-07-31",
+          "dayRate": 465000,
+          "client": "Not Disclosed",
+          "region": "Equatorial Guinea",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Jan-27",
+            "sourceEndText": "Jul-27",
+            "placementBasis": "보고서 월 표기를 해당 월 시작일과 말일로 배치",
+            "termText": "two-well contract",
+            "optionText": null,
+            "valueText": "approximately $80 million in backlog, excluding additional services and compensation for mobilization and demobilization",
+            "awardType": "signed-contract",
+            "valueUsd": 80000000,
+            "baseDurationDays": 170,
+            "includes": [],
+            "excludes": [
+              "additional services",
+              "compensation for mobilization and demobilization"
+            ],
+            "derivedUsdPerDay": 470588.23529411765
+          }
+        },
+        "reasonKo": "적도기니 2개 유정 계약의 표상 기간·요율 반영",
+        "quote": "Equatorial Guinea Not Disclosed Firm Jan-27 Jul-27 465,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-e986c6f7046eb3160627",
+      "company": "Transocean",
+      "vessel": "Deepwater Conqueror",
+      "vessels": [
+        "Deepwater Conqueror"
+      ],
+      "vesselId": "deepwater-conqueror",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "withdraw",
+        "contractId": "deepwater-conqueror-98c1fbaf6b",
+        "row": null,
+        "reasonKo": "적도기니 동일 2개 유정 수주가 보고서 기간에 반영되어 기존 중복 기록 정리",
+        "quote": "Awarded a two-well contract",
+        "locator": "page:1"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-928db7e45e7a714de562",
+      "company": "Transocean",
+      "vessel": "Deepwater Conqueror",
+      "vessels": [
+        "Deepwater Conqueror"
+      ],
+      "vesselId": "deepwater-conqueror",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "deepwater-conqueror-r86d777c75126",
+        "row": {
+          "startDate": "2027-08-01",
+          "endDate": "2028-11-30",
+          "dayRate": 499000,
+          "client": "Not Disclosed",
+          "region": "US Gulf",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Aug-27",
+            "sourceEndText": "Nov-28",
+            "placementBasis": "보고서 월 표기를 해당 월 시작일과 말일로 배치",
+            "termText": "five-well contract",
+            "optionText": null,
+            "valueText": "approximately $225 million in backlog, excluding mobilization fees",
+            "awardType": "signed-contract",
+            "valueUsd": 225000000,
+            "baseDurationDays": 450,
+            "includes": [],
+            "excludes": [
+              "mobilization fees"
+            ],
+            "derivedUsdPerDay": 500000.0
+          }
+        },
+        "reasonKo": "U.S. Gulf 5개 유정 계약의 표상 기간·요율 반영",
+        "quote": "US Gulf Not Disclosed Firm Aug-27 Nov-28 499,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-9e70087ced327a91debe",
+      "company": "Transocean",
+      "vessel": "Deepwater Proteus",
+      "vessels": [
+        "Deepwater Proteus"
+      ],
+      "vesselId": "deepwater-proteus",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "deepwater-proteus-4d9499f260",
+        "row": {
+          "startDate": "2026-10-01",
+          "endDate": "2027-01-31",
+          "dayRate": 0,
+          "client": "Not Disclosed",
+          "region": "US Gulf",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Oct-26",
+            "sourceEndText": "Feb-27",
+            "placementBasis": "보고서 월 표기로 배치; 후속 Firm 기간 Feb-27 시작에 맞춰 종료를 직전 월로 조정",
+            "termText": null,
+            "optionText": "client exercised one optional well estimated at 60 days",
+            "valueText": null,
+            "awardType": "option-exercised",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "선행 계약과 행사된 옵션 기간을 보고서 표에 맞춰 반영",
+        "quote": "Oct-26 Feb-27 Not Disclosed",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-2c3fddbe3c00bea05f59",
+      "company": "Transocean",
+      "vessel": "Deepwater Proteus",
+      "vessels": [
+        "Deepwater Proteus"
+      ],
+      "vesselId": "deepwater-proteus",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "withdraw",
+        "contractId": "deepwater-proteus-723ee53cd3",
+        "row": null,
+        "reasonKo": "행사된 옵션이 보고서상 선행 Firm 기간에 포함되어 중복 기간 정리",
+        "quote": "Client exercised one optional well estimated at 60 days",
+        "locator": "page:1"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-b140a4617b750f510847",
+      "company": "Transocean",
+      "vessel": "Deepwater Proteus",
+      "vessels": [
+        "Deepwater Proteus"
+      ],
+      "vesselId": "deepwater-proteus",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "deepwater-proteus-r96a1d4ea8524",
+        "row": {
+          "startDate": "2027-02-01",
+          "endDate": "2029-01-31",
+          "dayRate": 465000,
+          "client": "Not Disclosed",
+          "region": "US Gulf",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Feb-27",
+            "sourceEndText": "Jan-29",
+            "placementBasis": "보고서 월 표기로 배치; 선행 기간 종료 다음 날 시작",
+            "termText": "ten-well contract; The estimated 700-day campaign",
+            "optionText": null,
+            "valueText": "approximately $325 million in backlog",
+            "awardType": "signed-contract",
+            "valueUsd": 325000000,
+            "baseDurationDays": 700,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": 464285.71428571426
+          }
+        },
+        "reasonKo": "신규 10개 유정 계약을 별도 후속 기간으로 반영",
+        "quote": "Feb-27 Jan-29 465,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-236a660b7576a24d70c7",
+      "company": "Transocean",
+      "vessel": "Deepwater Thalassa",
+      "vessels": [
+        "Deepwater Thalassa"
+      ],
+      "vesselId": "deepwater-thalassa",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "deepwater-thalassa-b89b1c6af3",
+        "row": null,
+        "reasonKo": "기존 Woodside 계약과 일치",
+        "quote": "Mar-26 Feb-29 495,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-bc5e94672393a0b3ae22",
+      "company": "Transocean",
+      "vessel": "Deepwater Asgard",
+      "vessels": [
+        "Deepwater Asgard"
+      ],
+      "vesselId": "deepwater-asgard",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "deepwater-asgard-cbf073698c",
+        "row": null,
+        "reasonKo": "기존 계약기간·요율과 일치",
+        "quote": "Dec-26 Dec-27 405,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-59a8bb93e50c8d61f591",
+      "company": "Transocean",
+      "vessel": "Deepwater Invictus",
+      "vessels": [
+        "Deepwater Invictus"
+      ],
+      "vesselId": "deepwater-invictus",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "deepwater-invictus-848f8f4d84",
+        "row": null,
+        "reasonKo": "기존 bp 계약과 일치",
+        "quote": "Apr-25 Apr-28 494,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-0f0645a263494b79e786",
+      "company": "Transocean",
+      "vessel": "Deepwater Skyros",
+      "vessels": [
+        "Deepwater Skyros"
+      ],
+      "vesselId": "deepwater-skyros",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "deepwater-skyros-0f632f7c30",
+        "row": {
+          "startDate": "2027-03-01",
+          "endDate": "2028-02-29",
+          "dayRate": 0,
+          "client": "Not Disclosed",
+          "region": "Australia",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Mar-27",
+            "sourceEndText": "Feb-28",
+            "placementBasis": "월 표기를 해당 월 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": null,
+            "valueText": null,
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "호주 Firm 기간을 보고서상 월로 갱신",
+        "quote": "Australia Not Disclosed Firm Mar-27 Feb-28",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-a68879d2283c9edc36c2",
+      "company": "Transocean",
+      "vessel": "Deepwater Skyros",
+      "vessels": [
+        "Deepwater Skyros"
+      ],
+      "vesselId": "deepwater-skyros",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "deepwater-skyros-06b9e6a26a",
+        "row": {
+          "startDate": "2028-03-01",
+          "endDate": "2030-07-31",
+          "dayRate": 0,
+          "client": "Not Disclosed",
+          "region": "Australia",
+          "status": "Option",
+          "interpretation": {
+            "sourceStartText": "Feb-28",
+            "sourceEndText": "Jul-30",
+            "placementBasis": "선행 Firm 기간 종료 다음 날부터 옵션 월을 연속 배치",
+            "termText": null,
+            "optionText": "Priced Options",
+            "valueText": null,
+            "awardType": null,
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "옵션기간을 Firm 기간 뒤에 비중복으로 배치",
+        "quote": "Priced Options Feb-28 Jul-30",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-e619b1d9eb8659d422d2",
+      "company": "Transocean",
+      "vessel": "Deepwater Corcovado",
+      "vessels": [
+        "Deepwater Corcovado"
+      ],
+      "vesselId": "deepwater-corcovado",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "deepwater-corcovado-8be36e7ec8",
+        "row": {
+          "startDate": "2026-04-01",
+          "endDate": "2026-12-31",
+          "dayRate": 381000,
+          "client": "Petrobras",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Apr-26",
+            "sourceEndText": "Dec-26",
+            "placementBasis": "월 표기를 해당 월의 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": null,
+            "valueText": null,
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "보고서상 Petrobras 요율 변경 반영",
+        "quote": "Apr-26 Dec-26 381,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-052a89074f23eaa7456b",
+      "company": "Transocean",
+      "vessel": "Deepwater Corcovado",
+      "vessels": [
+        "Deepwater Corcovado"
+      ],
+      "vesselId": "deepwater-corcovado",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "deepwater-corcovado-rd206bba5068c",
+        "row": {
+          "startDate": "2027-01-01",
+          "endDate": "2030-11-30",
+          "dayRate": 392000,
+          "client": "Petrobras",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Jan-27",
+            "sourceEndText": "Nov-30",
+            "placementBasis": "월 표기를 해당 월의 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": null,
+            "valueText": null,
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "보고서에 기재된 Petrobras 후속기간",
+        "quote": "Jan-27 Nov-30 392,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-2132690721d24b17b6b7",
+      "company": "Transocean",
+      "vessel": "Deepwater Mykonos",
+      "vessels": [
+        "Deepwater Mykonos"
+      ],
+      "vesselId": "deepwater-mykonos",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "deepwater-mykonos-b884914197",
+        "row": {
+          "startDate": "2026-08-01",
+          "endDate": "2027-06-30",
+          "dayRate": 420000,
+          "client": "bp",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Aug-26",
+            "sourceEndText": "Jun-27",
+            "placementBasis": "월 표기를 해당 월의 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": null,
+            "valueText": null,
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "보고서상 시작월과 요율로 갱신",
+        "quote": "Aug-26 Jun-27 420,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-4ed1e26cf1971f6a33d8",
+      "company": "Transocean",
+      "vessel": "Deepwater Orion",
+      "vessels": [
+        "Deepwater Orion"
+      ],
+      "vesselId": "deepwater-orion",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "deepwater-orion-ffa9ece533",
+        "row": {
+          "startDate": "2026-04-01",
+          "endDate": "2026-12-31",
+          "dayRate": 377000,
+          "client": "Petrobras",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Apr-26",
+            "sourceEndText": "Dec-26",
+            "placementBasis": "월 표기를 해당 월의 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": null,
+            "valueText": null,
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "보고서상 요율 변경 반영",
+        "quote": "Apr-26 Dec-26 377,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-4f1b5e3363b589eae763",
+      "company": "Transocean",
+      "vessel": "Deepwater Orion",
+      "vessels": [
+        "Deepwater Orion"
+      ],
+      "vesselId": "deepwater-orion",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "deepwater-orion-63acbabd02",
+        "row": {
+          "startDate": "2027-01-01",
+          "endDate": "2030-03-31",
+          "dayRate": 392000,
+          "client": "Petrobras",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Jan-27",
+            "sourceEndText": "Mar-30",
+            "placementBasis": "월 표기를 해당 월의 시작일과 말일로 배치",
+            "termText": "1,095-day contract extension",
+            "optionText": null,
+            "valueText": null,
+            "awardType": "extension",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "보고서의 종료월과 요율로 기존 연장계약 갱신",
+        "quote": "Jan-27 Mar-30 392,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-af9677f00a0865bf2275",
+      "company": "Transocean",
+      "vessel": "Dhirubhai Deepwater KG2",
+      "vessels": [
+        "Dhirubhai Deepwater KG2"
+      ],
+      "vesselId": "dhirubhai-deepwater-kg2",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "dhirubhai-deepwater-kg2-r114174bb5915",
+        "row": {
+          "startDate": "2027-02-01",
+          "endDate": "2029-01-31",
+          "dayRate": 389000,
+          "client": "ONGC",
+          "region": "India",
+          "status": "Contingent",
+          "interpretation": {
+            "sourceStartText": "Feb-27",
+            "sourceEndText": "Feb-29",
+            "placementBasis": "월 표기로 배치; 옵션 시작 Feb-29에 앞서 종료월 조정",
+            "termText": "two-year binding Letter of Award",
+            "optionText": "two years of priced options",
+            "valueText": "approximately $300 million in contract value, inclusive of additional services and mobilization fees",
+            "awardType": "letter-of-award",
+            "valueUsd": 300000000,
+            "baseDurationDays": 730,
+            "includes": [
+              "additional services",
+              "mobilization fees"
+            ],
+            "excludes": [],
+            "derivedUsdPerDay": 410958.90410958906
+          }
+        },
+        "reasonKo": "Binding Letter of Award는 Contingent로 유지하고 표의 기간·요율을 반영",
+        "quote": "India ONGC Firm Feb-27 Feb-29 389,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-59ec6982a6c509fb9d1c",
+      "company": "Transocean",
+      "vessel": "Dhirubhai Deepwater KG2",
+      "vessels": [
+        "Dhirubhai Deepwater KG2"
+      ],
+      "vesselId": "dhirubhai-deepwater-kg2",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "dhirubhai-deepwater-kg2-r26a0d63b8b3a",
+        "row": {
+          "startDate": "2029-02-01",
+          "endDate": "2031-02-28",
+          "dayRate": 0,
+          "client": "ONGC",
+          "region": "India",
+          "status": "Option",
+          "interpretation": {
+            "sourceStartText": "Feb-29",
+            "sourceEndText": "Feb-31",
+            "placementBasis": "월 표기를 해당 월의 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": "two years of priced options",
+            "valueText": null,
+            "awardType": null,
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "가격 옵션 기간을 표의 시작·종료월에 맞춤",
+        "quote": "Priced Options Feb-29 Feb-31",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-73415eea225d21ada9c4",
+      "company": "Transocean",
+      "vessel": "Petrobras 10000",
+      "vessels": [
+        "Petrobras 10000"
+      ],
+      "vesselId": "petrobras-10000",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "petrobras-10000-fea1eb119e",
+        "row": null,
+        "reasonKo": "기존 2025년 10월부터 2026년 10월 계약은 보고서에서 별도 변경 없음",
+        "quote": "Oct-26 May-27 428,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-55a70b06cdaf58698c53",
+      "company": "Transocean",
+      "vessel": "Petrobras 10000",
+      "vessels": [
+        "Petrobras 10000"
+      ],
+      "vesselId": "petrobras-10000",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "petrobras-10000-43cfd4b9b6",
+        "row": {
+          "startDate": "2026-10-01",
+          "endDate": "2027-05-31",
+          "dayRate": 428000,
+          "client": "Petrobras",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Oct-26",
+            "sourceEndText": "May-27",
+            "placementBasis": "보고서 월 표기를 해당 월 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": null,
+            "valueText": null,
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "기존 기간을 보고서의 첫 Firm 구간 종료월로 갱신",
+        "quote": "Oct-26 May-27 428,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-fe87c0ce0e93bce1465e",
+      "company": "Transocean",
+      "vessel": "Petrobras 10000",
+      "vessels": [
+        "Petrobras 10000"
+      ],
+      "vesselId": "petrobras-10000",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "petrobras-10000-ra0ad942641e1",
+        "row": {
+          "startDate": "2027-06-01",
+          "endDate": "2027-09-30",
+          "dayRate": 428000,
+          "client": "Petrobras",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Jun-27",
+            "sourceEndText": "Oct-27",
+            "placementBasis": "보고서 월 표기로 배치; 다음 기간 Oct-27 시작에 맞춰 종료월 조정",
+            "termText": null,
+            "optionText": null,
+            "valueText": null,
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "별도 Firm 구간을 후속 기간과 겹치지 않게 반영",
+        "quote": "Jun-27 Oct-27 428,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-0742882669d3b4bdf417",
+      "company": "Transocean",
+      "vessel": "Petrobras 10000",
+      "vessels": [
+        "Petrobras 10000"
+      ],
+      "vesselId": "petrobras-10000",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "petrobras-10000-91cabb7037",
+        "row": {
+          "startDate": "2027-10-01",
+          "endDate": "2028-10-31",
+          "dayRate": 440000,
+          "client": "Petrobras",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Oct-27",
+            "sourceEndText": "Oct-28",
+            "placementBasis": "보고서 월 표기를 해당 월 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": null,
+            "valueText": null,
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "기존 Petrobras 기간의 보고서상 요율·종료월 반영",
+        "quote": "Oct-27 Oct-28 440,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-35f2fc819a20d59b78a5",
+      "company": "Transocean",
+      "vessel": "Petrobras 10000",
+      "vessels": [
+        "Petrobras 10000"
+      ],
+      "vesselId": "petrobras-10000",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "petrobras-10000-0149fc2786",
+        "row": {
+          "startDate": "2028-10-01",
+          "endDate": "2029-08-31",
+          "dayRate": 454000,
+          "client": "Petrobras",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Oct-28",
+            "sourceEndText": "Aug-29",
+            "placementBasis": "보고서 월 표기를 해당 월 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": null,
+            "valueText": null,
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "기존 Petrobras 기간의 보고서상 종료월 반영",
+        "quote": "Oct-28 Aug-29 454,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-0cb0c93d5ba3c128ef87",
+      "company": "Transocean",
+      "vessel": "Dhirubhai Deepwater KG1",
+      "vessels": [
+        "Dhirubhai Deepwater KG1"
+      ],
+      "vesselId": "dhirubhai-deepwater-kg1",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "dhirubhai-deepwater-kg1-d31d9733b1",
+        "row": null,
+        "reasonKo": "Reliance Firm 기간 및 요율과 일치",
+        "quote": "Aug-26 Mar-28 410,000",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-57a6ea8ad50ed35fa5a6",
+      "company": "Transocean",
+      "vessel": "Dhirubhai Deepwater KG1",
+      "vessels": [
+        "Dhirubhai Deepwater KG1"
+      ],
+      "vesselId": "dhirubhai-deepwater-kg1",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "dhirubhai-deepwater-kg1-18fafc4de2",
+        "row": null,
+        "reasonKo": "Reliance 옵션 기간과 일치",
+        "quote": "Priced Options Mar-28 Aug-29",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-ca59f6afb73ca31e390c",
+      "company": "Transocean",
+      "vessel": "Ocean Rig Apollo",
+      "vessels": [
+        "Ocean Rig Apollo"
+      ],
+      "vesselId": "ocean-rig-apollo",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": null,
+        "row": null,
+        "reasonKo": "보고서에 계약기간이 기재되지 않음",
+        "quote": "Stacked May-16",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-db3d7b2e9dc3980162c3",
+      "company": "Transocean",
+      "vessel": "Ocean Rig Athena",
+      "vessels": [
+        "Ocean Rig Athena"
+      ],
+      "vesselId": "ocean-rig-athena",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": null,
+        "row": null,
+        "reasonKo": "보고서에 계약기간이 기재되지 않음",
+        "quote": "Stacked Mar-17",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-83db484c6a2f88473520",
+      "company": "Transocean",
+      "vessel": "Ocean Rig Mylos",
+      "vessels": [
+        "Ocean Rig Mylos"
+      ],
+      "vesselId": "ocean-rig-mylos",
+      "classification": "official-report-reading",
+      "url": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
+      "publishedAt": null,
+      "title": "Transocean Fleet Status Report",
+      "sourceId": "source-2f85805e505d3b40dcf84a08bdf344a6b63984f5ba7b839deb91389aa3622815",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": null,
+        "row": null,
+        "reasonKo": "보고서에 계약기간이 기재되지 않음",
+        "quote": "Stacked Sep-16",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "news-0012d188622966e46db7",
+      "company": "Transocean",
+      "title": "Transocean Ltd. Provides Quarterly Fleet Status Report",
+      "url": "https://www.deepwater.com/news/detail?ID=30676",
+      "publishedAt": "2026-11-02",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "sourceId": "source-55d2827ac1d4ad61b7f9119b6bfd3a05174eaf18108f4b7864a0ec6387e5e076",
       "newsCategory": "Fleet Status"
     }
   ]

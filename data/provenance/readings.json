@@ -1,9 +1,69 @@
 {
   "schemaVersion": 3,
-  "lastCollectedAt": "2026-11-02T21:44:36Z",
-  "lastReadAt": "2026-10-28T14:35:55Z",
-  "lastAppliedAt": "2026-10-28T14:35:55Z",
+  "lastCollectedAt": "2026-11-03T05:17:19Z",
+  "lastReadAt": "2026-11-03T05:19:48Z",
+  "lastAppliedAt": "2026-11-03T05:19:42Z",
   "collectionErrors": [
+    {
+      "company": "Transocean",
+      "kind": "official-news",
+      "url": "https://www.deepwater.com/news/detail?ID=30311",
+      "phase": null,
+      "error": "ConnectionError: HTTPSConnectionPool(host='www.deepwater.com', port=443): Max retries exceeded with url: /news/detail?ID=30311 (Caused by ProtocolError('Connection aborted.', RemoteDisconnected('Remote end closed connection without response')))",
+      "httpStatus": null,
+      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastAttemptAt": "2026-11-02T22:55:33Z"
+    },
+    {
+      "company": "Valaris",
+      "kind": "fleet-report",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "phase": null,
+      "error": "ConnectionError: HTTPSConnectionPool(host='s23.q4cdn.com', port=443): Max retries exceeded with url: /956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf (Caused by ReadTimeoutError(\"HTTPSConnectionPool(host='s23.q4cdn.com', port=443): Read timed out. (read timeout=45)\"))",
+      "httpStatus": null,
+      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastAttemptAt": "2026-11-02T22:55:33Z"
+    },
+    {
+      "company": "Valaris",
+      "kind": "official-news",
+      "url": "https://www.valaris.com/news/news-details/2026/Valaris-Issues-Fleet-Status-Report-24497974b/default.aspx",
+      "phase": null,
+      "error": "ConnectionError: HTTPSConnectionPool(host='www.valaris.com', port=443): Max retries exceeded with url: /news/news-details/2026/Valaris-Issues-Fleet-Status-Report-24497974b/default.aspx (Caused by NameResolutionError(\"HTTPSConnection(host='www.valaris.com', port=443): Failed to resolve 'www.valaris.com' ([Errno 8] nodename nor servname provided, or not known)\"))",
+      "httpStatus": null,
+      "lastSuccessAt": null,
+      "lastAttemptAt": "2026-11-02T22:55:33Z"
+    },
+    {
+      "company": "Valaris",
+      "kind": "official-news",
+      "url": "https://www.valaris.com/news/news-details/2026/Valaris-Reports-Third-Quarter-2026-Results/default.aspx",
+      "phase": null,
+      "error": "ConnectionError: HTTPSConnectionPool(host='www.valaris.com', port=443): Max retries exceeded with url: /news/news-details/2026/Valaris-Reports-Third-Quarter-2026-Results/default.aspx (Caused by NameResolutionError(\"HTTPSConnection(host='www.valaris.com', port=443): Failed to resolve 'www.valaris.com' ([Errno 8] nodename nor servname provided, or not known)\"))",
+      "httpStatus": null,
+      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastAttemptAt": "2026-11-02T22:55:33Z"
+    },
+    {
+      "company": "Valaris",
+      "kind": "official-news",
+      "url": "https://www.valaris.com/news/news-details/2026/Valaris-Schedules-Third-Quarter-2026-Earnings-Release/default.aspx",
+      "phase": null,
+      "error": "ConnectionError: HTTPSConnectionPool(host='www.valaris.com', port=443): Max retries exceeded with url: /news/news-details/2026/Valaris-Schedules-Third-Quarter-2026-Earnings-Release/default.aspx (Caused by NameResolutionError(\"HTTPSConnection(host='www.valaris.com', port=443): Failed to resolve 'www.valaris.com' ([Errno 8] nodename nor servname provided, or not known)\"))",
+      "httpStatus": null,
+      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastAttemptAt": "2026-11-02T22:55:33Z"
+    },
+    {
+      "company": "Noble",
+      "kind": "fleet-report",
+      "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
+      "phase": null,
+      "error": "ConnectionError: HTTPSConnectionPool(host='noblecorp.com', port=443): Read timed out.",
+      "httpStatus": null,
+      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastAttemptAt": "2026-11-02T22:55:33Z"
+    },
     {
       "company": "Noble",
       "kind": "official-news",
@@ -12,7 +72,7 @@
       "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-third-quarter-2026-results",
       "httpStatus": 403,
       "lastSuccessAt": null,
-      "lastAttemptAt": "2026-11-02T21:43:18Z"
+      "lastAttemptAt": "2026-11-02T22:55:33Z"
     },
     {
       "company": "Noble",
@@ -22,7 +82,7 @@
       "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-third-quarter-2026-results",
       "httpStatus": 403,
       "lastSuccessAt": null,
-      "lastAttemptAt": "2026-11-02T21:43:18Z"
+      "lastAttemptAt": "2026-11-02T22:55:33Z"
     },
     {
       "company": "Noble",
@@ -32,7 +92,7 @@
       "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-second-quarter-2026-results",
       "httpStatus": 403,
       "lastSuccessAt": null,
-      "lastAttemptAt": "2026-11-02T21:43:18Z"
+      "lastAttemptAt": "2026-11-02T22:55:33Z"
     },
     {
       "company": "Noble",
@@ -42,7 +102,7 @@
       "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-second-quarter-2026-results",
       "httpStatus": 403,
       "lastSuccessAt": null,
-      "lastAttemptAt": "2026-11-02T21:43:18Z"
+      "lastAttemptAt": "2026-11-02T22:55:33Z"
     },
     {
       "company": "Noble",
@@ -52,7 +112,7 @@
       "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-pricing-upsized-offering-800",
       "httpStatus": 403,
       "lastSuccessAt": null,
-      "lastAttemptAt": "2026-11-02T21:43:18Z"
+      "lastAttemptAt": "2026-11-02T22:55:33Z"
     },
     {
       "company": "Noble",
@@ -62,7 +122,7 @@
       "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-proposed-offering-500-million",
       "httpStatus": 403,
       "lastSuccessAt": null,
-      "lastAttemptAt": "2026-11-02T21:43:18Z"
+      "lastAttemptAt": "2026-11-02T22:55:33Z"
     },
     {
       "company": "Noble",
@@ -72,7 +132,7 @@
       "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-new-director-appointment",
       "httpStatus": 403,
       "lastSuccessAt": null,
-      "lastAttemptAt": "2026-11-02T21:43:18Z"
+      "lastAttemptAt": "2026-11-02T22:55:33Z"
     },
     {
       "company": "Noble",
@@ -82,7 +142,7 @@
       "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-first-quarter-2026-results",
       "httpStatus": 403,
       "lastSuccessAt": null,
-      "lastAttemptAt": "2026-11-02T21:43:18Z"
+      "lastAttemptAt": "2026-11-02T22:55:33Z"
     },
     {
       "company": "Noble",
@@ -92,7 +152,7 @@
       "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-first-quarter-2026-results",
       "httpStatus": 403,
       "lastSuccessAt": null,
-      "lastAttemptAt": "2026-11-02T21:43:18Z"
+      "lastAttemptAt": "2026-11-02T22:55:33Z"
     }
   ],
   "documents": {
@@ -132,7 +192,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-861d50671254a28132f1018c532fc83d": {
       "jobId": "job-861d50671254a28132f1018c532fc83d",
@@ -151,7 +211,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "자금·주주"
     },
     "job-ed669224aa2784091ad41fa4a01fd90d": {
@@ -171,7 +231,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "일정"
     },
     "job-825a0e9d976358836d374fddaee447a3": {
@@ -191,7 +251,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-204021e5247c075be7ab685d60ca23f5": {
       "jobId": "job-204021e5247c075be7ab685d60ca23f5",
@@ -210,7 +270,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-0ae026d8b4130c14d931d3a0818eb790": {
       "jobId": "job-0ae026d8b4130c14d931d3a0818eb790",
@@ -229,7 +289,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-ce22a7588cbfa6d7bd55397b0e0da4db": {
       "jobId": "job-ce22a7588cbfa6d7bd55397b0e0da4db",
@@ -248,7 +308,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-7285f1da996397fc3c313342471007b2": {
       "jobId": "job-7285f1da996397fc3c313342471007b2",
@@ -298,7 +358,7 @@
           "quote": "Awarded a one-well extension by Murphy in Ivory Coast"
         }
       ],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "Fleet Status",
       "selected": true
     },
@@ -319,7 +379,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "일정"
     },
     "job-98a628dcab064fb6d63db254d7d35b31": {
@@ -339,7 +399,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "계약",
       "selected": true
     },
@@ -360,7 +420,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-3e1e293f554a03152e0bc26d52c015df": {
       "jobId": "job-3e1e293f554a03152e0bc26d52c015df",
@@ -379,7 +439,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-cada35436ae1cdf9916f832de41b031c": {
       "jobId": "job-cada35436ae1cdf9916f832de41b031c",
@@ -465,7 +525,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-aa516ba301eb3575037ce1758f6439a5": {
       "jobId": "job-aa516ba301eb3575037ce1758f6439a5",
@@ -484,7 +544,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-9f7dc311ac47397cb5e5ee240c497dac": {
       "jobId": "job-9f7dc311ac47397cb5e5ee240c497dac",
@@ -503,7 +563,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "일정"
     },
     "job-630779ae67d3e1a9cee78d7cbba4c250": {
@@ -523,7 +583,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-243a104f4c7d0fe74288ad7310f22864": {
       "jobId": "job-243a104f4c7d0fe74288ad7310f22864",
@@ -542,7 +602,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-16f8e95dab32eff321b2322ce564d05c": {
       "jobId": "job-16f8e95dab32eff321b2322ce564d05c",
@@ -638,7 +698,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-2c94c745b85b0aa8a8d1a8c0a0ecf426": {
       "jobId": "job-2c94c745b85b0aa8a8d1a8c0a0ecf426",
@@ -657,7 +717,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "Fleet Status",
       "selected": true
     },
@@ -678,7 +738,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-67905a7d106bf15f4d4397ae8255a209": {
       "jobId": "job-67905a7d106bf15f4d4397ae8255a209",
@@ -697,7 +757,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "일정"
     },
     "job-fdb5cb197c1bd462342cb6fdf80fb524": {
@@ -717,7 +777,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "Fleet Status",
       "selected": true
     },
@@ -738,7 +798,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-91ef3f1d14ba0b906b35a15956774e13": {
       "jobId": "job-91ef3f1d14ba0b906b35a15956774e13",
@@ -757,7 +817,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "일정"
     },
     "job-44de1d05146d966c60bbaf22a5cb1b3a": {
@@ -777,7 +837,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-f7359d0a59c6d872a428f1d0a60f5c17": {
       "jobId": "job-f7359d0a59c6d872a428f1d0a60f5c17",
@@ -796,7 +856,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "경영·인사"
     },
     "job-93221c349472517ef9ae06eb888bcead": {
@@ -816,7 +876,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-21da131fdfed65c740715fad6d37bf05": {
       "jobId": "job-21da131fdfed65c740715fad6d37bf05",
@@ -835,7 +895,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-8cbd65c40849621e40f002bcb2b9aa8a": {
       "jobId": "job-8cbd65c40849621e40f002bcb2b9aa8a",
@@ -854,7 +914,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "일정"
     },
     "job-8783234f0fe03e2421f1f5db7ed77ea3": {
@@ -874,7 +934,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "경영·인사"
     },
     "job-d64bd0f9ea0464cc4e645ddddaf7a07d": {
@@ -894,7 +954,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "일정"
     },
     "job-6d2f654858f2bda5f346746714ff5236": {
@@ -930,7 +990,7 @@
           "quote": "The contract is expected to commence in the first quarter of 2027, with an estimated duration of approximately 800 days"
         }
       ],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "계약",
       "selected": true
     },
@@ -951,7 +1011,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "실적"
     },
     "job-5d58c82a25da16d8c1c2d52d8e7055c6": {
@@ -971,7 +1031,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "Fleet Status",
       "selected": true
     },
@@ -1049,7 +1109,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "실적"
     },
     "job-aeb628e50318815f06eaba8165d0ba29": {
@@ -1069,7 +1129,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "실적"
     },
     "job-b67578c6facbd3fe40d8f71001c39152": {
@@ -1089,7 +1149,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "실적"
     },
     "job-4c9a97f96865aaafa88f9d55f3c6ebf7": {
@@ -1109,7 +1169,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "실적"
     },
     "job-6a72d1ea3c67aa7d32bc45950ec718a1": {
@@ -1149,7 +1209,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-bc67889edec42454ad64e3c4088a3dc7": {
       "jobId": "job-bc67889edec42454ad64e3c4088a3dc7",
@@ -1168,7 +1228,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-891ab22917870956a2680bbd8f90c820": {
       "jobId": "job-891ab22917870956a2680bbd8f90c820",
@@ -1187,7 +1247,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "일정"
     },
     "job-7d0d5a707821ca3ea5b429dc43fdbdcd": {
@@ -1207,7 +1267,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-bbef7a942f8027df03ced1e0e2e8ec08": {
       "jobId": "job-bbef7a942f8027df03ced1e0e2e8ec08",
@@ -1226,7 +1286,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "일정"
     },
     "job-184911aae089467cd868268457a48f03": {
@@ -1246,7 +1306,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "자금·주주"
     },
     "job-324bbf6df4c229dad1201594e30593ed": {
@@ -1266,7 +1326,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "자금·주주"
     },
     "job-98133dbfd504609e6e27dadc9010ee22": {
@@ -1286,7 +1346,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "자금·주주"
     },
     "job-465cb8ece0d498a7a9d296cad69ff903": {
@@ -1306,7 +1366,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "자금·주주"
     },
     "job-ad6c8b8fdcea2003d189236219d7fcba": {
@@ -1326,7 +1386,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-ec4bac03741a8a886cb10ad33423077e": {
       "jobId": "job-ec4bac03741a8a886cb10ad33423077e",
@@ -1345,7 +1405,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-55557c962588f8a378871c5dc8e4233c": {
       "jobId": "job-55557c962588f8a378871c5dc8e4233c",
@@ -1364,7 +1424,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "일정"
     },
     "job-935b2ff23844a40a95b83c15b374d5f4": {
@@ -1384,7 +1444,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-fd7b1b2c86c375c39030f644e27922ab": {
       "jobId": "job-fd7b1b2c86c375c39030f644e27922ab",
@@ -1403,7 +1463,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-bb433a9ab74a9949ac3eb8afc4ff033f": {
       "jobId": "job-bb433a9ab74a9949ac3eb8afc4ff033f",
@@ -1422,7 +1482,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "경영·인사"
     },
     "job-6e67f0453a099418aa9bac42ea0a2b72": {
@@ -1442,7 +1502,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-49291851598ab693e305d7cec946ecff": {
       "jobId": "job-49291851598ab693e305d7cec946ecff",
@@ -1461,7 +1521,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-07631d618619ac6c78b42dbc5b4c4afd": {
       "jobId": "job-07631d618619ac6c78b42dbc5b4c4afd",
@@ -1480,7 +1540,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "일정"
     },
     "job-70f44957a080a27df3117d8dfe545f35": {
@@ -1500,7 +1560,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z"
     },
     "job-a761f623ea072f38b9232ec1d6b52394": {
       "jobId": "job-a761f623ea072f38b9232ec1d6b52394",
@@ -1541,7 +1601,7 @@
           "quote": "five-well option has been exercised"
         }
       ],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "계약",
       "selected": true
     },
@@ -1562,7 +1622,7 @@
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
       "newsCategory": "실적"
     },
     "job-dc9e30dee7f7ec98f928613a67db9c40": {
@@ -2025,15 +2085,530 @@
       "title": null,
       "publishedAt": null,
       "documentSha256": "86a470d9af277a767d7c09226b20e6a8369b57b30e20792d5d056a41ec5aab56",
-      "status": "pending",
-      "outcome": null,
-      "lastReadAt": null,
+      "status": "completed",
+      "outcome": "applied",
+      "lastReadAt": "2026-11-03T05:19:42Z",
       "lastError": null,
       "failureCount": 0,
       "nextAttemptAfter": 0,
       "openHolds": [],
-      "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "changes": [
+        {
+          "vesselId": "ocean-rig-apollo",
+          "before": {
+            "status": "Cold-Stacked",
+            "statusAsOf": "2026-08-05"
+          },
+          "reasonKo": "보고서에 Stacked로 표시",
+          "quote": "Stacked May-16"
+        },
+        {
+          "vesselId": "ocean-rig-athena",
+          "before": {
+            "status": "Cold-Stacked",
+            "statusAsOf": "2026-08-05"
+          },
+          "reasonKo": "보고서에 Stacked로 표시",
+          "quote": "Stacked Mar-17"
+        },
+        {
+          "vesselId": "ocean-rig-mylos",
+          "before": {
+            "status": "Cold-Stacked",
+            "statusAsOf": "2026-08-05"
+          },
+          "reasonKo": "보고서에 Stacked로 표시",
+          "quote": "Stacked Sep-16"
+        },
+        {
+          "contractId": "deepwater-atlas-e5e064efb5",
+          "before": {
+            "vesselId": "deepwater-atlas",
+            "startDate": "2026-08-01",
+            "endDate": "2026-10-31",
+            "dayRate": 580000,
+            "client": "Beacon",
+            "region": "USGOM",
+            "status": "Firm",
+            "id": "deepwater-atlas-e5e064efb5"
+          },
+          "reasonKo": "보고서 표의 Beacon 기간·요율 반영",
+          "quote": "Sep-26 Nov-26 580,000"
+        },
+        {
+          "contractId": "deepwater-atlas-991f0699ec",
+          "before": {
+            "vesselId": "deepwater-atlas",
+            "startDate": "2026-10-01",
+            "endDate": "2026-12-31",
+            "dayRate": 650000,
+            "client": "Beacon",
+            "region": "USGOM",
+            "status": "Contingent",
+            "id": "deepwater-atlas-991f0699ec"
+          },
+          "reasonKo": "앞선 기간과 겹치지 않도록 보고서상 연속기간 배치",
+          "quote": "Nov-26 Jan-27 650,000"
+        },
+        {
+          "contractId": "deepwater-atlas-950ba82235",
+          "before": {
+            "vesselId": "deepwater-atlas",
+            "startDate": "2026-12-01",
+            "endDate": "2027-02-28",
+            "dayRate": 650000,
+            "client": "Beacon",
+            "region": "USGOM",
+            "status": "Contingent",
+            "id": "deepwater-atlas-950ba82235"
+          },
+          "reasonKo": "조건부 Beacon 기간과 상태 반영",
+          "quote": "Contingent Jan-27 Apr-27 650,000"
+        },
+        {
+          "contractId": "deepwater-atlas-fc99127caa-2",
+          "before": {
+            "vesselId": "deepwater-atlas",
+            "startDate": "2027-02-01",
+            "endDate": "2027-07-31",
+            "dayRate": 505000,
+            "client": "Beacon",
+            "region": "USGOM",
+            "status": "Firm",
+            "id": "deepwater-atlas-fc99127caa-2"
+          },
+          "reasonKo": "Firm 기간 요율과 비중복 기간 반영",
+          "quote": "Apr-27 Jun-27 505,000"
+        },
+        {
+          "contractId": "deepwater-atlas-rcd7679e7a0ef",
+          "before": null,
+          "reasonKo": "보고서에 별도 조건부 기간으로 표시",
+          "quote": "Contingent Jun-27 Sep-27 505,000"
+        },
+        {
+          "contractId": "deepwater-aquila-r37936514df36",
+          "before": null,
+          "reasonKo": "보고서에 기재된 새 Petrobras 기간",
+          "quote": "Jan-27 Jun-28 442,000"
+        },
+        {
+          "contractId": "deepwater-conqueror-r89e1559fc6d7",
+          "before": {
+            "startDate": "2027-06-01",
+            "endDate": "2027-11-17",
+            "dayRate": 0,
+            "client": "undisclosed operator",
+            "region": "Equatorial Guinea",
+            "status": "Firm",
+            "interpretation": {
+              "sourceStartText": "expected to commence in 2027; in direct continuation of the rig’s current contract in the U.S Gulf",
+              "sourceEndText": "The estimated 170-day campaign",
+              "placementBasis": "기존 미국 걸프 계약 종료 다음 날인 2027-06-01부터 170일로 배치",
+              "termText": "a two-well contract; The estimated 170-day campaign",
+              "optionText": null,
+              "valueText": "approximately $80 million in backlog, excluding additional services and compensation for mobilization and demobilization",
+              "awardType": "signed-contract",
+              "valueUsd": 80000000,
+              "baseDurationDays": 170,
+              "includes": [],
+              "excludes": [
+                "additional services",
+                "compensation for mobilization and demobilization"
+              ],
+              "derivedUsdPerDay": 470588.23529411765
+            },
+            "id": "deepwater-conqueror-r89e1559fc6d7",
+            "vesselId": "deepwater-conqueror",
+            "sourceUrl": "https://www.deepwater.com/news/detail?ID=30551",
+            "sourcePublishedAt": "2026-09-15",
+            "newsReviewed": true,
+            "inputMode": "stored-result",
+            "storedReading": {
+              "reviewedAt": "2026-10-19T16:33:01Z"
+            }
+          },
+          "reasonKo": "적도기니 2개 유정 계약의 표상 기간·요율 반영",
+          "quote": "Equatorial Guinea Not Disclosed Firm Jan-27 Jul-27 465,000"
+        },
+        {
+          "contractId": "deepwater-conqueror-98c1fbaf6b",
+          "before": {
+            "vesselId": "deepwater-conqueror",
+            "startDate": "2027-02-01",
+            "endDate": "2027-05-31",
+            "dayRate": 0,
+            "client": "Not Disclosed",
+            "region": "USGOM",
+            "status": "Firm",
+            "id": "deepwater-conqueror-98c1fbaf6b",
+            "interpretation": {
+              "sourceStartText": null,
+              "sourceEndText": null,
+              "placementBasis": "기존 계약 종료 후 2개 유정 연장으로 배치",
+              "termText": "two-well contract extension",
+              "optionText": null,
+              "valueText": null,
+              "awardType": "extension",
+              "valueUsd": null,
+              "baseDurationDays": null,
+              "includes": [],
+              "excludes": [],
+              "derivedUsdPerDay": null
+            },
+            "sourceUrl": "https://www.deepwater.com/news/detail?ID=30516",
+            "sourcePublishedAt": "2026-08-05",
+            "newsReviewed": true
+          },
+          "reasonKo": "적도기니 동일 2개 유정 수주가 보고서 기간에 반영되어 기존 중복 기록 정리",
+          "quote": "Awarded a two-well contract"
+        },
+        {
+          "contractId": "deepwater-conqueror-r86d777c75126",
+          "before": {
+            "startDate": "2027-11-18",
+            "endDate": "2029-02-09",
+            "dayRate": 0,
+            "client": "undisclosed operator",
+            "region": "U.S. Gulf",
+            "status": "Firm",
+            "interpretation": {
+              "sourceStartText": "commence in the third quarter of 2027",
+              "sourceEndText": "The estimated 450 days of work",
+              "placementBasis": "Q3 시작 전망은 기존 적도기니 작업 종료일 다음 날로 조정해 450일 배치",
+              "termText": "5개 유정 계약; The estimated 450 days of work",
+              "optionText": null,
+              "valueText": "approximately $225 million in backlog, excluding mobilization fees",
+              "awardType": "signed-contract",
+              "valueUsd": 225000000,
+              "baseDurationDays": 450,
+              "includes": [],
+              "excludes": [
+                "mobilization fees"
+              ],
+              "derivedUsdPerDay": 500000.0
+            },
+            "id": "deepwater-conqueror-r86d777c75126",
+            "vesselId": "deepwater-conqueror",
+            "sourceUrl": "https://www.deepwater.com/news/detail?ID=30626",
+            "sourcePublishedAt": "2026-10-19",
+            "newsReviewed": true,
+            "inputMode": "stored-result",
+            "storedReading": {
+              "reviewedAt": "2026-10-19T16:34:40Z"
+            }
+          },
+          "reasonKo": "U.S. Gulf 5개 유정 계약의 표상 기간·요율 반영",
+          "quote": "US Gulf Not Disclosed Firm Aug-27 Nov-28 499,000"
+        },
+        {
+          "contractId": "deepwater-proteus-4d9499f260",
+          "before": {
+            "vesselId": "deepwater-proteus",
+            "startDate": "2026-07-01",
+            "endDate": "2026-11-30",
+            "dayRate": 0,
+            "client": "Not Disclosed",
+            "region": "USGOM",
+            "status": "Firm",
+            "id": "deepwater-proteus-4d9499f260"
+          },
+          "reasonKo": "선행 계약과 행사된 옵션 기간을 보고서 표에 맞춰 반영",
+          "quote": "Oct-26 Feb-27 Not Disclosed"
+        },
+        {
+          "contractId": "deepwater-proteus-723ee53cd3",
+          "before": {
+            "vesselId": "deepwater-proteus",
+            "startDate": "2026-11-01",
+            "endDate": "2027-01-31",
+            "dayRate": 0,
+            "client": "Not Disclosed",
+            "region": "USGOM",
+            "status": "Option",
+            "id": "deepwater-proteus-723ee53cd3"
+          },
+          "reasonKo": "행사된 옵션이 보고서상 선행 Firm 기간에 포함되어 중복 기간 정리",
+          "quote": "Client exercised one optional well estimated at 60 days"
+        },
+        {
+          "contractId": "deepwater-proteus-r96a1d4ea8524",
+          "before": {
+            "startDate": "2027-01-01",
+            "endDate": "2028-12-31",
+            "dayRate": 0,
+            "client": "undisclosed operator",
+            "region": "U.S. Gulf",
+            "status": "Firm",
+            "interpretation": {
+              "sourceStartText": "in the first quarter of 2027",
+              "sourceEndText": "The estimated 700-day campaign",
+              "placementBasis": "Q1 시작을 1월로 배치하고, 기존 옵션 종료 뒤 700일로 산정",
+              "termText": "10개 유정 계약; The estimated 700-day campaign",
+              "optionText": null,
+              "valueText": "approximately $325 million in backlog",
+              "awardType": "signed-contract",
+              "valueUsd": 325000000,
+              "baseDurationDays": 700,
+              "includes": [],
+              "excludes": [],
+              "derivedUsdPerDay": 464285.71428571426
+            },
+            "id": "deepwater-proteus-r96a1d4ea8524",
+            "vesselId": "deepwater-proteus",
+            "sourceUrl": "https://www.deepwater.com/news/detail?ID=30626",
+            "sourcePublishedAt": "2026-10-19",
+            "newsReviewed": true,
+            "inputMode": "stored-result",
+            "storedReading": {
+              "reviewedAt": "2026-10-19T16:34:40Z"
+            }
+          },
+          "reasonKo": "신규 10개 유정 계약을 별도 후속 기간으로 반영",
+          "quote": "Feb-27 Jan-29 465,000"
+        },
+        {
+          "contractId": "deepwater-skyros-0f632f7c30",
+          "before": {
+            "vesselId": "deepwater-skyros",
+            "startDate": "2027-04-01",
+            "endDate": "2028-03-31",
+            "dayRate": 0,
+            "client": "Not Disclosed",
+            "region": "Australia",
+            "status": "Firm",
+            "id": "deepwater-skyros-0f632f7c30"
+          },
+          "reasonKo": "호주 Firm 기간을 보고서상 월로 갱신",
+          "quote": "Australia Not Disclosed Firm Mar-27 Feb-28"
+        },
+        {
+          "contractId": "deepwater-skyros-06b9e6a26a",
+          "before": {
+            "vesselId": "deepwater-skyros",
+            "startDate": "2028-03-01",
+            "endDate": "2030-08-31",
+            "dayRate": 0,
+            "client": "Not Disclosed",
+            "region": "Australia",
+            "status": "Option",
+            "id": "deepwater-skyros-06b9e6a26a"
+          },
+          "reasonKo": "옵션기간을 Firm 기간 뒤에 비중복으로 배치",
+          "quote": "Priced Options Feb-28 Jul-30"
+        },
+        {
+          "contractId": "deepwater-corcovado-8be36e7ec8",
+          "before": {
+            "vesselId": "deepwater-corcovado",
+            "startDate": "2026-04-01",
+            "endDate": "2026-12-31",
+            "dayRate": 379000,
+            "client": "Petrobras",
+            "region": "Brazil",
+            "status": "Firm",
+            "id": "deepwater-corcovado-8be36e7ec8"
+          },
+          "reasonKo": "보고서상 Petrobras 요율 변경 반영",
+          "quote": "Apr-26 Dec-26 381,000"
+        },
+        {
+          "contractId": "deepwater-corcovado-rd206bba5068c",
+          "before": null,
+          "reasonKo": "보고서에 기재된 Petrobras 후속기간",
+          "quote": "Jan-27 Nov-30 392,000"
+        },
+        {
+          "contractId": "deepwater-mykonos-b884914197",
+          "before": {
+            "vesselId": "deepwater-mykonos",
+            "startDate": "2026-09-01",
+            "endDate": "2027-06-30",
+            "dayRate": 426000,
+            "client": "bp",
+            "region": "Brazil",
+            "status": "Firm",
+            "id": "deepwater-mykonos-b884914197"
+          },
+          "reasonKo": "보고서상 시작월과 요율로 갱신",
+          "quote": "Aug-26 Jun-27 420,000"
+        },
+        {
+          "contractId": "deepwater-orion-ffa9ece533",
+          "before": {
+            "vesselId": "deepwater-orion",
+            "startDate": "2026-04-01",
+            "endDate": "2026-12-31",
+            "dayRate": 375000,
+            "client": "Petrobras",
+            "region": "Brazil",
+            "status": "Firm",
+            "id": "deepwater-orion-ffa9ece533"
+          },
+          "reasonKo": "보고서상 요율 변경 반영",
+          "quote": "Apr-26 Dec-26 377,000"
+        },
+        {
+          "contractId": "deepwater-orion-63acbabd02",
+          "before": {
+            "vesselId": "deepwater-orion",
+            "startDate": "2027-01-01",
+            "endDate": "2033-03-31",
+            "dayRate": 0,
+            "client": "Petrobras",
+            "region": "Brazil",
+            "status": "Firm",
+            "id": "deepwater-orion-63acbabd02",
+            "interpretation": {
+              "sourceStartText": null,
+              "sourceEndText": "1,095-day contract extension",
+              "placementBasis": "기존 계약 종료일 다음 날부터 1,095일 연장으로 배치",
+              "termText": "1,095-day contract extension",
+              "optionText": null,
+              "valueText": null,
+              "awardType": "extension",
+              "valueUsd": null,
+              "baseDurationDays": null,
+              "includes": [],
+              "excludes": [],
+              "derivedUsdPerDay": null
+            },
+            "sourceUrl": "https://www.deepwater.com/news/detail?ID=30311",
+            "sourcePublishedAt": "2026-05-04",
+            "newsReviewed": true
+          },
+          "reasonKo": "보고서의 종료월과 요율로 기존 연장계약 갱신",
+          "quote": "Jan-27 Mar-30 392,000"
+        },
+        {
+          "contractId": "dhirubhai-deepwater-kg2-r114174bb5915",
+          "before": {
+            "startDate": "2027-01-01",
+            "endDate": "2028-12-31",
+            "dayRate": 0,
+            "client": "ONGC",
+            "region": "India",
+            "status": "Contingent",
+            "interpretation": {
+              "sourceStartText": "Q1 2027",
+              "sourceEndText": null,
+              "placementBasis": "Q1 시작을 2027년 1월로 배치",
+              "termText": "two-year binding Letter of Award",
+              "optionText": "two years of priced options",
+              "valueText": "approximately $300 million in contract value, inclusive of additional services and mobilization fees",
+              "awardType": "letter-of-award",
+              "valueUsd": 300000000,
+              "baseDurationDays": 730,
+              "includes": [
+                "additional services",
+                "mobilization fees"
+              ],
+              "excludes": [],
+              "derivedUsdPerDay": 410958.90410958906
+            },
+            "id": "dhirubhai-deepwater-kg2-r114174bb5915",
+            "vesselId": "dhirubhai-deepwater-kg2",
+            "sourceUrl": "https://www.deepwater.com/news/detail?ID=30541",
+            "sourcePublishedAt": "2026-08-20",
+            "newsReviewed": true,
+            "inputMode": "stored-result",
+            "storedReading": {
+              "reviewedAt": "2026-10-19T16:32:53Z"
+            }
+          },
+          "reasonKo": "Binding Letter of Award는 Contingent로 유지하고 표의 기간·요율을 반영",
+          "quote": "India ONGC Firm Feb-27 Feb-29 389,000"
+        },
+        {
+          "contractId": "dhirubhai-deepwater-kg2-r26a0d63b8b3a",
+          "before": {
+            "startDate": "2029-01-01",
+            "endDate": "2030-12-31",
+            "dayRate": 0,
+            "client": "ONGC",
+            "region": "India",
+            "status": "Option",
+            "interpretation": {
+              "sourceStartText": null,
+              "sourceEndText": "early 2031",
+              "placementBasis": "기본 2년 종료 후 2년 옵션을 연속 배치; early 2031은 옵션 뒤 작업 전망으로 기록",
+              "termText": null,
+              "optionText": "two years of priced options",
+              "valueText": null,
+              "awardType": null,
+              "valueUsd": null,
+              "baseDurationDays": null,
+              "includes": [],
+              "excludes": [],
+              "derivedUsdPerDay": null
+            },
+            "id": "dhirubhai-deepwater-kg2-r26a0d63b8b3a",
+            "vesselId": "dhirubhai-deepwater-kg2",
+            "sourceUrl": "https://www.deepwater.com/news/detail?ID=30541",
+            "sourcePublishedAt": "2026-08-20",
+            "newsReviewed": true,
+            "inputMode": "stored-result",
+            "storedReading": {
+              "reviewedAt": "2026-10-19T16:32:53Z"
+            }
+          },
+          "reasonKo": "가격 옵션 기간을 표의 시작·종료월에 맞춤",
+          "quote": "Priced Options Feb-29 Feb-31"
+        },
+        {
+          "contractId": "petrobras-10000-43cfd4b9b6",
+          "before": {
+            "vesselId": "petrobras-10000",
+            "startDate": "2026-10-01",
+            "endDate": "2027-10-31",
+            "dayRate": 428000,
+            "client": "Petrobras",
+            "region": "Brazil",
+            "status": "Firm",
+            "id": "petrobras-10000-43cfd4b9b6"
+          },
+          "reasonKo": "기존 기간을 보고서의 첫 Firm 구간 종료월로 갱신",
+          "quote": "Oct-26 May-27 428,000"
+        },
+        {
+          "contractId": "petrobras-10000-ra0ad942641e1",
+          "before": null,
+          "reasonKo": "별도 Firm 구간을 후속 기간과 겹치지 않게 반영",
+          "quote": "Jun-27 Oct-27 428,000"
+        },
+        {
+          "contractId": "petrobras-10000-91cabb7037",
+          "before": {
+            "vesselId": "petrobras-10000",
+            "startDate": "2027-10-01",
+            "endDate": "2028-10-31",
+            "dayRate": 441000,
+            "client": "Petrobras",
+            "region": "Brazil",
+            "status": "Firm",
+            "id": "petrobras-10000-91cabb7037"
+          },
+          "reasonKo": "기존 Petrobras 기간의 보고서상 요율·종료월 반영",
+          "quote": "Oct-27 Oct-28 440,000"
+        },
+        {
+          "contractId": "petrobras-10000-0149fc2786",
+          "before": {
+            "vesselId": "petrobras-10000",
+            "startDate": "2028-10-01",
+            "endDate": "2029-08-31",
+            "dayRate": 454000,
+            "client": "Petrobras",
+            "region": "Brazil",
+            "status": "Firm",
+            "id": "petrobras-10000-0149fc2786"
+          },
+          "reasonKo": "기존 Petrobras 기간의 보고서상 종료월 반영",
+          "quote": "Oct-28 Aug-29 454,000"
+        }
+      ],
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
+      "reportDate": "2026-11-02"
     },
     "job-898fa185c1b0ecd3eccf0a8df3e12b46": {
       "jobId": "job-898fa185c1b0ecd3eccf0a8df3e12b46",
@@ -2044,15 +2619,16 @@
       "title": "Transocean Ltd. Reports Third Quarter 2026 Results",
       "publishedAt": "2026-11-02",
       "documentSha256": "47195c8be95157d8769908bb6fd820a5399498c5481c5f898c94a0bb1461b0af",
-      "status": "pending",
-      "outcome": null,
-      "lastReadAt": null,
+      "status": "completed",
+      "outcome": "excluded",
+      "lastReadAt": "2026-11-03T05:17:27Z",
       "lastError": null,
       "failureCount": 0,
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
+      "newsCategory": "실적"
     },
     "job-86d1e2206b4a42417271ce35ec632531": {
       "jobId": "job-86d1e2206b4a42417271ce35ec632531",
@@ -2063,15 +2639,17 @@
       "title": "Transocean Ltd. Provides Quarterly Fleet Status Report",
       "publishedAt": "2026-11-02",
       "documentSha256": "d13fd5c6ddbeebd796c0bf05ef05eaff17b57c12d8385f4241fd2ce924ef359a",
-      "status": "pending",
-      "outcome": null,
-      "lastReadAt": null,
+      "status": "completed",
+      "outcome": "no-change",
+      "lastReadAt": "2026-11-03T05:19:48Z",
       "lastError": null,
       "failureCount": 0,
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-03T05:17:19Z",
+      "newsCategory": "Fleet Status",
+      "selected": true
     },
     "job-8626e8ef196feaf9f06cb9b5a3dfbf4e": {
       "jobId": "job-8626e8ef196feaf9f06cb9b5a3dfbf4e",
@@ -2082,12 +2660,12 @@
       "title": null,
       "publishedAt": null,
       "documentSha256": "2fc2dad36232de827c22c054f9d5ca3fa5ac41a43811165e49bd11b13bb4dae1",
-      "status": "pending",
+      "status": "failed",
       "outcome": null,
       "lastReadAt": null,
-      "lastError": null,
-      "failureCount": 0,
-      "nextAttemptAfter": 0,
+      "lastError": "LookupError: source could not be fetched this run: ConnectionError: HTTPSConnectionPool(host='s23.q4cdn.com', port=443): Max retries exceeded with url: /956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf (Caused by ReadTimeoutError(\"HTTPSConnectionPool(host='s23.q4cdn.com', port=443): Read timed out. (read timeout=45)\"))",
+      "failureCount": 1,
+      "nextAttemptAfter": 1793683347,
       "openHolds": [],
       "changes": [],
       "lastSuccessAt": "2026-11-02T21:44:36Z"
@@ -2101,15 +2679,16 @@
       "title": "Valaris Reports Third Quarter 2026 Results",
       "publishedAt": "2026-11-02",
       "documentSha256": "125ebc368fe4696b0a412bae1fd4e072db135676d2045269a5cfdbdcefaffa28",
-      "status": "pending",
-      "outcome": null,
-      "lastReadAt": null,
+      "status": "completed",
+      "outcome": "excluded",
+      "lastReadAt": "2026-11-03T05:17:27Z",
       "lastError": null,
       "failureCount": 0,
       "nextAttemptAfter": 0,
       "openHolds": [],
       "changes": [],
-      "lastSuccessAt": "2026-11-02T21:44:36Z"
+      "lastSuccessAt": "2026-11-02T21:44:36Z",
+      "newsCategory": "실적"
     }
   }
 }

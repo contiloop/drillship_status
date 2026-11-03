@@ -1460,23 +1460,53 @@
       },
       {
         "vesselId": "deepwater-atlas",
-        "startDate": "2026-08-01",
-        "endDate": "2026-10-31",
+        "startDate": "2026-09-01",
+        "endDate": "2026-11-30",
         "dayRate": 580000,
         "client": "Beacon",
-        "region": "USGOM",
+        "region": "US Gulf",
         "status": "Firm",
-        "id": "deepwater-atlas-e5e064efb5"
+        "id": "deepwater-atlas-e5e064efb5",
+        "interpretation": {
+          "sourceStartText": "Sep-26",
+          "sourceEndText": "Nov-26",
+          "placementBasis": "보고서 월 표기로 배치; 다음 기간이 Nov-26 시작이라 종료를 직전 월로 조정",
+          "termText": null,
+          "optionText": null,
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       },
       {
         "vesselId": "deepwater-atlas",
-        "startDate": "2026-10-01",
+        "startDate": "2026-12-01",
         "endDate": "2026-12-31",
         "dayRate": 650000,
         "client": "Beacon",
-        "region": "USGOM",
-        "status": "Contingent",
-        "id": "deepwater-atlas-991f0699ec"
+        "region": "US Gulf",
+        "status": "Firm",
+        "id": "deepwater-atlas-991f0699ec",
+        "interpretation": {
+          "sourceStartText": "Nov-26",
+          "sourceEndText": "Jan-27",
+          "placementBasis": "월 표기로 배치; 겹침 방지를 위해 Nov-26은 앞 기간에 포함하고 이 기간은 Dec-26부터 배치",
+          "termText": null,
+          "optionText": null,
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       },
       {
         "vesselId": "deepwater-atlas",
@@ -1490,13 +1520,28 @@
       },
       {
         "vesselId": "deepwater-atlas",
-        "startDate": "2026-12-01",
-        "endDate": "2027-02-28",
+        "startDate": "2027-01-01",
+        "endDate": "2027-03-31",
         "dayRate": 650000,
         "client": "Beacon",
-        "region": "USGOM",
+        "region": "US Gulf",
         "status": "Contingent",
-        "id": "deepwater-atlas-950ba82235"
+        "id": "deepwater-atlas-950ba82235",
+        "interpretation": {
+          "sourceStartText": "Jan-27",
+          "sourceEndText": "Apr-27",
+          "placementBasis": "월 표기로 배치; 다음 Firm 기간 Apr-27 시작에 맞춰 종료월 조정",
+          "termText": null,
+          "optionText": null,
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       },
       {
         "vesselId": "deepwater-atlas",
@@ -1510,13 +1555,28 @@
       },
       {
         "vesselId": "deepwater-atlas",
-        "startDate": "2027-02-01",
-        "endDate": "2027-07-31",
+        "startDate": "2027-04-01",
+        "endDate": "2027-05-31",
         "dayRate": 505000,
         "client": "Beacon",
-        "region": "USGOM",
+        "region": "US Gulf",
         "status": "Firm",
-        "id": "deepwater-atlas-fc99127caa-2"
+        "id": "deepwater-atlas-fc99127caa-2",
+        "interpretation": {
+          "sourceStartText": "Apr-27",
+          "sourceEndText": "Jun-27",
+          "placementBasis": "월 표기로 배치; 다음 Contingent 기간 Jun-27 시작에 맞춰 종료월 조정",
+          "termText": null,
+          "optionText": null,
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       },
       {
         "vesselId": "deepwater-atlas",
@@ -1527,6 +1587,31 @@
         "region": "USGOM",
         "status": "Firm",
         "id": "deepwater-atlas-8f5a34ab13"
+      },
+      {
+        "startDate": "2027-06-01",
+        "endDate": "2027-09-30",
+        "dayRate": 505000,
+        "client": "Beacon",
+        "region": "US Gulf",
+        "status": "Contingent",
+        "interpretation": {
+          "sourceStartText": "Jun-27",
+          "sourceEndText": "Sep-27",
+          "placementBasis": "보고서 월 표기로 배치",
+          "termText": null,
+          "optionText": null,
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "id": "deepwater-atlas-rcd7679e7a0ef",
+        "vesselId": "deepwater-atlas",
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       }
     ]
   },
@@ -1575,6 +1660,31 @@
         "sourceUrl": "https://www.deepwater.com/news/detail?ID=30311",
         "sourcePublishedAt": "2026-05-04",
         "newsReviewed": true
+      },
+      {
+        "startDate": "2027-01-01",
+        "endDate": "2028-06-30",
+        "dayRate": 442000,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "interpretation": {
+          "sourceStartText": "Jan-27",
+          "sourceEndText": "Jun-28",
+          "placementBasis": "월 표기를 해당 월 시작일과 말일로 배치",
+          "termText": null,
+          "optionText": null,
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "id": "deepwater-aquila-r37936514df36",
+        "vesselId": "deepwater-aquila",
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       }
     ]
   },
@@ -1630,44 +1740,17 @@
     "yearBuilt": 2016,
     "contracts": [
       {
-        "vesselId": "deepwater-conqueror",
-        "startDate": "2027-02-01",
-        "endDate": "2027-05-31",
-        "dayRate": 0,
+        "startDate": "2027-01-01",
+        "endDate": "2027-07-31",
+        "dayRate": 465000,
         "client": "Not Disclosed",
-        "region": "USGOM",
-        "status": "Firm",
-        "id": "deepwater-conqueror-98c1fbaf6b",
-        "interpretation": {
-          "sourceStartText": null,
-          "sourceEndText": null,
-          "placementBasis": "기존 계약 종료 후 2개 유정 연장으로 배치",
-          "termText": "two-well contract extension",
-          "optionText": null,
-          "valueText": null,
-          "awardType": "extension",
-          "valueUsd": null,
-          "baseDurationDays": null,
-          "includes": [],
-          "excludes": [],
-          "derivedUsdPerDay": null
-        },
-        "sourceUrl": "https://www.deepwater.com/news/detail?ID=30516",
-        "sourcePublishedAt": "2026-08-05",
-        "newsReviewed": true
-      },
-      {
-        "startDate": "2027-06-01",
-        "endDate": "2027-11-17",
-        "dayRate": 0,
-        "client": "undisclosed operator",
         "region": "Equatorial Guinea",
         "status": "Firm",
         "interpretation": {
-          "sourceStartText": "expected to commence in 2027; in direct continuation of the rig’s current contract in the U.S Gulf",
-          "sourceEndText": "The estimated 170-day campaign",
-          "placementBasis": "기존 미국 걸프 계약 종료 다음 날인 2027-06-01부터 170일로 배치",
-          "termText": "a two-well contract; The estimated 170-day campaign",
+          "sourceStartText": "Jan-27",
+          "sourceEndText": "Jul-27",
+          "placementBasis": "보고서 월 표기를 해당 월 시작일과 말일로 배치",
+          "termText": "two-well contract",
           "optionText": null,
           "valueText": "approximately $80 million in backlog, excluding additional services and compensation for mobilization and demobilization",
           "awardType": "signed-contract",
@@ -1682,26 +1765,20 @@
         },
         "id": "deepwater-conqueror-r89e1559fc6d7",
         "vesselId": "deepwater-conqueror",
-        "sourceUrl": "https://www.deepwater.com/news/detail?ID=30551",
-        "sourcePublishedAt": "2026-09-15",
-        "newsReviewed": true,
-        "inputMode": "stored-result",
-        "storedReading": {
-          "reviewedAt": "2026-10-19T16:33:01Z"
-        }
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       },
       {
-        "startDate": "2027-11-18",
-        "endDate": "2029-02-09",
-        "dayRate": 0,
-        "client": "undisclosed operator",
-        "region": "U.S. Gulf",
+        "startDate": "2027-08-01",
+        "endDate": "2028-11-30",
+        "dayRate": 499000,
+        "client": "Not Disclosed",
+        "region": "US Gulf",
         "status": "Firm",
         "interpretation": {
-          "sourceStartText": "commence in the third quarter of 2027",
-          "sourceEndText": "The estimated 450 days of work",
-          "placementBasis": "Q3 시작 전망은 기존 적도기니 작업 종료일 다음 날로 조정해 450일 배치",
-          "termText": "5개 유정 계약; The estimated 450 days of work",
+          "sourceStartText": "Aug-27",
+          "sourceEndText": "Nov-28",
+          "placementBasis": "보고서 월 표기를 해당 월 시작일과 말일로 배치",
+          "termText": "five-well contract",
           "optionText": null,
           "valueText": "approximately $225 million in backlog, excluding mobilization fees",
           "awardType": "signed-contract",
@@ -1715,13 +1792,7 @@
         },
         "id": "deepwater-conqueror-r86d777c75126",
         "vesselId": "deepwater-conqueror",
-        "sourceUrl": "https://www.deepwater.com/news/detail?ID=30626",
-        "sourcePublishedAt": "2026-10-19",
-        "newsReviewed": true,
-        "inputMode": "stored-result",
-        "storedReading": {
-          "reviewedAt": "2026-10-19T16:34:40Z"
-        }
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       }
     ]
   },
@@ -1746,36 +1817,41 @@
       },
       {
         "vesselId": "deepwater-proteus",
-        "startDate": "2026-07-01",
-        "endDate": "2026-11-30",
-        "dayRate": 0,
-        "client": "Not Disclosed",
-        "region": "USGOM",
-        "status": "Firm",
-        "id": "deepwater-proteus-4d9499f260"
-      },
-      {
-        "vesselId": "deepwater-proteus",
-        "startDate": "2026-11-01",
+        "startDate": "2026-10-01",
         "endDate": "2027-01-31",
         "dayRate": 0,
         "client": "Not Disclosed",
-        "region": "USGOM",
-        "status": "Option",
-        "id": "deepwater-proteus-723ee53cd3"
+        "region": "US Gulf",
+        "status": "Firm",
+        "id": "deepwater-proteus-4d9499f260",
+        "interpretation": {
+          "sourceStartText": "Oct-26",
+          "sourceEndText": "Feb-27",
+          "placementBasis": "보고서 월 표기로 배치; 후속 Firm 기간 Feb-27 시작에 맞춰 종료를 직전 월로 조정",
+          "termText": null,
+          "optionText": "client exercised one optional well estimated at 60 days",
+          "valueText": null,
+          "awardType": "option-exercised",
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       },
       {
-        "startDate": "2027-01-01",
-        "endDate": "2028-12-31",
-        "dayRate": 0,
-        "client": "undisclosed operator",
-        "region": "U.S. Gulf",
+        "startDate": "2027-02-01",
+        "endDate": "2029-01-31",
+        "dayRate": 465000,
+        "client": "Not Disclosed",
+        "region": "US Gulf",
         "status": "Firm",
         "interpretation": {
-          "sourceStartText": "in the first quarter of 2027",
-          "sourceEndText": "The estimated 700-day campaign",
-          "placementBasis": "Q1 시작을 1월로 배치하고, 기존 옵션 종료 뒤 700일로 산정",
-          "termText": "10개 유정 계약; The estimated 700-day campaign",
+          "sourceStartText": "Feb-27",
+          "sourceEndText": "Jan-29",
+          "placementBasis": "보고서 월 표기로 배치; 선행 기간 종료 다음 날 시작",
+          "termText": "ten-well contract; The estimated 700-day campaign",
           "optionText": null,
           "valueText": "approximately $325 million in backlog",
           "awardType": "signed-contract",
@@ -1787,13 +1863,7 @@
         },
         "id": "deepwater-proteus-r96a1d4ea8524",
         "vesselId": "deepwater-proteus",
-        "sourceUrl": "https://www.deepwater.com/news/detail?ID=30626",
-        "sourcePublishedAt": "2026-10-19",
-        "newsReviewed": true,
-        "inputMode": "stored-result",
-        "storedReading": {
-          "reviewedAt": "2026-10-19T16:34:40Z"
-        }
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       }
     ]
   },
@@ -1928,23 +1998,53 @@
       },
       {
         "vesselId": "deepwater-skyros",
-        "startDate": "2027-04-01",
-        "endDate": "2028-03-31",
+        "startDate": "2027-03-01",
+        "endDate": "2028-02-29",
         "dayRate": 0,
         "client": "Not Disclosed",
         "region": "Australia",
         "status": "Firm",
-        "id": "deepwater-skyros-0f632f7c30"
+        "id": "deepwater-skyros-0f632f7c30",
+        "interpretation": {
+          "sourceStartText": "Mar-27",
+          "sourceEndText": "Feb-28",
+          "placementBasis": "월 표기를 해당 월 시작일과 말일로 배치",
+          "termText": null,
+          "optionText": null,
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       },
       {
         "vesselId": "deepwater-skyros",
         "startDate": "2028-03-01",
-        "endDate": "2030-08-31",
+        "endDate": "2030-07-31",
         "dayRate": 0,
         "client": "Not Disclosed",
         "region": "Australia",
         "status": "Option",
-        "id": "deepwater-skyros-06b9e6a26a"
+        "id": "deepwater-skyros-06b9e6a26a",
+        "interpretation": {
+          "sourceStartText": "Feb-28",
+          "sourceEndText": "Jul-30",
+          "placementBasis": "선행 Firm 기간 종료 다음 날부터 옵션 월을 연속 배치",
+          "termText": null,
+          "optionText": "Priced Options",
+          "valueText": null,
+          "awardType": null,
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       }
     ]
   },
@@ -1999,13 +2099,28 @@
       },
       {
         "vesselId": "deepwater-mykonos",
-        "startDate": "2026-09-01",
+        "startDate": "2026-08-01",
         "endDate": "2027-06-30",
-        "dayRate": 426000,
+        "dayRate": 420000,
         "client": "bp",
         "region": "Brazil",
         "status": "Firm",
-        "id": "deepwater-mykonos-b884914197"
+        "id": "deepwater-mykonos-b884914197",
+        "interpretation": {
+          "sourceStartText": "Aug-26",
+          "sourceEndText": "Jun-27",
+          "placementBasis": "월 표기를 해당 월의 시작일과 말일로 배치",
+          "termText": null,
+          "optionText": null,
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       }
     ]
   },
@@ -2022,11 +2137,26 @@
         "vesselId": "deepwater-corcovado",
         "startDate": "2026-04-01",
         "endDate": "2026-12-31",
-        "dayRate": 379000,
+        "dayRate": 381000,
         "client": "Petrobras",
         "region": "Brazil",
         "status": "Firm",
-        "id": "deepwater-corcovado-8be36e7ec8"
+        "id": "deepwater-corcovado-8be36e7ec8",
+        "interpretation": {
+          "sourceStartText": "Apr-26",
+          "sourceEndText": "Dec-26",
+          "placementBasis": "월 표기를 해당 월의 시작일과 말일로 배치",
+          "termText": null,
+          "optionText": null,
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       },
       {
         "vesselId": "deepwater-corcovado",
@@ -2054,6 +2184,31 @@
         "sourceUrl": "https://www.deepwater.com/news/detail?ID=30311",
         "sourcePublishedAt": "2026-05-04",
         "newsReviewed": true
+      },
+      {
+        "startDate": "2027-01-01",
+        "endDate": "2030-11-30",
+        "dayRate": 392000,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "interpretation": {
+          "sourceStartText": "Jan-27",
+          "sourceEndText": "Nov-30",
+          "placementBasis": "월 표기를 해당 월의 시작일과 말일로 배치",
+          "termText": null,
+          "optionText": null,
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "id": "deepwater-corcovado-rd206bba5068c",
+        "vesselId": "deepwater-corcovado",
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       }
     ]
   },
@@ -2070,25 +2225,40 @@
         "vesselId": "deepwater-orion",
         "startDate": "2026-04-01",
         "endDate": "2026-12-31",
-        "dayRate": 375000,
+        "dayRate": 377000,
         "client": "Petrobras",
         "region": "Brazil",
         "status": "Firm",
-        "id": "deepwater-orion-ffa9ece533"
+        "id": "deepwater-orion-ffa9ece533",
+        "interpretation": {
+          "sourceStartText": "Apr-26",
+          "sourceEndText": "Dec-26",
+          "placementBasis": "월 표기를 해당 월의 시작일과 말일로 배치",
+          "termText": null,
+          "optionText": null,
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       },
       {
         "vesselId": "deepwater-orion",
         "startDate": "2027-01-01",
-        "endDate": "2033-03-31",
-        "dayRate": 0,
+        "endDate": "2030-03-31",
+        "dayRate": 392000,
         "client": "Petrobras",
         "region": "Brazil",
         "status": "Firm",
         "id": "deepwater-orion-63acbabd02",
         "interpretation": {
-          "sourceStartText": null,
-          "sourceEndText": "1,095-day contract extension",
-          "placementBasis": "기존 계약 종료일 다음 날부터 1,095일 연장으로 배치",
+          "sourceStartText": "Jan-27",
+          "sourceEndText": "Mar-30",
+          "placementBasis": "월 표기를 해당 월의 시작일과 말일로 배치",
           "termText": "1,095-day contract extension",
           "optionText": null,
           "valueText": null,
@@ -2099,9 +2269,7 @@
           "excludes": [],
           "derivedUsdPerDay": null
         },
-        "sourceUrl": "https://www.deepwater.com/news/detail?ID=30311",
-        "sourcePublishedAt": "2026-05-04",
-        "newsReviewed": true
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       }
     ]
   },
@@ -2125,16 +2293,16 @@
         "id": "dhirubhai-deepwater-kg2-98fde0c097"
       },
       {
-        "startDate": "2027-01-01",
-        "endDate": "2028-12-31",
-        "dayRate": 0,
+        "startDate": "2027-02-01",
+        "endDate": "2029-01-31",
+        "dayRate": 389000,
         "client": "ONGC",
         "region": "India",
         "status": "Contingent",
         "interpretation": {
-          "sourceStartText": "Q1 2027",
-          "sourceEndText": null,
-          "placementBasis": "Q1 시작을 2027년 1월로 배치",
+          "sourceStartText": "Feb-27",
+          "sourceEndText": "Feb-29",
+          "placementBasis": "월 표기로 배치; 옵션 시작 Feb-29에 앞서 종료월 조정",
           "termText": "two-year binding Letter of Award",
           "optionText": "two years of priced options",
           "valueText": "approximately $300 million in contract value, inclusive of additional services and mobilization fees",
@@ -2150,25 +2318,19 @@
         },
         "id": "dhirubhai-deepwater-kg2-r114174bb5915",
         "vesselId": "dhirubhai-deepwater-kg2",
-        "sourceUrl": "https://www.deepwater.com/news/detail?ID=30541",
-        "sourcePublishedAt": "2026-08-20",
-        "newsReviewed": true,
-        "inputMode": "stored-result",
-        "storedReading": {
-          "reviewedAt": "2026-10-19T16:32:53Z"
-        }
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       },
       {
-        "startDate": "2029-01-01",
-        "endDate": "2030-12-31",
+        "startDate": "2029-02-01",
+        "endDate": "2031-02-28",
         "dayRate": 0,
         "client": "ONGC",
         "region": "India",
         "status": "Option",
         "interpretation": {
-          "sourceStartText": null,
-          "sourceEndText": "early 2031",
-          "placementBasis": "기본 2년 종료 후 2년 옵션을 연속 배치; early 2031은 옵션 뒤 작업 전망으로 기록",
+          "sourceStartText": "Feb-29",
+          "sourceEndText": "Feb-31",
+          "placementBasis": "월 표기를 해당 월의 시작일과 말일로 배치",
           "termText": null,
           "optionText": "two years of priced options",
           "valueText": null,
@@ -2181,13 +2343,7 @@
         },
         "id": "dhirubhai-deepwater-kg2-r26a0d63b8b3a",
         "vesselId": "dhirubhai-deepwater-kg2",
-        "sourceUrl": "https://www.deepwater.com/news/detail?ID=30541",
-        "sourcePublishedAt": "2026-08-20",
-        "newsReviewed": true,
-        "inputMode": "stored-result",
-        "storedReading": {
-          "reviewedAt": "2026-10-19T16:32:53Z"
-        }
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       }
     ]
   },
@@ -2213,22 +2369,52 @@
       {
         "vesselId": "petrobras-10000",
         "startDate": "2026-10-01",
-        "endDate": "2027-10-31",
+        "endDate": "2027-05-31",
         "dayRate": 428000,
         "client": "Petrobras",
         "region": "Brazil",
         "status": "Firm",
-        "id": "petrobras-10000-43cfd4b9b6"
+        "id": "petrobras-10000-43cfd4b9b6",
+        "interpretation": {
+          "sourceStartText": "Oct-26",
+          "sourceEndText": "May-27",
+          "placementBasis": "보고서 월 표기를 해당 월 시작일과 말일로 배치",
+          "termText": null,
+          "optionText": null,
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       },
       {
         "vesselId": "petrobras-10000",
         "startDate": "2027-10-01",
         "endDate": "2028-10-31",
-        "dayRate": 441000,
+        "dayRate": 440000,
         "client": "Petrobras",
         "region": "Brazil",
         "status": "Firm",
-        "id": "petrobras-10000-91cabb7037"
+        "id": "petrobras-10000-91cabb7037",
+        "interpretation": {
+          "sourceStartText": "Oct-27",
+          "sourceEndText": "Oct-28",
+          "placementBasis": "보고서 월 표기를 해당 월 시작일과 말일로 배치",
+          "termText": null,
+          "optionText": null,
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       },
       {
         "vesselId": "petrobras-10000",
@@ -2238,7 +2424,47 @@
         "client": "Petrobras",
         "region": "Brazil",
         "status": "Firm",
-        "id": "petrobras-10000-0149fc2786"
+        "id": "petrobras-10000-0149fc2786",
+        "interpretation": {
+          "sourceStartText": "Oct-28",
+          "sourceEndText": "Aug-29",
+          "placementBasis": "보고서 월 표기를 해당 월 시작일과 말일로 배치",
+          "termText": null,
+          "optionText": null,
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
+      },
+      {
+        "startDate": "2027-06-01",
+        "endDate": "2027-09-30",
+        "dayRate": 428000,
+        "client": "Petrobras",
+        "region": "Brazil",
+        "status": "Firm",
+        "interpretation": {
+          "sourceStartText": "Jun-27",
+          "sourceEndText": "Oct-27",
+          "placementBasis": "보고서 월 표기로 배치; 다음 기간 Oct-27 시작에 맞춰 종료월 조정",
+          "termText": null,
+          "optionText": null,
+          "valueText": null,
+          "awardType": "unreported",
+          "valueUsd": null,
+          "baseDurationDays": null,
+          "includes": [],
+          "excludes": [],
+          "derivedUsdPerDay": null
+        },
+        "id": "petrobras-10000-ra0ad942641e1",
+        "vesselId": "petrobras-10000",
+        "sourceUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf"
       }
     ]
   },
@@ -2289,7 +2515,7 @@
     "company": "Transocean",
     "generation": "7G",
     "status": "Cold-Stacked",
-    "statusAsOf": "2026-08-05",
+    "statusAsOf": "2026-11-02",
     "yearBuilt": 2015,
     "contracts": []
   },
@@ -2299,7 +2525,7 @@
     "company": "Transocean",
     "generation": "7G",
     "status": "Cold-Stacked",
-    "statusAsOf": "2026-08-05",
+    "statusAsOf": "2026-11-02",
     "yearBuilt": 2014,
     "contracts": []
   },
@@ -2309,7 +2535,7 @@
     "company": "Transocean",
     "generation": "7G",
     "status": "Cold-Stacked",
-    "statusAsOf": "2026-08-05",
+    "statusAsOf": "2026-11-02",
     "yearBuilt": 2013,
     "contracts": []
   },
