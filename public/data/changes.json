@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-11-03T05:28:59Z",
-  "fromDataHash": "84ace30496a36314a4ff",
+  "generatedAt": "2026-11-03T06:50:05Z",
+  "fromDataHash": "08c61ddfc90e5e7bd3f2",
   "toDataHash": "08c61ddfc90e5e7bd3f2",
   "companies": {
     "Transocean": {
@@ -11,9 +11,9 @@
     },
     "Valaris": {
       "statusChanges": 0,
-      "contractsAdded": 8,
+      "contractsAdded": 0,
       "contractsRemoved": 0,
-      "contractsChanged": 13
+      "contractsChanged": 0
     },
     "Noble": {
       "statusChanges": 0,

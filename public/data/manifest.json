@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-03T05:28:59Z",
+  "generatedAt": "2026-11-03T06:50:05Z",
   "updatedAsOf": "2026-11-02",
   "dataHash": "08c61ddfc90e5e7bd3f2",
-  "stateFingerprint": "832d260e04c9e3ffb0ee",
+  "stateFingerprint": "7a80b777a18b691539b4",
   "fleetFile": "fleet.08c61ddfc90e5e7bd3f2.json",
   "eventsFile": "events.d1a223c5851932ecb91e.json",
   "eventsHash": "d1a223c5851932ecb91e",
@@ -18,7 +18,7 @@
       "discovery": "official-index",
       "sha256": "4dd3a586ae73f5752ae3893a970800ec6c8300dfd110e9c067c5f525bfebaa22",
       "reportDate": "2026-10-26",
-      "lastSuccessAt": "2026-11-03T05:25:55Z",
+      "lastSuccessAt": "2026-11-03T06:49:20Z",
       "httpStatus": 200,
       "error": null,
       "health": "healthy",
@@ -31,7 +31,7 @@
       "discovery": "official-wordpress-api",
       "sha256": "b774357daafdb62dcc8c371fe5f5d118fb8d7d51c91badd05cd6cae3c9a39cb1",
       "reportDate": "2026-08-10",
-      "lastSuccessAt": "2026-11-03T05:25:55Z",
+      "lastSuccessAt": "2026-11-03T06:49:20Z",
       "httpStatus": 200,
       "error": null,
       "health": "healthy",
@@ -44,7 +44,7 @@
       "discovery": "official-index",
       "sha256": "86a470d9af277a767d7c09226b20e6a8369b57b30e20792d5d056a41ec5aab56",
       "reportDate": "2026-11-02",
-      "lastSuccessAt": "2026-11-03T05:25:55Z",
+      "lastSuccessAt": "2026-11-03T06:49:20Z",
       "httpStatus": 200,
       "error": null,
       "health": "healthy",
@@ -57,7 +57,7 @@
       "discovery": "official-index",
       "sha256": "2fc2dad36232de827c22c054f9d5ca3fa5ac41a43811165e49bd11b13bb4dae1",
       "reportDate": "2026-11-02",
-      "lastSuccessAt": "2026-11-03T05:25:55Z",
+      "lastSuccessAt": "2026-11-03T06:49:20Z",
       "httpStatus": 200,
       "error": null,
       "health": "held",
@@ -72,7 +72,7 @@
       "reportDate": "2026-10-26",
       "documentUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
       "sha256": "4dd3a586ae73f5752ae3893a970800ec6c8300dfd110e9c067c5f525bfebaa22",
-      "lastSuccessAt": "2026-11-03T05:25:55Z",
+      "lastSuccessAt": "2026-11-03T06:49:20Z",
       "httpStatus": 200,
       "error": null
     },
@@ -83,7 +83,7 @@
       "reportDate": "2026-08-10",
       "documentUrl": "https://www.seadrill.com/wp-content/uploads/2026/08/Seadrill-Fleet-Status-Report-August-2026-vF.pdf",
       "sha256": "b774357daafdb62dcc8c371fe5f5d118fb8d7d51c91badd05cd6cae3c9a39cb1",
-      "lastSuccessAt": "2026-11-03T05:25:55Z",
+      "lastSuccessAt": "2026-11-03T06:49:20Z",
       "httpStatus": 200,
       "error": null
     },
@@ -94,7 +94,7 @@
       "reportDate": "2026-11-02",
       "documentUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
       "sha256": "86a470d9af277a767d7c09226b20e6a8369b57b30e20792d5d056a41ec5aab56",
-      "lastSuccessAt": "2026-11-03T05:25:55Z",
+      "lastSuccessAt": "2026-11-03T06:49:20Z",
       "httpStatus": 200,
       "error": null
     },
@@ -105,7 +105,7 @@
       "reportDate": "2026-11-02",
       "documentUrl": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
       "sha256": "2fc2dad36232de827c22c054f9d5ca3fa5ac41a43811165e49bd11b13bb4dae1",
-      "lastSuccessAt": "2026-11-03T05:25:55Z",
+      "lastSuccessAt": "2026-11-03T06:49:20Z",
       "httpStatus": 200,
       "error": null
     }
@@ -150,7 +150,7 @@
         "lastReadAt": "2026-11-03T05:28:51Z"
       }
     ],
-    "lastCollectedAt": "2026-11-03T05:27:46Z",
+    "lastCollectedAt": "2026-11-03T06:50:05Z",
     "lastReadAt": "2026-11-03T05:28:59Z",
     "lastAppliedAt": "2026-11-03T05:28:51Z",
     "usageLimitedUntil": null,
@@ -163,7 +163,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-third-quarter-2026-results",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-03T05:25:55Z"
+        "lastAttemptAt": "2026-11-03T06:49:20Z"
       },
       {
         "company": "Noble",
@@ -173,7 +173,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-third-quarter-2026-results",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-03T05:25:55Z"
+        "lastAttemptAt": "2026-11-03T06:49:20Z"
       },
       {
         "company": "Noble",
@@ -183,7 +183,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-second-quarter-2026-results",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-03T05:25:55Z"
+        "lastAttemptAt": "2026-11-03T06:49:20Z"
       },
       {
         "company": "Noble",
@@ -193,7 +193,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-second-quarter-2026-results",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-03T05:25:55Z"
+        "lastAttemptAt": "2026-11-03T06:49:20Z"
       },
       {
         "company": "Noble",
@@ -203,7 +203,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-pricing-upsized-offering-800",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-03T05:25:55Z"
+        "lastAttemptAt": "2026-11-03T06:49:20Z"
       },
       {
         "company": "Noble",
@@ -213,7 +213,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-proposed-offering-500-million",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-03T05:25:55Z"
+        "lastAttemptAt": "2026-11-03T06:49:20Z"
       },
       {
         "company": "Noble",
@@ -223,7 +223,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-new-director-appointment",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-03T05:25:55Z"
+        "lastAttemptAt": "2026-11-03T06:49:20Z"
       },
       {
         "company": "Noble",
@@ -233,7 +233,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-first-quarter-2026-results",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-03T05:25:55Z"
+        "lastAttemptAt": "2026-11-03T06:49:20Z"
       },
       {
         "company": "Noble",
@@ -243,7 +243,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-first-quarter-2026-results",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-03T05:25:55Z"
+        "lastAttemptAt": "2026-11-03T06:49:20Z"
       }
     ],
     "readingErrors": []
