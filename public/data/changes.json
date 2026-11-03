@@ -1,19 +1,19 @@
 {
-  "generatedAt": "2026-11-03T05:19:48Z",
-  "fromDataHash": "f47450ad2846c9bf21e6",
-  "toDataHash": "84ace30496a36314a4ff",
+  "generatedAt": "2026-11-03T05:28:59Z",
+  "fromDataHash": "84ace30496a36314a4ff",
+  "toDataHash": "08c61ddfc90e5e7bd3f2",
   "companies": {
     "Transocean": {
-      "statusChanges": 0,
-      "contractsAdded": 4,
-      "contractsRemoved": 2,
-      "contractsChanged": 19
-    },
-    "Valaris": {
       "statusChanges": 0,
       "contractsAdded": 0,
       "contractsRemoved": 0,
       "contractsChanged": 0
+    },
+    "Valaris": {
+      "statusChanges": 0,
+      "contractsAdded": 8,
+      "contractsRemoved": 0,
+      "contractsChanged": 13
     },
     "Noble": {
       "statusChanges": 0,

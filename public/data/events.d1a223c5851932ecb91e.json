@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-03T05:19:48Z",
+  "generatedAt": "2026-11-03T05:28:59Z",
   "events": [
     {
       "company": "Noble",
@@ -5306,6 +5306,1061 @@
       "pendingReview": false,
       "reviewStatus": "acknowledged",
       "sourceId": "source-55d2827ac1d4ad61b7f9119b6bfd3a05174eaf18108f4b7864a0ec6387e5e076",
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-55c7becd7f88d39092ef",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-18",
+      "vessels": [
+        "VALARIS DS-18"
+      ],
+      "vesselId": "valaris-ds-18",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "valaris-ds-18-rf34d98e17b93",
+        "row": {
+          "startDate": "2026-10-01",
+          "endDate": "2027-04-30",
+          "dayRate": 0,
+          "client": "PETRONAS Suriname Exploration & Production B.V.",
+          "region": "Suriname",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "fourth quarter of 2026",
+            "sourceEndText": "up to seven months",
+            "placementBasis": "Q4 초에 시작해 최대 7개월을 2027년 4월 말까지로 배치",
+            "termText": "Two-well exploration program; duration of up to seven months",
+            "optionText": null,
+            "valueText": "Contract backlog excludes additional services that may be provided and billed separately, as well as compensation for mobilization and demobilization.",
+            "awardType": "signed-contract",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [
+              "additional services that may be provided and billed separately",
+              "compensation for mobilization and demobilization",
+              "lump sum payments such as mobilization fees and capital reimbursements"
+            ],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "기존 LOA와 같은 수주이며 보고서의 확정 일정과 제외 항목을 반영",
+        "quote": "expected to commence in the fourth quarter of 2026",
+        "locator": "page:2"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-ca4acce6e710807d4b13",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-18",
+      "vessels": [
+        "VALARIS DS-18"
+      ],
+      "vesselId": "valaris-ds-18",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "valaris-ds-18-982da24b82",
+        "row": {
+          "startDate": "2027-06-01",
+          "endDate": "2029-12-31",
+          "dayRate": 0,
+          "client": "Occidental",
+          "region": "Gulf of America",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Jun 27",
+            "sourceEndText": "Dec 29",
+            "placementBasis": "월 표기를 해당 월 시작일과 말일로 배치",
+            "termText": "914-day contract for DS-18",
+            "optionText": "Two 1-year options",
+            "valueText": "Combined addition to contract backlog for DS-18 and DS-16 is approx. $760 million.",
+            "awardType": "extension",
+            "valueUsd": null,
+            "baseDurationDays": 914,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "기존 Occidental 수주에 기간 및 옵션 정보를 반영; 7억6천만 달러는 두 선박 합산액이라 배분하지 않음",
+        "quote": "914-day contract for DS-18",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-ab88917cee91b21b50ce",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-18",
+      "vessels": [
+        "VALARIS DS-18"
+      ],
+      "vesselId": "valaris-ds-18",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "valaris-ds-18-rf2745d8a07ac",
+        "row": {
+          "startDate": "2030-01-01",
+          "endDate": "2031-12-31",
+          "dayRate": 0,
+          "client": "Occidental",
+          "region": "Gulf of America",
+          "status": "Option",
+          "interpretation": {
+            "sourceStartText": null,
+            "sourceEndText": null,
+            "placementBasis": "기본 계약 Dec 29 종료 다음 달부터 1년 옵션 2회를 연속 배치",
+            "termText": null,
+            "optionText": "Two 1-year options",
+            "valueText": null,
+            "awardType": null,
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "미행사 1년 옵션 두 건을 기본 계약 종료 후 연속 배치",
+        "quote": "Two 1-year options",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-b5f1d6758bb870533dbe",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-17",
+      "vessels": [
+        "VALARIS DS-17"
+      ],
+      "vesselId": "valaris-ds-17",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "valaris-ds-17-4e15f5bfca",
+        "row": {
+          "startDate": "2026-03-01",
+          "endDate": "2028-01-31",
+          "dayRate": 0,
+          "client": "Equinor",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Mar 26",
+            "sourceEndText": "Jan 28",
+            "placementBasis": "월 표기를 해당 월 시작일과 말일로 배치",
+            "termText": "Estimated initial duration of 852 days, comprised of a 180-day standby period and a 672-day drilling program",
+            "optionText": "Three priced options with a total duration of 228 days",
+            "valueText": "Estimated total contract value (TCV) of $498 million, inclusive of MPD, additional services and fees for mobilization and minor rig upgrades.",
+            "awardType": "signed-contract",
+            "valueUsd": 498000000,
+            "baseDurationDays": 852,
+            "includes": [
+              "MPD",
+              "additional services",
+              "fees for mobilization and minor rig upgrades"
+            ],
+            "excludes": [],
+            "derivedUsdPerDay": 584507.0422535212
+          }
+        },
+        "reasonKo": "기존 계약의 TCV, 기본 기간, 대기 기간 및 옵션 정보를 보완",
+        "quote": "Estimated total contract value (\"TCV\") of $498 million",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-b6f97884e225656a1cfd",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-17",
+      "vessels": [
+        "VALARIS DS-17"
+      ],
+      "vesselId": "valaris-ds-17",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "valaris-ds-17-r473b70ff07a1",
+        "row": {
+          "startDate": "2028-02-01",
+          "endDate": "2028-09-15",
+          "dayRate": 0,
+          "client": "Equinor",
+          "region": "Brazil",
+          "status": "Option",
+          "interpretation": {
+            "sourceStartText": null,
+            "sourceEndText": null,
+            "placementBasis": "기본 계약 Jan 28 종료 다음 날부터 총 228일 옵션 기간으로 배치",
+            "termText": null,
+            "optionText": "Three priced options with a total duration of 228 days",
+            "valueText": null,
+            "awardType": null,
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "미행사 유상 옵션 총 228일을 기본 계약 뒤에 배치",
+        "quote": "Three priced options with a total duration of 228 days",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-433290ab0e9c1c9d60af",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-16",
+      "vessels": [
+        "VALARIS DS-16"
+      ],
+      "vesselId": "valaris-ds-16",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "valaris-ds-16-31f3dea8b8",
+        "row": {
+          "startDate": "2026-06-01",
+          "endDate": "2028-12-31",
+          "dayRate": 0,
+          "client": "Occidental",
+          "region": "Gulf of America",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Jun 26",
+            "sourceEndText": "Dec 28",
+            "placementBasis": "월 표기를 해당 월 시작일과 말일로 배치",
+            "termText": "940-day contract extension",
+            "optionText": "Two 1-year options",
+            "valueText": "Combined addition to contract backlog for DS-16 and DS-18 is approx. $760 million.",
+            "awardType": "extension",
+            "valueUsd": null,
+            "baseDurationDays": 940,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "기존 연장 계약에 기간과 옵션 정보를 반영; 합산 백로그는 선박별 배분 불가",
+        "quote": "940-day contract extension for DS-16",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-0c36a42e6f23fe60b42f",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-16",
+      "vessels": [
+        "VALARIS DS-16"
+      ],
+      "vesselId": "valaris-ds-16",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "valaris-ds-16-r24513e431c7a",
+        "row": {
+          "startDate": "2029-01-01",
+          "endDate": "2030-12-31",
+          "dayRate": 0,
+          "client": "Occidental",
+          "region": "Gulf of America",
+          "status": "Option",
+          "interpretation": {
+            "sourceStartText": null,
+            "sourceEndText": null,
+            "placementBasis": "기본 계약 Dec 28 종료 다음 달부터 1년 옵션 2회를 연속 배치",
+            "termText": null,
+            "optionText": "Two 1-year options",
+            "valueText": null,
+            "awardType": null,
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "미행사 1년 옵션 두 건을 기본 계약 종료 후 연속 배치",
+        "quote": "Two 1-year options",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-2df37be230ddc5a6f983",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-15",
+      "vessels": [
+        "VALARIS DS-15"
+      ],
+      "vesselId": "valaris-ds-15",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "valaris-ds-15-9f5aba7a23",
+        "row": {
+          "startDate": "2026-09-01",
+          "endDate": "2027-05-31",
+          "dayRate": 0,
+          "client": "CNR",
+          "region": "Cote d'Ivoire",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Sep 26",
+            "sourceEndText": "May 27",
+            "placementBasis": "월 표기를 해당 월 시작일과 말일로 배치",
+            "termText": "Estimated duration of 250 days",
+            "optionText": "Priced options with a total estimated duration of 80 to 100 days",
+            "valueText": "TCV is approx. $135 million, including upfront payments for rig upgrades and mobilization. TCV does not include the provision of additional services.",
+            "awardType": "signed-contract",
+            "valueUsd": 135000000,
+            "baseDurationDays": 250,
+            "includes": [
+              "upfront payments for rig upgrades",
+              "mobilization"
+            ],
+            "excludes": [
+              "provision of additional services"
+            ],
+            "derivedUsdPerDay": 540000.0
+          }
+        },
+        "reasonKo": "기존 수주에 TCV, 기본 기간 및 옵션 정보를 추가",
+        "quote": "TCV, based on an estimated duration of 250 days, is approx. $135 million",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-db49172f1a4fa88b4299",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-15",
+      "vessels": [
+        "VALARIS DS-15"
+      ],
+      "vesselId": "valaris-ds-15",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "valaris-ds-15-r95152f6e2788",
+        "row": {
+          "startDate": "2027-06-01",
+          "endDate": "2027-08-29",
+          "dayRate": 0,
+          "client": "CNR",
+          "region": "Cote d'Ivoire",
+          "status": "Option",
+          "interpretation": {
+            "sourceStartText": null,
+            "sourceEndText": null,
+            "placementBasis": "기본 계약 May 27 종료 다음 달부터 옵션 기간의 중간 추정치 90일로 배치",
+            "termText": null,
+            "optionText": "Priced options with a total estimated duration of 80 to 100 days",
+            "valueText": null,
+            "awardType": null,
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "미행사 옵션 총 기간 80~100일을 약 90일로 배치",
+        "quote": "total estimated duration of 80 to 100 days",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-a2fd90a0d9ce21e8c8ce",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-12",
+      "vessels": [
+        "VALARIS DS-12"
+      ],
+      "vesselId": "valaris-ds-12",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "valaris-ds-12-a3cb519857",
+        "row": {
+          "startDate": "2026-04-01",
+          "endDate": "2027-12-31",
+          "dayRate": 0,
+          "client": "BP",
+          "region": "Egypt",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Apr 26",
+            "sourceEndText": "Dec 27",
+            "placementBasis": "월 표기를 해당 월 시작일과 말일로 배치",
+            "termText": "Initial estimated duration of 350 days",
+            "optionText": "Two option wells remaining",
+            "valueText": "TCV of approx. $140 million, inclusive of MPD and mobilization.",
+            "awardType": "signed-contract",
+            "valueUsd": 140000000,
+            "baseDurationDays": 350,
+            "includes": [
+              "MPD",
+              "mobilization"
+            ],
+            "excludes": [],
+            "derivedUsdPerDay": 400000.0
+          }
+        },
+        "reasonKo": "기존 기본 계약의 고객 표기와 TCV 포함 항목을 보고서에 맞게 보완",
+        "quote": "TCV, based on initial estimated duration of 350 days, is approx. $140 million",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-7ff7a1d40296688a1cbc",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-12",
+      "vessels": [
+        "VALARIS DS-12"
+      ],
+      "vesselId": "valaris-ds-12",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "valaris-ds-12-r8046a5326657",
+        "row": {
+          "startDate": "2028-01-01",
+          "endDate": "2028-02-29",
+          "dayRate": 0,
+          "client": "BP",
+          "region": "Egypt",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Jan 28",
+            "sourceEndText": "Feb 28",
+            "placementBasis": "월 표기를 해당 월 시작일과 말일로 배치",
+            "termText": "Priced extension of 60 days",
+            "optionText": "Two option wells remaining",
+            "valueText": "Contract backlog of approx. $25 million based on priced extension of 60 days.",
+            "awardType": "extension",
+            "valueUsd": 25000000,
+            "baseDurationDays": 60,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": 416666.6666666667
+          }
+        },
+        "reasonKo": "기존 계약에 없는 60일 가격 확정 연장",
+        "quote": "Contract backlog of approx. $25 million based on priced extension of 60 days",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-455ee18abccf4f74d944",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-12",
+      "vessels": [
+        "VALARIS DS-12"
+      ],
+      "vesselId": "valaris-ds-12",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": false,
+      "pendingReview": true,
+      "reviewStatus": "conflict",
+      "readingDecision": {
+        "action": "hold",
+        "contractId": null,
+        "row": null,
+        "reasonKo": "잔여 옵션 유정 2개의 기간을 보고서에서 특정할 수 없음",
+        "quote": "Two option wells remaining",
+        "locator": "page:4",
+        "holdReason": "잔여 옵션 유정 2개의 기간을 보고서에서 특정할 수 없음"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-3eba087d5a213da1d7ed",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-10",
+      "vessels": [
+        "VALARIS DS-10"
+      ],
+      "vesselId": "valaris-ds-10",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "valaris-ds-10-69b08bc5cd",
+        "row": {
+          "startDate": "2026-06-01",
+          "endDate": "2028-07-31",
+          "dayRate": 0,
+          "client": "Shell",
+          "region": "Nigeria",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Jun 26",
+            "sourceEndText": "Jul 28",
+            "placementBasis": "월 표기를 해당 월 시작일과 말일로 배치",
+            "termText": "TCV based on duration of two years",
+            "optionText": "Two 1-year options",
+            "valueText": "TCV of $352 million. TCV does not include the provision of additional services.",
+            "awardType": "signed-contract",
+            "valueUsd": 352000000,
+            "baseDurationDays": 730,
+            "includes": [],
+            "excludes": [
+              "provision of additional services"
+            ],
+            "derivedUsdPerDay": 482191.7808219178
+          }
+        },
+        "reasonKo": "기존 계약에 TCV, 기본 기간 및 옵션 정보를 추가",
+        "quote": "TCV of $352 million based on duration of two years",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-45bc9bbacaba778b776c",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-10",
+      "vessels": [
+        "VALARIS DS-10"
+      ],
+      "vesselId": "valaris-ds-10",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "valaris-ds-10-r2ecb02cc0441",
+        "row": {
+          "startDate": "2028-08-01",
+          "endDate": "2030-07-31",
+          "dayRate": 0,
+          "client": "Shell",
+          "region": "Nigeria",
+          "status": "Option",
+          "interpretation": {
+            "sourceStartText": null,
+            "sourceEndText": null,
+            "placementBasis": "기본 계약 Jul 28 종료 다음 달부터 1년 옵션 2회를 연속 배치",
+            "termText": null,
+            "optionText": "Two 1-year options",
+            "valueText": null,
+            "awardType": null,
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "미행사 1년 옵션 두 건을 기본 계약 종료 후 연속 배치",
+        "quote": "Two 1-year options",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-cada228281f87a67d5ef",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-9",
+      "vessels": [
+        "VALARIS DS-9"
+      ],
+      "vesselId": "valaris-ds-9",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "valaris-ds-9-c7494ad887",
+        "row": {
+          "startDate": "2026-07-01",
+          "endDate": "2028-07-31",
+          "dayRate": 0,
+          "client": "ExxonMobil",
+          "region": "Angola",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Jul 26",
+            "sourceEndText": "Jul 28",
+            "placementBasis": "월 표기를 해당 월 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": "Two 6-month options",
+            "valueText": null,
+            "awardType": "signed-contract",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "기존 계약에 보고서의 옵션 정보를 추가",
+        "quote": "Two 6-month options",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-1abf9eca76df9a7da59f",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-9",
+      "vessels": [
+        "VALARIS DS-9"
+      ],
+      "vesselId": "valaris-ds-9",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "valaris-ds-9-r599931c08a59",
+        "row": {
+          "startDate": "2028-08-01",
+          "endDate": "2029-07-31",
+          "dayRate": 0,
+          "client": "ExxonMobil",
+          "region": "Angola",
+          "status": "Option",
+          "interpretation": {
+            "sourceStartText": null,
+            "sourceEndText": null,
+            "placementBasis": "기본 계약 Jul 28 종료 다음 달부터 6개월 옵션 두 건을 연속 배치",
+            "termText": null,
+            "optionText": "Two 6-month options",
+            "valueText": null,
+            "awardType": null,
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "미행사 6개월 옵션 두 건을 기본 계약 종료 후 연속 배치",
+        "quote": "Two 6-month options",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-000020735db0be61ad5b",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-8",
+      "vessels": [
+        "VALARIS DS-8"
+      ],
+      "vesselId": "valaris-ds-8",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "valaris-ds-8-da0348a4fb",
+        "row": {
+          "startDate": "2023-12-01",
+          "endDate": "2026-12-31",
+          "dayRate": 428000,
+          "client": "Petrobras",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Dec 23",
+            "sourceEndText": "Dec 26",
+            "placementBasis": "월 표기를 해당 월 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": null,
+            "valueText": "Plus mobilization fee of approx. $30 million. Contract includes additional services.",
+            "awardType": "signed-contract",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [
+              "additional services",
+              "mobilization fee of approx. $30 million"
+            ],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "기존 수주에 동원비와 추가 서비스 정보를 반영",
+        "quote": "Plus mobilization fee of approx. $30 million",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-fe9208286a09ae7fd874",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-8",
+      "vessels": [
+        "VALARIS DS-8"
+      ],
+      "vesselId": "valaris-ds-8",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "valaris-ds-8-12e785487f",
+        "row": {
+          "startDate": "2027-03-01",
+          "endDate": "2029-05-31",
+          "dayRate": 0,
+          "client": "Shell",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Mar 27",
+            "sourceEndText": "May 29",
+            "placementBasis": "표에 기재된 월 표기대로 2027년 3월부터 2029년 5월까지 배치",
+            "termText": "Estimated duration of 800 days",
+            "optionText": "Options with a total estimated duration of approx. one year",
+            "valueText": "TCV of approx. $300 million, excluding additional services.",
+            "awardType": "signed-contract",
+            "valueUsd": 300000000,
+            "baseDurationDays": 800,
+            "includes": [],
+            "excludes": [
+              "additional services"
+            ],
+            "derivedUsdPerDay": 375000.0
+          }
+        },
+        "reasonKo": "기존 시작일을 표의 Mar 27로 정정하고 TCV 및 기간 정보를 보완",
+        "quote": "TCV of approx. $300 million, excluding additional services, based on estimated duration of 800 days",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-bcb698e5a3d2f5635fca",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-8",
+      "vessels": [
+        "VALARIS DS-8"
+      ],
+      "vesselId": "valaris-ds-8",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "valaris-ds-8-r0e43e58dfb13",
+        "row": {
+          "startDate": "2029-06-01",
+          "endDate": "2030-05-31",
+          "dayRate": 0,
+          "client": "Shell",
+          "region": "Brazil",
+          "status": "Option",
+          "interpretation": {
+            "sourceStartText": null,
+            "sourceEndText": null,
+            "placementBasis": "기본 계약 May 29 종료 다음 달부터 약 1년 옵션 기간으로 배치",
+            "termText": null,
+            "optionText": "Options with a total estimated duration of approx. one year",
+            "valueText": null,
+            "awardType": null,
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "미행사 옵션 총 예상 기간 약 1년을 기본 계약 종료 후 배치",
+        "quote": "Options with a total estimated duration of approx. one year",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-e626f6f09f5055556770",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-7",
+      "vessels": [
+        "VALARIS DS-7"
+      ],
+      "vesselId": "valaris-ds-7",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "valaris-ds-7-1ebbaf6700",
+        "row": {
+          "startDate": "2026-10-01",
+          "endDate": "2027-07-31",
+          "dayRate": 0,
+          "client": "Azule Energy",
+          "region": "Angola",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Oct 26",
+            "sourceEndText": "Jul 27",
+            "placementBasis": "월 표기를 해당 월 시작일과 말일로 배치",
+            "termText": "Initial estimated duration of 325 days",
+            "optionText": null,
+            "valueText": "Contract backlog of approx. $125 million based on initial estimated duration of 325 days.",
+            "awardType": "extension",
+            "valueUsd": 125000000,
+            "baseDurationDays": 325,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": 384615.3846153846
+          }
+        },
+        "reasonKo": "기존 계약 종료일을 Jul 27로 정정하고 백로그와 기간을 반영",
+        "quote": "Contract backlog of approx. $125 million based on initial estimated duration of 325 days",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-3910830b5cb820b9310a",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-4",
+      "vessels": [
+        "VALARIS DS-4"
+      ],
+      "vesselId": "valaris-ds-4",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "valaris-ds-4-eaf3fb18a1",
+        "row": {
+          "startDate": "2024-12-01",
+          "endDate": "2027-11-30",
+          "dayRate": 0,
+          "client": "Petrobras",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Dec 24",
+            "sourceEndText": "Nov 27",
+            "placementBasis": "월 표기를 해당 월 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": null,
+            "valueText": "Previous day rate of $450,000 has been adjusted, reducing contract backlog from Apr 2026 to Nov 2027 by approx. $21 million. Plus mobilization fee of approx. $41 million.",
+            "awardType": "signed-contract",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [
+              "MPD",
+              "additional services",
+              "mobilization fee of approx. $41 million"
+            ],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "기존 계약의 조정된 백로그와 동원비, MPD 및 추가 서비스 정보를 반영",
+        "quote": "Previous day rate of $450,000 has been adjusted",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-73d127bfb60e66a4552a",
+      "company": "Valaris",
+      "vessel": "VALARIS DS-4",
+      "vessels": [
+        "VALARIS DS-4"
+      ],
+      "vesselId": "valaris-ds-4",
+      "classification": "official-report-reading",
+      "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
+      "publishedAt": null,
+      "title": "Valaris Fleet Status Report",
+      "sourceId": "source-f09ab3582b5cbfa4d205a60e3b78bbccea7bf7f0e2efa2ce0aff913d73d9771b",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "valaris-ds-4-3e029d35a7",
+        "row": {
+          "startDate": "2027-11-01",
+          "endDate": "2030-10-31",
+          "dayRate": 0,
+          "client": "Petrobras",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Nov 27",
+            "sourceEndText": "Oct 30",
+            "placementBasis": "월 표기를 해당 월 시작일과 말일로 배치",
+            "termText": "1,064-day extension",
+            "optionText": null,
+            "valueText": "Contract backlog of approx. $447 million for 1,064-day extension.",
+            "awardType": "extension",
+            "valueUsd": 447000000,
+            "baseDurationDays": 1064,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": 420112.7819548872
+          }
+        },
+        "reasonKo": "기존 연장 계약에 백로그와 1,064일 기간을 추가",
+        "quote": "Contract backlog of approx. $447 million for a 1,064-day extension",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "news-89fea5ca2284c9fde4cb",
+      "company": "Valaris",
+      "title": "Valaris Issues Fleet Status Report",
+      "url": "https://www.valaris.com/news/news-details/2026/Valaris-Issues-Fleet-Status-Report-24497974b/default.aspx",
+      "publishedAt": "2026-11-02",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "sourceId": "source-fcde0f721a5b8190add2dc8ca6ef29c30f9113081c4f1376e9f4620f000a4d8a",
       "newsCategory": "Fleet Status"
     }
   ]

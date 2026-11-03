@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-03T05:19:48Z",
+  "generatedAt": "2026-11-03T05:28:59Z",
   "updatedAsOf": "2026-11-02",
-  "dataHash": "84ace30496a36314a4ff",
-  "stateFingerprint": "ab1a8c9273f1fb13cc76",
-  "fleetFile": "fleet.84ace30496a36314a4ff.json",
-  "eventsFile": "events.a7faed7cfb9cff9f86bc.json",
-  "eventsHash": "a7faed7cfb9cff9f86bc",
+  "dataHash": "08c61ddfc90e5e7bd3f2",
+  "stateFingerprint": "832d260e04c9e3ffb0ee",
+  "fleetFile": "fleet.08c61ddfc90e5e7bd3f2.json",
+  "eventsFile": "events.d1a223c5851932ecb91e.json",
+  "eventsHash": "d1a223c5851932ecb91e",
   "shipCount": 62,
-  "contractCount": 134,
+  "contractCount": 142,
   "sourceCount": 4,
   "sources": [
     {
@@ -18,10 +18,10 @@
       "discovery": "official-index",
       "sha256": "4dd3a586ae73f5752ae3893a970800ec6c8300dfd110e9c067c5f525bfebaa22",
       "reportDate": "2026-10-26",
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
-      "httpStatus": null,
-      "error": "ConnectionError: HTTPSConnectionPool(host='noblecorp.com', port=443): Read timed out.",
-      "health": "degraded-preserved",
+      "lastSuccessAt": "2026-11-03T05:25:55Z",
+      "httpStatus": 200,
+      "error": null,
+      "health": "healthy",
       "readingStatus": "completed"
     },
     {
@@ -31,7 +31,7 @@
       "discovery": "official-wordpress-api",
       "sha256": "b774357daafdb62dcc8c371fe5f5d118fb8d7d51c91badd05cd6cae3c9a39cb1",
       "reportDate": "2026-08-10",
-      "lastSuccessAt": "2026-11-02T22:55:33Z",
+      "lastSuccessAt": "2026-11-03T05:25:55Z",
       "httpStatus": 200,
       "error": null,
       "health": "healthy",
@@ -44,7 +44,7 @@
       "discovery": "official-index",
       "sha256": "86a470d9af277a767d7c09226b20e6a8369b57b30e20792d5d056a41ec5aab56",
       "reportDate": "2026-11-02",
-      "lastSuccessAt": "2026-11-02T22:55:33Z",
+      "lastSuccessAt": "2026-11-03T05:25:55Z",
       "httpStatus": 200,
       "error": null,
       "health": "healthy",
@@ -56,25 +56,25 @@
       "documentUrl": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
       "discovery": "official-index",
       "sha256": "2fc2dad36232de827c22c054f9d5ca3fa5ac41a43811165e49bd11b13bb4dae1",
-      "reportDate": "2026-08-05",
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
-      "httpStatus": null,
-      "error": "ConnectionError: HTTPSConnectionPool(host='s23.q4cdn.com', port=443): Max retries exceeded with url: /956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf (Caused by ReadTimeoutError(\"HTTPSConnectionPool(host='s23.q4cdn.com', port=443): Read timed out. (read timeout=45)\"))",
-      "health": "degraded-preserved",
-      "readingStatus": "failed"
+      "reportDate": "2026-11-02",
+      "lastSuccessAt": "2026-11-03T05:25:55Z",
+      "httpStatus": 200,
+      "error": null,
+      "health": "held",
+      "readingStatus": "completed"
     }
   ],
   "sourceHealth": [
     {
       "company": "Noble",
-      "fleetReport": "degraded-preserved",
+      "fleetReport": "healthy",
       "newsMonitor": "healthy",
       "reportDate": "2026-10-26",
       "documentUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
       "sha256": "4dd3a586ae73f5752ae3893a970800ec6c8300dfd110e9c067c5f525bfebaa22",
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
-      "httpStatus": null,
-      "error": "ConnectionError: HTTPSConnectionPool(host='noblecorp.com', port=443): Read timed out."
+      "lastSuccessAt": "2026-11-03T05:25:55Z",
+      "httpStatus": 200,
+      "error": null
     },
     {
       "company": "Seadrill",
@@ -83,7 +83,7 @@
       "reportDate": "2026-08-10",
       "documentUrl": "https://www.seadrill.com/wp-content/uploads/2026/08/Seadrill-Fleet-Status-Report-August-2026-vF.pdf",
       "sha256": "b774357daafdb62dcc8c371fe5f5d118fb8d7d51c91badd05cd6cae3c9a39cb1",
-      "lastSuccessAt": "2026-11-02T22:55:33Z",
+      "lastSuccessAt": "2026-11-03T05:25:55Z",
       "httpStatus": 200,
       "error": null
     },
@@ -94,45 +94,37 @@
       "reportDate": "2026-11-02",
       "documentUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
       "sha256": "86a470d9af277a767d7c09226b20e6a8369b57b30e20792d5d056a41ec5aab56",
-      "lastSuccessAt": "2026-11-02T22:55:33Z",
+      "lastSuccessAt": "2026-11-03T05:25:55Z",
       "httpStatus": 200,
       "error": null
     },
     {
       "company": "Valaris",
-      "fleetReport": "degraded-preserved",
+      "fleetReport": "held",
       "newsMonitor": "healthy",
-      "reportDate": "2026-08-05",
+      "reportDate": "2026-11-02",
       "documentUrl": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
       "sha256": "2fc2dad36232de827c22c054f9d5ca3fa5ac41a43811165e49bd11b13bb4dae1",
-      "lastSuccessAt": "2026-11-02T21:44:36Z",
-      "httpStatus": null,
-      "error": "ConnectionError: HTTPSConnectionPool(host='s23.q4cdn.com', port=443): Max retries exceeded with url: /956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf (Caused by ReadTimeoutError(\"HTTPSConnectionPool(host='s23.q4cdn.com', port=443): Read timed out. (read timeout=45)\"))"
+      "lastSuccessAt": "2026-11-03T05:25:55Z",
+      "httpStatus": 200,
+      "error": null
     }
   ],
-  "warningsCount": 16,
-  "eventCount": 167,
-  "pendingEventCount": 2,
+  "warningsCount": 9,
+  "eventCount": 190,
+  "pendingEventCount": 3,
   "newsQueue": {
     "schemaVersion": 2,
-    "pendingCount": 1,
-    "fingerprint": "ffa31bdf09a72eabf013ccbb9efef64134428630e3fb8665458cd5b0f21ed0c9",
-    "jobs": [
-      {
-        "jobId": "job-8626e8ef196feaf9f06cb9b5a3dfbf4e",
-        "kind": "fleet-report",
-        "company": "Valaris",
-        "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
-        "documentSha256": "2fc2dad36232de827c22c054f9d5ca3fa5ac41a43811165e49bd11b13bb4dae1"
-      }
-    ]
+    "pendingCount": 0,
+    "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "jobs": []
   },
   "readingStatus": {
     "reports": [
       {
         "company": "Noble",
         "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
-        "collectionStatus": "failed",
+        "collectionStatus": "collected",
         "readingStatus": "completed",
         "lastReadAt": "2026-10-28T14:35:55Z"
       },
@@ -153,76 +145,16 @@
       {
         "company": "Valaris",
         "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
-        "collectionStatus": "failed",
-        "readingStatus": "failed",
-        "lastReadAt": null
+        "collectionStatus": "collected",
+        "readingStatus": "completed",
+        "lastReadAt": "2026-11-03T05:28:51Z"
       }
     ],
-    "lastCollectedAt": "2026-11-03T05:17:19Z",
-    "lastReadAt": "2026-11-03T05:19:48Z",
-    "lastAppliedAt": "2026-11-03T05:19:42Z",
+    "lastCollectedAt": "2026-11-03T05:27:46Z",
+    "lastReadAt": "2026-11-03T05:28:59Z",
+    "lastAppliedAt": "2026-11-03T05:28:51Z",
     "usageLimitedUntil": null,
     "collectionErrors": [
-      {
-        "company": "Transocean",
-        "kind": "official-news",
-        "url": "https://www.deepwater.com/news/detail?ID=30311",
-        "phase": null,
-        "error": "ConnectionError: HTTPSConnectionPool(host='www.deepwater.com', port=443): Max retries exceeded with url: /news/detail?ID=30311 (Caused by ProtocolError('Connection aborted.', RemoteDisconnected('Remote end closed connection without response')))",
-        "httpStatus": null,
-        "lastSuccessAt": "2026-11-02T21:44:36Z",
-        "lastAttemptAt": "2026-11-02T22:55:33Z"
-      },
-      {
-        "company": "Valaris",
-        "kind": "fleet-report",
-        "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
-        "phase": null,
-        "error": "ConnectionError: HTTPSConnectionPool(host='s23.q4cdn.com', port=443): Max retries exceeded with url: /956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf (Caused by ReadTimeoutError(\"HTTPSConnectionPool(host='s23.q4cdn.com', port=443): Read timed out. (read timeout=45)\"))",
-        "httpStatus": null,
-        "lastSuccessAt": "2026-11-02T21:44:36Z",
-        "lastAttemptAt": "2026-11-02T22:55:33Z"
-      },
-      {
-        "company": "Valaris",
-        "kind": "official-news",
-        "url": "https://www.valaris.com/news/news-details/2026/Valaris-Issues-Fleet-Status-Report-24497974b/default.aspx",
-        "phase": null,
-        "error": "ConnectionError: HTTPSConnectionPool(host='www.valaris.com', port=443): Max retries exceeded with url: /news/news-details/2026/Valaris-Issues-Fleet-Status-Report-24497974b/default.aspx (Caused by NameResolutionError(\"HTTPSConnection(host='www.valaris.com', port=443): Failed to resolve 'www.valaris.com' ([Errno 8] nodename nor servname provided, or not known)\"))",
-        "httpStatus": null,
-        "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-02T22:55:33Z"
-      },
-      {
-        "company": "Valaris",
-        "kind": "official-news",
-        "url": "https://www.valaris.com/news/news-details/2026/Valaris-Reports-Third-Quarter-2026-Results/default.aspx",
-        "phase": null,
-        "error": "ConnectionError: HTTPSConnectionPool(host='www.valaris.com', port=443): Max retries exceeded with url: /news/news-details/2026/Valaris-Reports-Third-Quarter-2026-Results/default.aspx (Caused by NameResolutionError(\"HTTPSConnection(host='www.valaris.com', port=443): Failed to resolve 'www.valaris.com' ([Errno 8] nodename nor servname provided, or not known)\"))",
-        "httpStatus": null,
-        "lastSuccessAt": "2026-11-02T21:44:36Z",
-        "lastAttemptAt": "2026-11-02T22:55:33Z"
-      },
-      {
-        "company": "Valaris",
-        "kind": "official-news",
-        "url": "https://www.valaris.com/news/news-details/2026/Valaris-Schedules-Third-Quarter-2026-Earnings-Release/default.aspx",
-        "phase": null,
-        "error": "ConnectionError: HTTPSConnectionPool(host='www.valaris.com', port=443): Max retries exceeded with url: /news/news-details/2026/Valaris-Schedules-Third-Quarter-2026-Earnings-Release/default.aspx (Caused by NameResolutionError(\"HTTPSConnection(host='www.valaris.com', port=443): Failed to resolve 'www.valaris.com' ([Errno 8] nodename nor servname provided, or not known)\"))",
-        "httpStatus": null,
-        "lastSuccessAt": "2026-11-02T21:44:36Z",
-        "lastAttemptAt": "2026-11-02T22:55:33Z"
-      },
-      {
-        "company": "Noble",
-        "kind": "fleet-report",
-        "url": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
-        "phase": null,
-        "error": "ConnectionError: HTTPSConnectionPool(host='noblecorp.com', port=443): Read timed out.",
-        "httpStatus": null,
-        "lastSuccessAt": "2026-11-02T21:44:36Z",
-        "lastAttemptAt": "2026-11-02T22:55:33Z"
-      },
       {
         "company": "Noble",
         "kind": "official-news",
@@ -231,7 +163,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-third-quarter-2026-results",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-02T22:55:33Z"
+        "lastAttemptAt": "2026-11-03T05:25:55Z"
       },
       {
         "company": "Noble",
@@ -241,7 +173,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-third-quarter-2026-results",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-02T22:55:33Z"
+        "lastAttemptAt": "2026-11-03T05:25:55Z"
       },
       {
         "company": "Noble",
@@ -251,7 +183,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-second-quarter-2026-results",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-02T22:55:33Z"
+        "lastAttemptAt": "2026-11-03T05:25:55Z"
       },
       {
         "company": "Noble",
@@ -261,7 +193,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-second-quarter-2026-results",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-02T22:55:33Z"
+        "lastAttemptAt": "2026-11-03T05:25:55Z"
       },
       {
         "company": "Noble",
@@ -271,7 +203,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-pricing-upsized-offering-800",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-02T22:55:33Z"
+        "lastAttemptAt": "2026-11-03T05:25:55Z"
       },
       {
         "company": "Noble",
@@ -281,7 +213,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-proposed-offering-500-million",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-02T22:55:33Z"
+        "lastAttemptAt": "2026-11-03T05:25:55Z"
       },
       {
         "company": "Noble",
@@ -291,7 +223,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-new-director-appointment",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-02T22:55:33Z"
+        "lastAttemptAt": "2026-11-03T05:25:55Z"
       },
       {
         "company": "Noble",
@@ -301,7 +233,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-first-quarter-2026-results",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-02T22:55:33Z"
+        "lastAttemptAt": "2026-11-03T05:25:55Z"
       },
       {
         "company": "Noble",
@@ -311,19 +243,9 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-first-quarter-2026-results",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-02T22:55:33Z"
+        "lastAttemptAt": "2026-11-03T05:25:55Z"
       }
     ],
-    "readingErrors": [
-      {
-        "jobId": "job-8626e8ef196feaf9f06cb9b5a3dfbf4e",
-        "company": "Valaris",
-        "kind": "fleet-report",
-        "url": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
-        "lastError": "LookupError: source could not be fetched this run: ConnectionError: HTTPSConnectionPool(host='s23.q4cdn.com', port=443): Max retries exceeded with url: /956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf (Caused by ReadTimeoutError(\"HTTPSConnectionPool(host='s23.q4cdn.com', port=443): Read timed out. (read timeout=45)\"))",
-        "failureCount": 1,
-        "nextAttemptAfter": 1793683347
-      }
-    ]
+    "readingErrors": []
   }
 }
