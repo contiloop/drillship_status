@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-04T06:26:14Z",
+  "generatedAt": "2026-11-04T06:36:44Z",
   "events": [
     {
       "company": "Noble",
@@ -6361,6 +6361,778 @@
       "pendingReview": false,
       "reviewStatus": "acknowledged",
       "sourceId": "source-fcde0f721a5b8190add2dc8ca6ef29c30f9113081c4f1376e9f4620f000a4d8a",
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "news-9c47172f046811cbf955",
+      "company": "Seadrill",
+      "title": "Seadrill Announces Third Quarter 2026 Results",
+      "url": "https://ir.seadrill.com/news/news-details/2026/Seadrill-Announces-Third-Quarter-2026-Results/default.aspx",
+      "publishedAt": "2026-11-03",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "sourceId": "source-13d038c95121366e3a2b7880c59ecd00e56939e5da33a729824569b67589f679",
+      "newsCategory": "실적"
+    },
+    {
+      "id": "reading-661f9c8b626ca9ad464d",
+      "company": "Seadrill",
+      "vessel": "West Capella",
+      "vessels": [
+        "West Capella"
+      ],
+      "vesselId": "west-capella",
+      "classification": "official-report-reading",
+      "url": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
+      "publishedAt": null,
+      "title": "Seadrill Fleet Status Report",
+      "sourceId": "source-77a71a79f880dafb5f3b0173ac9da4f99c297a53616cbec1d163e308a33d4cb4",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "west-capella-80422e397b",
+        "row": {
+          "startDate": "2026-03-01",
+          "endDate": "2028-02-29",
+          "dayRate": 0,
+          "client": "Undisclosed",
+          "region": "Malaysia",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Mar-26",
+            "sourceEndText": "Feb-28",
+            "placementBasis": "월 표기를 해당 월의 시작일과 말일로 배치",
+            "termText": "~440-day duration",
+            "optionText": "Options exercised for an additional ~240 days, adding approximately $94 million in total contract value",
+            "valueText": "Total contract value at signing was ~$157m, including mobilization and excluding additional services",
+            "awardType": "option-exercised",
+            "valueUsd": 157000000,
+            "baseDurationDays": 440,
+            "includes": [
+              "mobilization"
+            ],
+            "excludes": [
+              "additional services"
+            ],
+            "derivedUsdPerDay": 356818.1818181818
+          }
+        },
+        "reasonKo": "기존 계약에 기본 가치와 행사된 옵션 기간을 반영",
+        "quote": "Options exercised for an additional ~240 days, adding approximately $94 million, page:3",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-04761388e33266ed2f6d",
+      "company": "Seadrill",
+      "vessel": "West Carina",
+      "vessels": [
+        "West Carina"
+      ],
+      "vesselId": "west-carina",
+      "classification": "official-report-reading",
+      "url": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
+      "publishedAt": null,
+      "title": "Seadrill Fleet Status Report",
+      "sourceId": "source-77a71a79f880dafb5f3b0173ac9da4f99c297a53616cbec1d163e308a33d4cb4",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "west-carina-rba3e7e3096f7",
+        "row": {
+          "startDate": "2027-04-01",
+          "endDate": "2029-08-31",
+          "dayRate": 0,
+          "client": "Undisclosed",
+          "region": "Indonesia",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Apr-27",
+            "sourceEndText": "Aug-29",
+            "placementBasis": "보고서의 월 표기로 2027년 4월부터 2029년 8월까지 배치",
+            "termText": "~880-day duration",
+            "optionText": "Includes priced options for up to an additional ~880 days",
+            "valueText": "Total contract value at signing was ~$420m, including mobilization and excluding additional services",
+            "awardType": "signed-contract",
+            "valueUsd": 420000000,
+            "baseDurationDays": 880,
+            "includes": [
+              "mobilization"
+            ],
+            "excludes": [
+              "additional services"
+            ],
+            "derivedUsdPerDay": 477272.7272727273
+          }
+        },
+        "reasonKo": "보고서가 시작월을 Apr-27로 명시해 기존 H1 배치를 갱신",
+        "quote": "~880-day duration. Includes priced options for up to an additional ~880 days, page:3",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-aeffbbdc2d7740aefe18",
+      "company": "Seadrill",
+      "vessel": "West Carina",
+      "vessels": [
+        "West Carina"
+      ],
+      "vesselId": "west-carina",
+      "classification": "official-report-reading",
+      "url": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
+      "publishedAt": null,
+      "title": "Seadrill Fleet Status Report",
+      "sourceId": "source-77a71a79f880dafb5f3b0173ac9da4f99c297a53616cbec1d163e308a33d4cb4",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "west-carina-rde35f00705c4",
+        "row": {
+          "startDate": "2029-09-01",
+          "endDate": "2032-01-28",
+          "dayRate": 0,
+          "client": "Undisclosed",
+          "region": "Indonesia",
+          "status": "Option",
+          "interpretation": {
+            "sourceStartText": null,
+            "sourceEndText": null,
+            "placementBasis": "기본 계약 2029년 8월 종료 다음 날부터 추가 880일을 연속 배치",
+            "termText": "up to an additional ~880 days",
+            "optionText": "priced options for up to an additional ~880 days",
+            "valueText": null,
+            "awardType": null,
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "최대 추가 옵션 기간을 기본 계약 뒤에 배치",
+        "quote": "priced options for up to an additional ~880 days, page:3",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-7936faf2b6df4f7c7a47",
+      "company": "Seadrill",
+      "vessel": "West Auriga",
+      "vessels": [
+        "West Auriga"
+      ],
+      "vesselId": "west-auriga",
+      "classification": "official-report-reading",
+      "url": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
+      "publishedAt": null,
+      "title": "Seadrill Fleet Status Report",
+      "sourceId": "source-77a71a79f880dafb5f3b0173ac9da4f99c297a53616cbec1d163e308a33d4cb4",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "west-auriga-66763d29c1",
+        "row": {
+          "startDate": "2024-12-01",
+          "endDate": "2027-11-30",
+          "dayRate": 0,
+          "client": "Petrobras",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Dec-24",
+            "sourceEndText": "Nov-27",
+            "placementBasis": "월 표기를 해당 월의 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": null,
+            "valueText": "Total contract value at signing was ~$577m, including mobilization and additional services",
+            "awardType": "signed-contract",
+            "valueUsd": 577000000,
+            "baseDurationDays": null,
+            "includes": [
+              "mobilization",
+              "additional services"
+            ],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "기존 계약에 보고된 계약 가치를 추가",
+        "quote": "Total contract value at signing was ~$577m, including mobilization and additional services, page:3",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-905deddd5e6a42c8d970",
+      "company": "Seadrill",
+      "vessel": "West Jupiter",
+      "vessels": [
+        "West Jupiter"
+      ],
+      "vesselId": "west-jupiter",
+      "classification": "official-report-reading",
+      "url": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
+      "publishedAt": null,
+      "title": "Seadrill Fleet Status Report",
+      "sourceId": "source-77a71a79f880dafb5f3b0173ac9da4f99c297a53616cbec1d163e308a33d4cb4",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "west-jupiter-326198347b",
+        "row": {
+          "startDate": "2026-03-01",
+          "endDate": "2029-03-31",
+          "dayRate": 0,
+          "client": "Petrobras",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Mar-26",
+            "sourceEndText": "Mar-29",
+            "placementBasis": "월 표기를 해당 월의 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": null,
+            "valueText": "Total contract value at signing was ~$525m, including mobilization and additional services",
+            "awardType": "signed-contract",
+            "valueUsd": 525000000,
+            "baseDurationDays": null,
+            "includes": [
+              "mobilization",
+              "additional services"
+            ],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "기존 계약에 보고된 계약 가치를 추가",
+        "quote": "Total contract value at signing was ~$525m, including mobilization and additional services, page:3",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-476a18ec547beb5c4c4c",
+      "company": "Seadrill",
+      "vessel": "West Neptune",
+      "vessels": [
+        "West Neptune"
+      ],
+      "vesselId": "west-neptune",
+      "classification": "official-report-reading",
+      "url": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
+      "publishedAt": null,
+      "title": "Seadrill Fleet Status Report",
+      "sourceId": "source-77a71a79f880dafb5f3b0173ac9da4f99c297a53616cbec1d163e308a33d4cb4",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "west-neptune-91d87b94bc",
+        "row": null,
+        "reasonKo": "기존 계약의 기간과 보고서 기재가 일치",
+        "quote": "Oct-26 — Oct-27, page:3",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-8eb67b524c6645f7dc08",
+      "company": "Seadrill",
+      "vessel": "West Polaris",
+      "vessels": [
+        "West Polaris"
+      ],
+      "vesselId": "west-polaris",
+      "classification": "official-report-reading",
+      "url": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
+      "publishedAt": null,
+      "title": "Seadrill Fleet Status Report",
+      "sourceId": "source-77a71a79f880dafb5f3b0173ac9da4f99c297a53616cbec1d163e308a33d4cb4",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "west-polaris-f2ac061c43",
+        "row": {
+          "startDate": "2026-04-01",
+          "endDate": "2027-03-31",
+          "dayRate": 414000,
+          "client": "Petrobras",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "April 1, 2026 through March 31, 2027",
+            "sourceEndText": "March 31, 2027",
+            "placementBasis": "보고서에 기재된 적용 기간을 그대로 반영",
+            "termText": null,
+            "optionText": null,
+            "valueText": "Dayrate subject to foreign exchange fluctuations",
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "보고서에서 일일 요율을 $414,000로 갱신",
+        "quote": "$414,000 from April 1, 2026 through March 31, 2027, page:3",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-13a1b4b837102441449b",
+      "company": "Seadrill",
+      "vessel": "West Polaris",
+      "vessels": [
+        "West Polaris"
+      ],
+      "vesselId": "west-polaris",
+      "classification": "official-report-reading",
+      "url": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
+      "publishedAt": null,
+      "title": "Seadrill Fleet Status Report",
+      "sourceId": "source-77a71a79f880dafb5f3b0173ac9da4f99c297a53616cbec1d163e308a33d4cb4",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "west-polaris-6daf925ac7",
+        "row": {
+          "startDate": "2027-04-01",
+          "endDate": "2028-01-15",
+          "dayRate": 460000,
+          "client": "Petrobras",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "April 1, 2027 through January 15, 2028",
+            "sourceEndText": "January 15, 2028",
+            "placementBasis": "보고서에 기재된 적용 기간을 그대로 반영",
+            "termText": null,
+            "optionText": null,
+            "valueText": "Dayrate subject to foreign exchange fluctuations",
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "보고서에서 일일 요율을 $460,000로 갱신",
+        "quote": "$460,000 from April 1, 2027 through January 15, 2028, page:3",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-a745b6086399b310301b",
+      "company": "Seadrill",
+      "vessel": "West Polaris",
+      "vessels": [
+        "West Polaris"
+      ],
+      "vesselId": "west-polaris",
+      "classification": "official-report-reading",
+      "url": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
+      "publishedAt": null,
+      "title": "Seadrill Fleet Status Report",
+      "sourceId": "source-77a71a79f880dafb5f3b0173ac9da4f99c297a53616cbec1d163e308a33d4cb4",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "west-polaris-6e32c7fdd7",
+        "row": {
+          "startDate": "2028-01-16",
+          "endDate": "2031-01-15",
+          "dayRate": 442000,
+          "client": "Petrobras",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "January 16, 2028 through January 15, 2031",
+            "sourceEndText": "January 15, 2031",
+            "placementBasis": "보고서에 기재된 적용 기간을 그대로 반영",
+            "termText": null,
+            "optionText": null,
+            "valueText": "Dayrate subject to foreign exchange fluctuations",
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "보고서에서 일일 요율을 $442,000로 갱신",
+        "quote": "$442,000 from January 16, 2028 through January 15, 2031, page:3",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-8fe9e4a296b42f2dea91",
+      "company": "Seadrill",
+      "vessel": "West Saturn",
+      "vessels": [
+        "West Saturn"
+      ],
+      "vesselId": "west-saturn",
+      "classification": "official-report-reading",
+      "url": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
+      "publishedAt": null,
+      "title": "Seadrill Fleet Status Report",
+      "sourceId": "source-77a71a79f880dafb5f3b0173ac9da4f99c297a53616cbec1d163e308a33d4cb4",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "west-saturn-a73231a41b",
+        "row": {
+          "startDate": "2022-10-01",
+          "endDate": "2027-10-31",
+          "dayRate": 0,
+          "client": "Equinor",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Oct-22",
+            "sourceEndText": "Oct-27",
+            "placementBasis": "월 표기를 해당 월의 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": "One-year priced option exercised commencing October 2026; priced options for up to an additional three years",
+            "valueText": "Total contract value at signing was ~$114m",
+            "awardType": "option-exercised",
+            "valueUsd": 114000000,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "기존 계약에 행사된 1년 옵션과 남은 옵션을 반영",
+        "quote": "One-year priced option exercised commencing October 2026, page:3",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-e4b8848573c8040add67",
+      "company": "Seadrill",
+      "vessel": "West Saturn",
+      "vessels": [
+        "West Saturn"
+      ],
+      "vesselId": "west-saturn",
+      "classification": "official-report-reading",
+      "url": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
+      "publishedAt": null,
+      "title": "Seadrill Fleet Status Report",
+      "sourceId": "source-77a71a79f880dafb5f3b0173ac9da4f99c297a53616cbec1d163e308a33d4cb4",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "west-saturn-a52ad4b9c4",
+        "row": null,
+        "reasonKo": "기존 3년 옵션 구간이 보고서 내용과 부합",
+        "quote": "priced options for up to an additional three years, page:3",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-0b8a6282d4accc1be09e",
+      "company": "Seadrill",
+      "vessel": "West Tellus",
+      "vessels": [
+        "West Tellus"
+      ],
+      "vesselId": "west-tellus",
+      "classification": "official-report-reading",
+      "url": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
+      "publishedAt": null,
+      "title": "Seadrill Fleet Status Report",
+      "sourceId": "source-77a71a79f880dafb5f3b0173ac9da4f99c297a53616cbec1d163e308a33d4cb4",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "west-tellus-bc51c53d38",
+        "row": {
+          "startDate": "2026-06-01",
+          "endDate": "2029-06-30",
+          "dayRate": 0,
+          "client": "Petrobras",
+          "region": "Brazil",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Jun-26",
+            "sourceEndText": "Jun-29",
+            "placementBasis": "월 표기를 해당 월의 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": null,
+            "valueText": "Total contract value at signing was ~$539m, including mobilization and additional services",
+            "awardType": "signed-contract",
+            "valueUsd": 539000000,
+            "baseDurationDays": null,
+            "includes": [
+              "mobilization",
+              "additional services"
+            ],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "기존 계약에 보고된 계약 가치를 추가",
+        "quote": "Total contract value at signing was ~$539m, including mobilization and additional services, page:3",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-a030749b9ba3b8f2c8c0",
+      "company": "Seadrill",
+      "vessel": "West Vela",
+      "vessels": [
+        "West Vela"
+      ],
+      "vesselId": "west-vela",
+      "classification": "official-report-reading",
+      "url": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
+      "publishedAt": null,
+      "title": "Seadrill Fleet Status Report",
+      "sourceId": "source-77a71a79f880dafb5f3b0173ac9da4f99c297a53616cbec1d163e308a33d4cb4",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "west-vela-17387c5be0",
+        "row": null,
+        "reasonKo": "기존 LLOG 기간이 보고서와 일치",
+        "quote": "LLOG Sep-26 Jun-27, page:3",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-eb2f3932c9dba567107b",
+      "company": "Seadrill",
+      "vessel": "West Vela",
+      "vessels": [
+        "West Vela"
+      ],
+      "vesselId": "west-vela",
+      "classification": "official-report-reading",
+      "url": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
+      "publishedAt": null,
+      "title": "Seadrill Fleet Status Report",
+      "sourceId": "source-77a71a79f880dafb5f3b0173ac9da4f99c297a53616cbec1d163e308a33d4cb4",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "west-vela-2bc3dea2ad",
+        "row": null,
+        "reasonKo": "기존 Talos 기간이 보고서와 일치",
+        "quote": "Talos Jun-27 Jun-28, page:3",
+        "locator": "page:3"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-28417a3c0843fc07856f",
+      "company": "Seadrill",
+      "vessel": "West Gemini",
+      "vessels": [
+        "West Gemini"
+      ],
+      "vesselId": "west-gemini",
+      "classification": "official-report-reading",
+      "url": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
+      "publishedAt": null,
+      "title": "Seadrill Fleet Status Report",
+      "sourceId": "source-77a71a79f880dafb5f3b0173ac9da4f99c297a53616cbec1d163e308a33d4cb4",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "west-gemini-92bdf3a911",
+        "row": {
+          "startDate": "2026-02-01",
+          "endDate": "2027-01-31",
+          "dayRate": 0,
+          "client": "Sonangol",
+          "region": "Angola",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Feb-26",
+            "sourceEndText": "Jan-27",
+            "placementBasis": "월 표기를 해당 월의 시작일과 말일로 배치",
+            "termText": null,
+            "optionText": null,
+            "valueText": "Seadrill earns daily management fee, not dayrate",
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "기존 계약에 관리 수수료와 일일 요율 미수취 정보를 추가",
+        "quote": "Seadrill earns daily management fee, not dayrate, page:4",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-05b9e77068a940e2c79c",
+      "company": "Seadrill",
+      "vessel": "Sonangol Libongos",
+      "vessels": [
+        "Sonangol Libongos"
+      ],
+      "vesselId": "sonangol-libongos",
+      "classification": "official-report-reading",
+      "url": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
+      "publishedAt": null,
+      "title": "Seadrill Fleet Status Report",
+      "sourceId": "source-77a71a79f880dafb5f3b0173ac9da4f99c297a53616cbec1d163e308a33d4cb4",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "sonangol-libongos-75324c4808",
+        "row": {
+          "startDate": "2027-03-01",
+          "endDate": "2030-01-31",
+          "dayRate": 0,
+          "client": "Undisclosed",
+          "region": "Angola",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "Mar-27",
+            "sourceEndText": "Jan-30",
+            "placementBasis": "보고서 종료월 Jan-30을 2030년 1월로 반영",
+            "termText": null,
+            "optionText": null,
+            "valueText": "Seadrill earns daily management fee, not dayrate",
+            "awardType": "unreported",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "기존 연장 계약의 종료월을 Jan-30으로 갱신",
+        "quote": "Dec-20 Jan-30; Seadrill earns daily management fee, not dayrate, page:4",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-04235695f032f7fda942",
+      "company": "Seadrill",
+      "vessel": "Sonangol Libongos",
+      "vessels": [
+        "Sonangol Libongos"
+      ],
+      "vesselId": "sonangol-libongos",
+      "classification": "official-report-reading",
+      "url": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
+      "publishedAt": null,
+      "title": "Seadrill Fleet Status Report",
+      "sourceId": "source-77a71a79f880dafb5f3b0173ac9da4f99c297a53616cbec1d163e308a33d4cb4",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "readingDecision": {
+        "action": "no-change",
+        "contractId": "sonangol-libongos-3adb0be48f",
+        "row": null,
+        "reasonKo": "기존 계약은 보고서에서 취소되지 않았으며 변경 내용이 없음",
+        "quote": "Dec-20 Jan-30, page:4",
+        "locator": "page:4"
+      },
+      "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "reading-2c072c883fb2319678d4",
+      "company": "Seadrill",
+      "vessel": "Sonangol Quenguela",
+      "vessels": [
+        "Sonangol Quenguela"
+      ],
+      "vesselId": "sonangol-quenguela",
+      "classification": "official-report-reading",
+      "url": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
+      "publishedAt": null,
+      "title": "Seadrill Fleet Status Report",
+      "sourceId": "source-77a71a79f880dafb5f3b0173ac9da4f99c297a53616cbec1d163e308a33d4cb4",
+      "autoApplied": true,
+      "pendingReview": false,
+      "reviewStatus": "applied",
+      "readingDecision": {
+        "action": "upsert",
+        "contractId": "sonangol-quenguela-b899c57352",
+        "row": {
+          "startDate": "2024-05-01",
+          "endDate": "2028-07-31",
+          "dayRate": 0,
+          "client": "TotalEnergies",
+          "region": "Angola",
+          "status": "Firm",
+          "interpretation": {
+            "sourceStartText": "May-24",
+            "sourceEndText": "Jul-28",
+            "placementBasis": "보고서에 기재된 종료월 Jul-28까지 배치",
+            "termText": null,
+            "optionText": "five-well option has been exercised; approximately ten months",
+            "valueText": "Seadrill earns daily management fee, not dayrate",
+            "awardType": "option-exercised",
+            "valueUsd": null,
+            "baseDurationDays": null,
+            "includes": [],
+            "excludes": [],
+            "derivedUsdPerDay": null
+          }
+        },
+        "reasonKo": "보고서가 계약 종료를 Jul-28로 기재해 기존 기간을 갱신",
+        "quote": "Sonangol Quenguela — May-24 Jul-28, page:4",
+        "locator": "page:4"
+      },
       "newsCategory": "Fleet Status"
     }
   ]
