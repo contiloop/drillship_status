@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-03T19:31:50Z",
+  "generatedAt": "2026-11-04T06:26:14Z",
   "updatedAsOf": "2026-11-02",
   "dataHash": "08c61ddfc90e5e7bd3f2",
-  "stateFingerprint": "fd333425b55d4747cb89",
+  "stateFingerprint": "5286c772104578e6c4fb",
   "fleetFile": "fleet.08c61ddfc90e5e7bd3f2.json",
   "eventsFile": "events.d1a223c5851932ecb91e.json",
   "eventsHash": "d1a223c5851932ecb91e",
@@ -18,7 +18,7 @@
       "discovery": "official-index",
       "sha256": "4dd3a586ae73f5752ae3893a970800ec6c8300dfd110e9c067c5f525bfebaa22",
       "reportDate": "2026-10-26",
-      "lastSuccessAt": "2026-11-03T19:30:36Z",
+      "lastSuccessAt": "2026-11-04T06:24:52Z",
       "httpStatus": 200,
       "error": null,
       "health": "healthy",
@@ -27,15 +27,15 @@
     {
       "company": "Seadrill",
       "indexUrl": "https://www.seadrill.com/wp-json/wp/v2/pages/987508015",
-      "documentUrl": "https://www.seadrill.com/wp-content/uploads/2026/08/Seadrill-Fleet-Status-Report-August-2026-vF.pdf",
+      "documentUrl": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
       "discovery": "official-wordpress-api",
-      "sha256": "b774357daafdb62dcc8c371fe5f5d118fb8d7d51c91badd05cd6cae3c9a39cb1",
+      "sha256": "3c9b8d84b0138fed05297cbb805e95430ae51da78260cc85b9e66c449fd0163f",
       "reportDate": "2026-08-10",
-      "lastSuccessAt": "2026-11-03T19:30:36Z",
+      "lastSuccessAt": "2026-11-04T06:24:52Z",
       "httpStatus": 200,
       "error": null,
-      "health": "healthy",
-      "readingStatus": "completed"
+      "health": "reading-pending",
+      "readingStatus": "pending"
     },
     {
       "company": "Transocean",
@@ -44,7 +44,7 @@
       "discovery": "official-index",
       "sha256": "86a470d9af277a767d7c09226b20e6a8369b57b30e20792d5d056a41ec5aab56",
       "reportDate": "2026-11-02",
-      "lastSuccessAt": "2026-11-03T19:30:36Z",
+      "lastSuccessAt": "2026-11-04T06:24:52Z",
       "httpStatus": 200,
       "error": null,
       "health": "healthy",
@@ -57,7 +57,7 @@
       "discovery": "official-index",
       "sha256": "2fc2dad36232de827c22c054f9d5ca3fa5ac41a43811165e49bd11b13bb4dae1",
       "reportDate": "2026-11-02",
-      "lastSuccessAt": "2026-11-03T19:30:36Z",
+      "lastSuccessAt": "2026-11-04T06:24:52Z",
       "httpStatus": 200,
       "error": null,
       "health": "held",
@@ -72,18 +72,18 @@
       "reportDate": "2026-10-26",
       "documentUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
       "sha256": "4dd3a586ae73f5752ae3893a970800ec6c8300dfd110e9c067c5f525bfebaa22",
-      "lastSuccessAt": "2026-11-03T19:30:36Z",
+      "lastSuccessAt": "2026-11-04T06:24:52Z",
       "httpStatus": 200,
       "error": null
     },
     {
       "company": "Seadrill",
-      "fleetReport": "healthy",
+      "fleetReport": "reading-pending",
       "newsMonitor": "healthy",
       "reportDate": "2026-08-10",
-      "documentUrl": "https://www.seadrill.com/wp-content/uploads/2026/08/Seadrill-Fleet-Status-Report-August-2026-vF.pdf",
-      "sha256": "b774357daafdb62dcc8c371fe5f5d118fb8d7d51c91badd05cd6cae3c9a39cb1",
-      "lastSuccessAt": "2026-11-03T19:30:36Z",
+      "documentUrl": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
+      "sha256": "3c9b8d84b0138fed05297cbb805e95430ae51da78260cc85b9e66c449fd0163f",
+      "lastSuccessAt": "2026-11-04T06:24:52Z",
       "httpStatus": 200,
       "error": null
     },
@@ -94,7 +94,7 @@
       "reportDate": "2026-11-02",
       "documentUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
       "sha256": "86a470d9af277a767d7c09226b20e6a8369b57b30e20792d5d056a41ec5aab56",
-      "lastSuccessAt": "2026-11-03T19:30:36Z",
+      "lastSuccessAt": "2026-11-04T06:24:52Z",
       "httpStatus": 200,
       "error": null
     },
@@ -105,7 +105,7 @@
       "reportDate": "2026-11-02",
       "documentUrl": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
       "sha256": "2fc2dad36232de827c22c054f9d5ca3fa5ac41a43811165e49bd11b13bb4dae1",
-      "lastSuccessAt": "2026-11-03T19:30:36Z",
+      "lastSuccessAt": "2026-11-04T06:24:52Z",
       "httpStatus": 200,
       "error": null
     }
@@ -115,9 +115,24 @@
   "pendingEventCount": 3,
   "newsQueue": {
     "schemaVersion": 2,
-    "pendingCount": 0,
-    "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "jobs": []
+    "pendingCount": 2,
+    "fingerprint": "77638711ebdef68801314a1850bb2bd591ae1d4870f6474dc29951cac776e900",
+    "jobs": [
+      {
+        "jobId": "job-98549c12e7dc77bcce650862d86f5e71",
+        "kind": "fleet-report",
+        "company": "Seadrill",
+        "url": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
+        "documentSha256": "3c9b8d84b0138fed05297cbb805e95430ae51da78260cc85b9e66c449fd0163f"
+      },
+      {
+        "jobId": "job-ee55007085cbf39ac6f9d9c23be74bdb",
+        "kind": "official-news",
+        "company": "Seadrill",
+        "url": "https://ir.seadrill.com/news/news-details/2026/Seadrill-Announces-Third-Quarter-2026-Results/default.aspx",
+        "documentSha256": "b5153333274691edc0ceaddd102fc5fa5cc1c766e9d3a3ab22cb38cc63651a26"
+      }
+    ]
   },
   "readingStatus": {
     "reports": [
@@ -130,9 +145,9 @@
       },
       {
         "company": "Seadrill",
-        "url": "https://www.seadrill.com/wp-content/uploads/2026/08/Seadrill-Fleet-Status-Report-August-2026-vF.pdf",
+        "url": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
         "collectionStatus": "collected",
-        "readingStatus": "completed",
+        "readingStatus": "pending",
         "lastReadAt": null
       },
       {
@@ -150,7 +165,7 @@
         "lastReadAt": "2026-11-03T05:28:51Z"
       }
     ],
-    "lastCollectedAt": "2026-11-03T19:31:50Z",
+    "lastCollectedAt": "2026-11-04T06:26:14Z",
     "lastReadAt": "2026-11-03T05:28:59Z",
     "lastAppliedAt": "2026-11-03T05:28:51Z",
     "usageLimitedUntil": null,
@@ -163,7 +178,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-third-quarter-2026-results",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-03T19:30:36Z"
+        "lastAttemptAt": "2026-11-04T06:24:52Z"
       },
       {
         "company": "Noble",
@@ -173,7 +188,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-third-quarter-2026-results",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-03T19:30:36Z"
+        "lastAttemptAt": "2026-11-04T06:24:52Z"
       },
       {
         "company": "Noble",
@@ -183,7 +198,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-second-quarter-2026-results",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-03T19:30:36Z"
+        "lastAttemptAt": "2026-11-04T06:24:52Z"
       },
       {
         "company": "Noble",
@@ -193,7 +208,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-second-quarter-2026-results",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-03T19:30:36Z"
+        "lastAttemptAt": "2026-11-04T06:24:52Z"
       },
       {
         "company": "Noble",
@@ -203,7 +218,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-pricing-upsized-offering-800",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-03T19:30:36Z"
+        "lastAttemptAt": "2026-11-04T06:24:52Z"
       },
       {
         "company": "Noble",
@@ -213,7 +228,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-proposed-offering-500-million",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-03T19:30:36Z"
+        "lastAttemptAt": "2026-11-04T06:24:52Z"
       },
       {
         "company": "Noble",
@@ -223,7 +238,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-new-director-appointment",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-03T19:30:36Z"
+        "lastAttemptAt": "2026-11-04T06:24:52Z"
       },
       {
         "company": "Noble",
@@ -233,7 +248,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-first-quarter-2026-results",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-03T19:30:36Z"
+        "lastAttemptAt": "2026-11-04T06:24:52Z"
       },
       {
         "company": "Noble",
@@ -243,7 +258,7 @@
         "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-first-quarter-2026-results",
         "httpStatus": 403,
         "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-03T19:30:36Z"
+        "lastAttemptAt": "2026-11-04T06:24:52Z"
       }
     ],
     "readingErrors": []
