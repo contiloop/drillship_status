@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-14T06:26:30Z",
+  "generatedAt": "2026-11-14T06:30:06Z",
   "events": [
     {
       "company": "Noble",
@@ -7134,6 +7134,132 @@
         "locator": "page:4"
       },
       "newsCategory": "Fleet Status"
+    },
+    {
+      "id": "news-2060046d755d7ecade9e",
+      "company": "Noble",
+      "title": "NOBLE CORPORATION PLC ANNOUNCES THIRD QUARTER 2026 RESULTS",
+      "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-third-quarter-2026-results",
+      "publishedAt": "2026-10-26T11:45:00-05:00",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "sourceId": "source-8a5004cf6a51153674195c8fb9cab2c6b1f46ed30928ed48851de45c01c8390a",
+      "newsCategory": "실적"
+    },
+    {
+      "id": "news-aae0b5e722003b6c3e9b",
+      "company": "Noble",
+      "title": "Noble Corporation plc to announce third quarter 2026 results",
+      "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-third-quarter-2026-results",
+      "publishedAt": "2026-10-12T11:05:00-05:00",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "sourceId": "source-a52353a3a43939ea9cbc8c78edb7e07e7ed5aabd6bec79492dac5cb954e68cc3",
+      "newsCategory": "일정"
+    },
+    {
+      "id": "news-24e773a04ca00470cb42",
+      "company": "Noble",
+      "title": "NOBLE CORPORATION PLC ANNOUNCES SECOND QUARTER 2026 RESULTS",
+      "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-second-quarter-2026-results",
+      "publishedAt": "2026-07-27T11:05:00-05:00",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "sourceId": "source-a57705fa160913b537a575f3e64dfdae3d370f1d06f844a90fb33d933fcc9cfb",
+      "newsCategory": "실적"
+    },
+    {
+      "id": "news-358ce3f5577b174d3c0c",
+      "company": "Noble",
+      "title": "Noble Corporation plc to announce second quarter 2026 results",
+      "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-second-quarter-2026-results",
+      "publishedAt": "2026-07-14T11:05:00-05:00",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "sourceId": "source-616c090a5aa74950f0ac6ffbbb48f73a86fc0e29c6ee5954d16865f9eab09d2c",
+      "newsCategory": "일정"
+    },
+    {
+      "id": "news-64b4a89bde49a06114a5",
+      "company": "Noble",
+      "title": "Noble Corporation plc Announces Pricing of Upsized Offering Of $800 Million Principal Amount Of 6.250% Senior Notes Due 2034",
+      "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-pricing-upsized-offering-800",
+      "publishedAt": "2026-06-01T03:00:00-05:00",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "sourceId": "source-d8a447a57ae5b2530b87421bf6f9505635724928fef93bcccc09505f921169b8",
+      "newsCategory": "자금·주주"
+    },
+    {
+      "id": "news-0804a08afdd61401ee1b",
+      "company": "Noble",
+      "title": "Noble Corporation plc Announces Proposed Offering of $500 Million Of Senior Notes Due 2034",
+      "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-proposed-offering-500-million",
+      "publishedAt": "2026-06-01T03:00:00-05:00",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "sourceId": "source-ce73acc87e81491cab286ba8093cb0feeb76821dcd4d1763f33c2da1f9c32c02",
+      "newsCategory": "자금·주주"
+    },
+    {
+      "id": "news-33480903eae4ac423a08",
+      "company": "Noble",
+      "title": "Noble Corporation plc Announces New Director Appointment",
+      "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-new-director-appointment",
+      "publishedAt": "2026-05-21T03:00:00-05:00",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "sourceId": "source-51ae67ab29ee353c1a14f49874efebdc516f989520a050a9a69044f5955b367a",
+      "newsCategory": "경영·인사"
+    },
+    {
+      "id": "news-676e65d08272e972a8d1",
+      "company": "Noble",
+      "title": "Noble Corporation plc Announces First Quarter 2026 Results",
+      "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-first-quarter-2026-results",
+      "publishedAt": "2026-04-26T03:00:00-05:00",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "sourceId": "source-0342a8fd3078318d9fe8bd3d125ae4d74ac5a3f9fd0561abb4f5d2e77740a484",
+      "newsCategory": "실적"
+    },
+    {
+      "id": "news-16dd45db52ea315f3cad",
+      "company": "Noble",
+      "title": "Noble Corporation plc to announce first quarter 2026 results",
+      "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-first-quarter-2026-results",
+      "publishedAt": "2026-04-14T03:00:00-05:00",
+      "vessels": [],
+      "classification": "official-news-signal",
+      "autoApplied": false,
+      "pendingReview": false,
+      "reviewStatus": "acknowledged",
+      "sourceId": "source-74389d54b2abb075bfec2d71e508fbf29493e9d6364c77ff1f2169cf585133e2",
+      "newsCategory": "일정"
     }
   ]
 }
