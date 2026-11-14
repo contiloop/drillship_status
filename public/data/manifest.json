@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-13T19:44:07Z",
+  "generatedAt": "2026-11-14T06:26:30Z",
   "updatedAsOf": "2026-11-03",
   "dataHash": "4344e4c62aa8e335f66a",
-  "stateFingerprint": "86d2baf75cc45325738c",
+  "stateFingerprint": "60c236aa94e8ce7acac8",
   "fleetFile": "fleet.4344e4c62aa8e335f66a.json",
   "eventsFile": "events.26abf3230744d9e4ac5b.json",
   "eventsHash": "26abf3230744d9e4ac5b",
@@ -18,7 +18,7 @@
       "discovery": "official-index",
       "sha256": "4dd3a586ae73f5752ae3893a970800ec6c8300dfd110e9c067c5f525bfebaa22",
       "reportDate": "2026-10-26",
-      "lastSuccessAt": "2026-11-13T19:43:16Z",
+      "lastSuccessAt": "2026-11-14T06:25:29Z",
       "httpStatus": 200,
       "error": null,
       "health": "healthy",
@@ -31,7 +31,7 @@
       "discovery": "official-wordpress-api",
       "sha256": "3c9b8d84b0138fed05297cbb805e95430ae51da78260cc85b9e66c449fd0163f",
       "reportDate": "2026-11-03",
-      "lastSuccessAt": "2026-11-13T19:43:16Z",
+      "lastSuccessAt": "2026-11-14T06:25:29Z",
       "httpStatus": 200,
       "error": null,
       "health": "healthy",
@@ -44,7 +44,7 @@
       "discovery": "official-index",
       "sha256": "86a470d9af277a767d7c09226b20e6a8369b57b30e20792d5d056a41ec5aab56",
       "reportDate": "2026-11-02",
-      "lastSuccessAt": "2026-11-13T19:43:16Z",
+      "lastSuccessAt": "2026-11-14T06:25:29Z",
       "httpStatus": 200,
       "error": null,
       "health": "healthy",
@@ -57,7 +57,7 @@
       "discovery": "official-index",
       "sha256": "2fc2dad36232de827c22c054f9d5ca3fa5ac41a43811165e49bd11b13bb4dae1",
       "reportDate": "2026-11-02",
-      "lastSuccessAt": "2026-11-13T19:43:16Z",
+      "lastSuccessAt": "2026-11-14T06:25:29Z",
       "httpStatus": 200,
       "error": null,
       "health": "held",
@@ -72,7 +72,7 @@
       "reportDate": "2026-10-26",
       "documentUrl": "https://noblecorp.com/download/noble-corporation-fleet-status-report-4/?wpdmdl=4015",
       "sha256": "4dd3a586ae73f5752ae3893a970800ec6c8300dfd110e9c067c5f525bfebaa22",
-      "lastSuccessAt": "2026-11-13T19:43:16Z",
+      "lastSuccessAt": "2026-11-14T06:25:29Z",
       "httpStatus": 200,
       "error": null
     },
@@ -83,7 +83,7 @@
       "reportDate": "2026-11-03",
       "documentUrl": "https://www.seadrill.com/wp-content/uploads/2026/11/Seadrill-Fleet-Status-Report-November-2026-vF.pdf",
       "sha256": "3c9b8d84b0138fed05297cbb805e95430ae51da78260cc85b9e66c449fd0163f",
-      "lastSuccessAt": "2026-11-13T19:43:16Z",
+      "lastSuccessAt": "2026-11-14T06:25:29Z",
       "httpStatus": 200,
       "error": null
     },
@@ -94,7 +94,7 @@
       "reportDate": "2026-11-02",
       "documentUrl": "https://www.deepwater.com/documents/FleetStatusReport/2026/November%202026%20Fleet%20Status%20Report.pdf",
       "sha256": "86a470d9af277a767d7c09226b20e6a8369b57b30e20792d5d056a41ec5aab56",
-      "lastSuccessAt": "2026-11-13T19:43:16Z",
+      "lastSuccessAt": "2026-11-14T06:25:29Z",
       "httpStatus": 200,
       "error": null
     },
@@ -105,19 +105,83 @@
       "reportDate": "2026-11-02",
       "documentUrl": "https://s23.q4cdn.com/956522167/files/content_files/11022026-Fleet-Status-Report_FINAL.pdf",
       "sha256": "2fc2dad36232de827c22c054f9d5ca3fa5ac41a43811165e49bd11b13bb4dae1",
-      "lastSuccessAt": "2026-11-13T19:43:16Z",
+      "lastSuccessAt": "2026-11-14T06:25:29Z",
       "httpStatus": 200,
       "error": null
     }
   ],
-  "warningsCount": 9,
+  "warningsCount": 0,
   "eventCount": 209,
   "pendingEventCount": 3,
   "newsQueue": {
     "schemaVersion": 2,
-    "pendingCount": 0,
-    "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "jobs": []
+    "pendingCount": 9,
+    "fingerprint": "d50f6eb8b0ac7fe743396c534227d02bba80cde5e7eea77649d33b21193561ee",
+    "jobs": [
+      {
+        "jobId": "job-073ef439cddd04ae6027f9610e002cbe",
+        "kind": "official-news",
+        "company": "Noble",
+        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-new-director-appointment",
+        "documentSha256": "b68be36d20c996849769e28d5a1bb0c876b5cab73c5992ba151a1e76b7d6f7c8"
+      },
+      {
+        "jobId": "job-10bf596b790b8581e13a4c0dd8182dab",
+        "kind": "official-news",
+        "company": "Noble",
+        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-first-quarter-2026-results",
+        "documentSha256": "570870ea0b8d3e911ce9ece4c7889a72bbe7b22f306a4b77083cf4558372d0e4"
+      },
+      {
+        "jobId": "job-430c630c6a82a6f1468e0cb29e42b86a",
+        "kind": "official-news",
+        "company": "Noble",
+        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-second-quarter-2026-results",
+        "documentSha256": "f4a780efcf549a8e4d51ab48fd73b8fd3c23855b04a98bd79c931f2b3078cffa"
+      },
+      {
+        "jobId": "job-4b0cb043e41e1a623205d3b1a27f72e8",
+        "kind": "official-news",
+        "company": "Noble",
+        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-third-quarter-2026-results",
+        "documentSha256": "6c08b8b4ad2be46079a3575b09589357e9f5dd6185ebfcc9be5467489674f138"
+      },
+      {
+        "jobId": "job-55c146d0ff9f2f88513cafa09488a2fd",
+        "kind": "official-news",
+        "company": "Noble",
+        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-proposed-offering-500-million",
+        "documentSha256": "053975e6a1a9d45ee54c4a47720d87e30394cc80c85d5f5b290c6a15021a7df9"
+      },
+      {
+        "jobId": "job-6f7bbbdb6ca2e68ef5ec44112192e6e1",
+        "kind": "official-news",
+        "company": "Noble",
+        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-third-quarter-2026-results",
+        "documentSha256": "8dbae81a2737bbeb430f412671805127bf27032067544fc4bbba367a21bf2110"
+      },
+      {
+        "jobId": "job-a58164b0207aad1067e862c88a90cf8f",
+        "kind": "official-news",
+        "company": "Noble",
+        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-first-quarter-2026-results",
+        "documentSha256": "242b93dbc892c340fe73c8307c4d2b4b076bc42fcd186eb727da1b05930d70f9"
+      },
+      {
+        "jobId": "job-a8a930076c446cd1df6cb717323cec25",
+        "kind": "official-news",
+        "company": "Noble",
+        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-pricing-upsized-offering-800",
+        "documentSha256": "16d6a8ac7cbc463f995d8c82fbae16122f46b57bac6719002ef10fea8e75d897"
+      },
+      {
+        "jobId": "job-ea59c91e34e59e416f2a38b4dedd093e",
+        "kind": "official-news",
+        "company": "Noble",
+        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-second-quarter-2026-results",
+        "documentSha256": "a2fc32271ca87c180fef90fe2ee9e757ffd5654ad57531fa937e62387cf04a2f"
+      }
+    ]
   },
   "readingStatus": {
     "reports": [
@@ -150,102 +214,11 @@
         "lastReadAt": "2026-11-03T05:28:51Z"
       }
     ],
-    "lastCollectedAt": "2026-11-13T19:44:07Z",
+    "lastCollectedAt": "2026-11-14T06:26:30Z",
     "lastReadAt": "2026-11-04T06:36:44Z",
     "lastAppliedAt": "2026-11-04T06:36:44Z",
     "usageLimitedUntil": null,
-    "collectionErrors": [
-      {
-        "company": "Noble",
-        "kind": "official-news",
-        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-third-quarter-2026-results",
-        "phase": null,
-        "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-third-quarter-2026-results",
-        "httpStatus": 403,
-        "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-13T19:43:16Z"
-      },
-      {
-        "company": "Noble",
-        "kind": "official-news",
-        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-third-quarter-2026-results",
-        "phase": null,
-        "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-third-quarter-2026-results",
-        "httpStatus": 403,
-        "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-13T19:43:16Z"
-      },
-      {
-        "company": "Noble",
-        "kind": "official-news",
-        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-second-quarter-2026-results",
-        "phase": null,
-        "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-second-quarter-2026-results",
-        "httpStatus": 403,
-        "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-13T19:43:16Z"
-      },
-      {
-        "company": "Noble",
-        "kind": "official-news",
-        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-second-quarter-2026-results",
-        "phase": null,
-        "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-second-quarter-2026-results",
-        "httpStatus": 403,
-        "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-13T19:43:16Z"
-      },
-      {
-        "company": "Noble",
-        "kind": "official-news",
-        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-pricing-upsized-offering-800",
-        "phase": null,
-        "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-pricing-upsized-offering-800",
-        "httpStatus": 403,
-        "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-13T19:43:16Z"
-      },
-      {
-        "company": "Noble",
-        "kind": "official-news",
-        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-proposed-offering-500-million",
-        "phase": null,
-        "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-proposed-offering-500-million",
-        "httpStatus": 403,
-        "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-13T19:43:16Z"
-      },
-      {
-        "company": "Noble",
-        "kind": "official-news",
-        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-new-director-appointment",
-        "phase": null,
-        "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-new-director-appointment",
-        "httpStatus": 403,
-        "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-13T19:43:16Z"
-      },
-      {
-        "company": "Noble",
-        "kind": "official-news",
-        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-first-quarter-2026-results",
-        "phase": null,
-        "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announces-first-quarter-2026-results",
-        "httpStatus": 403,
-        "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-13T19:43:16Z"
-      },
-      {
-        "company": "Noble",
-        "kind": "official-news",
-        "url": "https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-first-quarter-2026-results",
-        "phase": null,
-        "error": "HTTPError: 403 Client Error: Forbidden for url: https://noble.gcs-web.com/news-releases/news-release-details/noble-corporation-plc-announce-first-quarter-2026-results",
-        "httpStatus": 403,
-        "lastSuccessAt": null,
-        "lastAttemptAt": "2026-11-13T19:43:16Z"
-      }
-    ],
+    "collectionErrors": [],
     "readingErrors": []
   }
 }
